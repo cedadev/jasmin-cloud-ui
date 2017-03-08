@@ -1,0 +1,20 @@
+/**
+ * This file contains CSS tweaks required for the cloud portal.
+ */
+
+/*
+ * Make control-label and control-container behave like col-sm-3 and col-sm-9
+ * when inside a form-horizontal
+ */
+.form-horizontal .control-label, .form-horizontal .control-container {
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+@media (min-width: 768px) {
+    .form-horizontal .control-label { width: 25%; float: left; }
+    .form-horizontal .control-container { margin-left: 25%; width: 75%; float: left; }
+    /* When the control-container follows a control-label, remove the margin */
+    .form-horizontal .control-label + .control-container { margin-left: 0; }
+}

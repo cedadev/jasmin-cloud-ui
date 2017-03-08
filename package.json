@@ -1,0 +1,28 @@
+{
+  "name": "jasmin-cloud-ui",
+  "version": "1.0.0",
+  "description": "Web portal for administration of tenancies in the JASMIN Community Cloud",
+  "scripts": {
+    "start": "webpack-dev-server --port 8081"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cedadev/jasmin-cloud.git"
+  },
+  "keywords": [],
+  "author": "Matt Pryor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cedadev/jasmin-cloud/issues"
+  },
+  "homepage": "https://github.com/cedadev/jasmin-cloud",
+  "dependencies": {
+    "coffee-loader": "^0.7.3",
+    "coffee-script": "^1.12.4",
+    "mithril": "^1.0.1",
+    "webpack": "^2.2.1"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^2.4.1"
+  }
+}

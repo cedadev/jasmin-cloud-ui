@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="some keywords">
+        <meta name="description" content="JASMIN Theme example page">
+
+        <!-- Replace with page title -->
+        <title>JASMIN Cloud Portal</title>
+        <link rel="shortcut icon" href="vendor/jasmin_theme/img/favicon.ico">
+
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="vendor/jasmin_theme/css/bootstrap-theme.css" />
+        <link rel="stylesheet" href="vendor/jasmin_theme/css/jasmin.css" />
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="static/css/tweaks.css" />
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="vendor/jasmin_theme/js/cookielaw.js"></script>
+        <!--[if lt IE 9]>
+            <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+        <div class="container-fluid">
+            <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed"
+                                data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false">
+                            <span class="sr-only">Toggle Navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand">JASMIN Cloud Portal</a>
+                    </div>
+
+                    <div id="navigation" class="navbar-collapse collapse">
+                        <!-- Managed by Mithril component -->
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container">
+                <div class="alert alert-info text-center" id="cookielaw_banner">
+                    This website and other JASMIN sites use cookies.
+                    By continuing to use this website you are agreeing to our use of cookies.
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default"
+                                onclick="javascript:Cookielaw.createCookie();$('#cookielaw_banner').slideUp();">OK</button>
+                        <button type="button" class="btn btn-default"
+                                onclick="javascript:window.open('https://accounts.jasmin.ac.uk/account/privacy/')">Find out more</button>
+                    </div>
+                </div>
+                <script>
+                    if( Cookielaw.hasCookie() ) $('#cookielaw_banner').hide();
+                </script>
+            </div>
+
+            <div id="content-main" class="container">
+                <!--
+                    PAGE HEADER
+                -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="page-header"><!-- Replace with page title -->Content Heavy Page</h1>
+                        <!--
+                            EXAMPLE BREADCRUMBS
+                            THESE CAN BE OMITTED ENTIRELY
+                        -->
+                        <ol class="breadcrumb">
+                            <li><a href="#">Example Level 1</a></li>
+                            <li><a href="#">Example Level 2</a></li>
+                            <li class="active">Example Level 3</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--
+                            MAIN PAGE CONTENT GOES HERE
+                        -->
+                        <div class="col-md-12">
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing
+                            elit. Aenean commodo ligula eget dolor. Aenean massa
+                            <strong>strong</strong>. Cum sociis natoque penatibus
+                            et magnis dis parturient montes, nascetur ridiculus
+                            mus. Donec quam felis, ultricies nec, pellentesque
+                            eu, pretium quis, sem. Nulla consequat massa quis
+                            enim. Donec pede justo, fringilla vel, aliquet nec,
+                            vulputate eget, arcu. In enim justo, rhoncus ut,
+                            imperdiet a, venenatis vitae, justo. Nullam dictum
+                            felis eu pede <a href="#">link</a>
+                            mollis pretium. Integer tincidunt. Cras dapibus.
+                            Vivamus elementum semper nisi. Aenean vulputate
+                            eleifend tellus. Aenean leo ligula, porttitor eu,
+                            consequat vitae, eleifend ac, enim. Aliquam lorem ante,
+                            dapibus in, viverra quis, feugiat a, tellus. Phasellus
+                            viverra nulla ut metus varius laoreet. Quisque rutrum.
+                            Aenean imperdiet. Etiam ultricies nisi vel augue.
+                            Curabitur ullamcorper ultricies nisi.</p>
+
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing
+                            elit. Aenean commodo ligula eget dolor. Aenean massa.
+                            Cum sociis natoque penatibus et magnis dis parturient
+                            montes, nascetur ridiculus mus. Donec quam felis,
+                            ultricies nec, pellentesque eu, pretium quis, sem.</p>
+
+                            <h2>Aenean commodo ligula eget dolor aenean massa</h2>
+
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing
+                            elit. Aenean commodo ligula eget dolor. Aenean massa.
+                            Cum sociis natoque penatibus et magnis dis parturient
+                            montes, nascetur ridiculus mus. Donec quam felis,
+                            ultricies nec, pellentesque eu, pretium quis, sem.</p>
+
+                            <ul>
+                                <li>Lorem ipsum dolor sit amet consectetuer.</li>
+                                <li>Aenean commodo ligula eget dolor.</li>
+                                <li>Aenean massa cum sociis natoque penatibus.</li>
+                            </ul>
+
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing
+                            elit. Aenean commodo ligula eget dolor. Aenean massa.
+                            Cum sociis natoque penatibus et magnis dis parturient
+                            montes, nascetur ridiculus mus. Donec quam felis,
+                            ultricies nec, pellentesque eu, pretium quis, sem.</p>
+
+                            <ol>
+                                <li>Lorem ipsum dolor sit amet consectetuer.</li>
+                                <li>Aenean commodo ligula eget dolor.</li>
+                                <li>Aenean massa cum sociis natoque penatibus.</li>
+                            </ol>
+
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing
+                            elit. Aenean commodo ligula eget dolor. Aenean massa.
+                            Cum sociis natoque penatibus et magnis dis parturient
+                            montes, nascetur ridiculus mus. Donec quam felis,
+                            ultricies nec, pellentesque eu, pretium quis, sem.</p>
+
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Entry Header 1</th>
+                                        <th>Entry Header 2</th>
+                                        <th>Entry Header 3</th>
+                                        <th>Entry Header 4</th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td>Entry First Line 1</td>
+                                    <td>Entry First Line 2</td>
+                                    <td>Entry First Line 3</td>
+                                    <td>Entry First Line 4</td>
+                                </tr>
+                                <tr>
+                                    <td>Entry Line 1</td>
+                                    <td>Entry Line 2</td>
+                                    <td>Entry Line 3</td>
+                                    <td>Entry Line 4</td>
+                                </tr>
+                                <tr>
+                                    <td>Entry Line 1</td>
+                                    <td>Entry Line 2</td>
+                                    <td>Entry Line 3</td>
+                                    <td>Entry Line 4</td>
+                                </tr>
+                                <tr>
+                                    <td>Entry Line 1</td>
+                                    <td>Entry Line 2</td>
+                                    <td>Entry Line 3</td>
+                                    <td>Entry Line 4</td>
+                                </tr>
+                                <tr>
+                                    <td>Entry Line 1</td>
+                                    <td>Entry Line 2</td>
+                                    <td>Entry Line 3</td>
+                                    <td>Entry Line 4</td>
+                                </tr>
+                                <tr>
+                                    <td>Entry Last Line 1</td>
+                                    <td>Entry Last Line 2</td>
+                                    <td>Entry Last Line 3</td>
+                                    <td>Entry Last Line 4</td>
+                                </tr>
+                            </table>
+
+                            <p>Lorem ipsum dolor sit amet, consectetuer adipiscing
+                            elit. Aenean commodo ligula eget dolor. Aenean massa.
+                            Cum sociis natoque penatibus et magnis dis parturient
+                            montes, nascetur ridiculus mus. Donec quam felis,
+                            ultricies nec, pellentesque eu, pretium quis, sem.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div id="nerc-logo" class="col-sm-6">
+                        <a href="http://www.nerc.ac.uk" title="NERC">
+                            <img src="vendor/jasmin_theme/img/nerc-long-logo-261.png" title="NERC logo"
+                                 height="53" width="261" alt="NERC logo" />
+                        </a>
+                    </div>
+                    <div id="stfc-logo" class="col-sm-6">
+                        <a href="http://www.stfc.ac.uk" title="STFC">
+                            <img src="vendor/jasmin_theme/img/STFCMediumColourTrans.png" title="STFC logo"
+                                 height="57" width="261" alt="STFC logo" />
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="site-info">
+                            Copyright &copy; 2017 <a href="http://www.stfc.ac.uk">STFC</a> |
+                            All Rights Reserved |
+                            <a href="https://accounts.jasmin.ac.uk/account/accessibility/" target="_blank">Accessibility</a> |
+                            <a href="https://accounts.jasmin.ac.uk/account/privacy/" target="_blank">Privacy</a> |
+                            <a href="https://accounts.jasmin.ac.uk/account/support/" target="_blank">Support</a> |
+                            <a href="https://accounts.jasmin.ac.uk/account/conditions/" target="_blank">Terms and Conditions</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>!function(e,o,n){window.HSCW=o,window.HS=n,n.beacon=n.beacon||{};var t=n.beacon;t.userConfig={},t.readyQueue=[],t.config=function(e){this.userConfig=e},t.ready=function(e){this.readyQueue.push(e)},o.config={docs:{enabled:!0,baseUrl:"//jasmin-help.helpscoutdocs.com/"},contact:{enabled:!0,formId:"71e2f368-bd39-11e6-91aa-0a5fecc78a4d"}};var r=e.getElementsByTagName("script")[0],c=e.createElement("script");c.type="text/javascript",c.async=!0,c.src="https://djtflbt20bdde.cloudfront.net/",r.parentNode.insertBefore(c,r)}(document,window.HSCW||{},window.HS||{});</script>
+        <script>
+            HS.beacon.config({
+                color: '#ff6600',
+                topArticles: true,
+                icon: 'question',
+                translation: {
+                    searchLabel: 'Search JASMIN documentation',
+                    searchErrorLabel: 'There was a problem searching the Help pages. Visit: help.ceda.ac.uk or email support@ceda.ac.uk'
+                },
+                topics: [
+                    { val: 'jasmin-help', label: 'Help with JASMIN/CEMS'},
+                    { val: 'account-problem', label: 'Help with my account'},
+                    { val: 'bug-flag', label: 'Found a bug?'},
+                    { val: 'content-flag', label: 'Content on this page looks wrong'}
+                ],
+                attachment: true,
+                instructions:'Drop CEDA Support a message below and we\'ll try to help.'
+            });
+            HS.beacon.ready(function() {
+                HS.beacon.suggest([]);
+                // If the user doesn't have the cookie, pop ourselves up, but set the cookie
+                if( document.cookie.match(/^(.*; ?)?hs_beacon_shown=[^;]+/) === null ) {
+                    // Open the Beacon as soon as it's ready
+                    this.open();
+                    setTimeout(this.close, 3000);
+                    // Set cookie that expires at end of session
+                    document.cookie = "hs_beacon_shown=1; expires=; path=/; ";
+                }
+            });
+        </script>
+        <script src="dist/bundle.js"></script>
+    </body>
+</html>
