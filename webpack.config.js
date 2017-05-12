@@ -1,25 +1,28 @@
-var path = require('path');
+const path = require('path');
 
 module.exports = {
-    entry: './main.coffee',
+    entry: "./src/main.js",
+    output: {
+        filename: "bundle.js",
+        path: path.resolve(__dirname, "dist")
+    },
+
+    devtool: 'source-map',
+
     module: {
-		loaders: [
-			{ test: /\.coffee$/, loader: "coffee-loader" }
-		]
-	},
-	resolve: {
-		extensions: [".coffee", ".js"]
-	},
-	output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: '/dist/'
-    },
-    devServer: {
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-            "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
-        }
-    },
-}
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: "babel-loader",
+                options: {
+                    "presets": ["env", "react"],
+                    "plugins": [
+                        "transform-object-rest-spread",
+                        "transform-class-properties"
+                    ]
+                }
+            }
+        ]
+    }
+};

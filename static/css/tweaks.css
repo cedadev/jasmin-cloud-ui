@@ -18,3 +18,105 @@
     /* When the control-container follows a control-label, remove the margin */
     .form-horizontal .control-label + .control-container { margin-left: 0; }
 }
+
+/* CSS for banners - they are better than alerts as they are flat */
+.banner {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+.banner-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.banner-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+.banner-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.modal-vertical-center.modal.in .modal-dialog {
+    margin-top: 0;
+    margin-bottom: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.loading-notice {
+    margin: 100px auto;
+    text-align: center;
+}
+
+.table > tbody > tr > td {
+    -webkit-transition: background-color 500ms linear;
+    -moz-transition: background-color 500ms linear;
+    -o-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+
+    vertical-align: middle;
+}
+
+.table .progress, .table .control-label {
+    margin-bottom: 0;
+}
+.table .progress-bar {
+    padding: 0 10px;
+}
+
+@media (max-width: 768px) {
+    .table-responsive {
+        margin-top: 10px;
+    }
+}
+
+caption {
+    caption-side: bottom;
+    padding: 8px 15px;
+    border-top: 2px solid #ddd;
+}
+
+.machine-actions {
+    text-align: right;
+    min-width: 180px;
+}
+.machine-working {
+    display: inline-block;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    line-height: 22px;
+    margin-right: 3px;
+}
+.machine-status {
+    font-weight: bold;
+}
+.machine-status .tooltip-trigger {
+    color: inherit;
+    cursor: help;
+}
+.ip-list {
+    list-style-type: none;
+    margin: 0;
+    padding:0;
+}
+
+.volumes-table, .volume-add-form .table {
+    margin-bottom: 0;
+}
+.volumes-table td:nth-child(1), .volume-add-form .control-label {
+    white-space: nowrap;
+}
+.volume-add-form td:nth-child(2) {
+    width: 99%;
+}
+.volume-add-form .input-group {
+    width: 100%;
+}
