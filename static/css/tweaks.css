@@ -75,10 +75,8 @@
     padding: 0 10px;
 }
 
-@media (max-width: 768px) {
-    .table-responsive {
-        margin-top: 10px;
-    }
+.table-responsive {
+    margin-top: 10px;
 }
 
 caption {

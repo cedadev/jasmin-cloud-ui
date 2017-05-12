@@ -553,11 +553,40 @@ function repeatFetchMachineUntilTaskCompleteEpic(action$) {
         .map(action => fetchMachine(action.request.tenancyId, action.payload.id));
 }
 
+function fetchQuotasAfterActionEpic(action$) {
+    // When an action takes place that might effect the quotas, refresh them
+    return action$
+        .filter(action => {
+            switch(action.type) {
+                case Actions.CREATE_MACHINE_SUCCEEDED:
+                case Actions.DELETE_MACHINE_SUCCEEDED:
+                case Actions.ATTACH_VOLUME_SUCCEEDED:
+                case Actions.DETACH_VOLUME_SUCCEEDED:
+                    return true;
+                default:
+                    return false;
+            }
+        })
+        .map(action => fetchQuotas(action.request.tenancyId));
+}
+
+function repeatFetchQuotasEpic(action$) {
+    // Whenever the quotas for a tenancy are successfully fetched, wait for
+    // 2 mins and fetch them again
+    return action$.ofType(Actions.FETCH_QUOTAS_SUCCEEDED)
+        .switchMap(action =>
+            Observable.of(fetchQuotas(action.request.tenancyId))
+                .delay(2 * 60 * 1000)
+        );
+}
+
 export const epic = combineEpics(
     loadTenanciesOnSessionStartEpic,
     resetTenanciesOnSessionTerminatedEpic,
     loadTenancyDataEpic,
     repeatFetchMachinesEpic,
     fetchMachineAfterActionEpic,
-    repeatFetchMachineUntilTaskCompleteEpic
+    repeatFetchMachineUntilTaskCompleteEpic,
+    fetchQuotasAfterActionEpic,
+    repeatFetchQuotasEpic
 );
