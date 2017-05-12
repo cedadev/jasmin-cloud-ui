@@ -13,12 +13,13 @@ import { Loading, Form, Field, ControlContainer } from '../../utils';
 
 import { MachinesTable } from './machines-table';
 import { CreateMachineModal } from './create-machine-modal';
+import { QuotasModal } from './quotas-modal';
 
 
 export class TenancyPage extends React.Component {
     constructor(props) {
         super(props)
-        this.state = { createMachineModalVisible: false };
+        this.state = { createMachineModalVisible: false, quotasModalVisible: false };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -41,6 +42,9 @@ export class TenancyPage extends React.Component {
     openCreateMachineModal = () => this.setState({ createMachineModalVisible: true })
     closeCreateMachineModal = () => this.setState({ createMachineModalVisible: false })
 
+    openQuotasModal = () => this.setState({ quotasModalVisible: true })
+    closeQuotasModal = () => this.setState({ quotasModalVisible: false })
+
     createMachine = (name, image, size) => {
         this.props.createMachine(this.props.tenancyId, name, image, size);
     }
@@ -61,13 +65,22 @@ export class TenancyPage extends React.Component {
                         <Col md={12}>
                             <ButtonGroup className="pull-right">
                                 <Button
-                                    bsStyle="success"
-                                    onClick={this.openCreateMachineModal}>
+                                  bsStyle="success"
+                                  onClick={this.openCreateMachineModal}>
                                     <i className="fa fa-fw fa-desktop"></i>
                                     {' '}
                                     New machine
                                 </Button>
-                                <Button bsStyle="info" onClick={this.refreshMachines}>
+                                <Button
+                                  bsStyle="warning"
+                                  onClick={this.openQuotasModal}>
+                                    <i className="fa fa-fw fa-pie-chart"></i>
+                                    {' '}
+                                    Quotas
+                                </Button>
+                                <Button
+                                  bsStyle="info"
+                                  onClick={this.refreshMachines}>
                                     <i className="fa fa-fw fa-refresh"></i>
                                     {' '}
                                     Refresh
@@ -88,12 +101,16 @@ export class TenancyPage extends React.Component {
                         </Col>
                     </Row>
                     <CreateMachineModal
-                        show={this.state.createMachineModalVisible}
-                        close={this.closeCreateMachineModal}
-                        creating={!!tenancy.machines.creating}
-                        images={tenancy.images}
-                        sizes={tenancy.sizes}
-                        createMachine={this.createMachine} />
+                      show={this.state.createMachineModalVisible}
+                      close={this.closeCreateMachineModal}
+                      creating={!!tenancy.machines.creating}
+                      images={tenancy.images}
+                      sizes={tenancy.sizes}
+                      createMachine={this.createMachine} />
+                    <QuotasModal
+                      show={this.state.quotasModalVisible}
+                      close={this.closeQuotasModal}
+                      quotas={tenancy.quotas} />
                 </div>
             );
         }

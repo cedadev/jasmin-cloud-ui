@@ -186,7 +186,7 @@ export class MachineVolumesModal extends React.Component {
                       bsStyle="primary"
                       onClick={close}
                       disabled={attachingVolume || !!detachingVolume}>
-                        Done
+                        Close
                     </Button>
                 </Modal.Footer>
             </Modal>

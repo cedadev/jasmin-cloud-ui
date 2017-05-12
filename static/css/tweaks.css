@@ -42,6 +42,10 @@
     border-color: #ebccd1;
 }
 
+.btn:focus {
+    outline: none;
+}
+
 .modal-vertical-center.modal.in .modal-dialog {
     margin-top: 0;
     margin-bottom: 0;
@@ -119,4 +123,20 @@ caption {
 }
 .volume-add-form .input-group {
     width: 100%;
+}
+
+.quotas-modal .loading-notice {
+    margin: 40px auto;
+}
+.quotas {
+    margin-bottom: 0;
+}
+.quotas dd {
+    margin-bottom: 5px;
+}
+.quotas dd:last-child {
+    margin-bottom: 0;
+}
+.quotas .progress {
+    margin-bottom: 0;
 }

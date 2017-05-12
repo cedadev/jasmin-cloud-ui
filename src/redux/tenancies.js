@@ -27,9 +27,9 @@ const Actions = {
     FETCH_TENANCY_LIST_SUCCEEDED: 'TENANCIES/FETCH_TENANCY_LIST_SUCCEEDED',
     FETCH_TENANCY_LIST_FAILED: 'TENANCIES/FETCH_TENANCY_LIST_FAILED',
 
-    FETCH_MACHINES: 'TENANCIES/FETCH_MACHINES',
-    FETCH_MACHINES_SUCCEEDED: 'TENANCIES/FETCH_MACHINES_SUCCEEDED',
-    FETCH_MACHINES_FAILED: 'TENANCIES/FETCH_MACHINES_FAILED',
+    FETCH_QUOTAS: 'TENANCIES/FETCH_QUOTAS',
+    FETCH_QUOTAS_SUCCEEDED: 'TENANCIES/FETCH_QUOTAS_SUCCEEDED',
+    FETCH_QUOTAS_FAILED: 'TENANCIES/FETCH_QUOTAS_FAILED',
 
     FETCH_IMAGES: 'TENANCIES/FETCH_IMAGES',
     FETCH_IMAGES_SUCCEEDED: 'TENANCIES/FETCH_IMAGES_SUCCEEDED',
@@ -38,6 +38,10 @@ const Actions = {
     FETCH_SIZES: 'TENANCIES/FETCH_SIZES',
     FETCH_SIZES_SUCCEEDED: 'TENANCIES/FETCH_SIZES_SUCCEEDED',
     FETCH_SIZES_FAILED: 'TENANCIES/FETCH_SIZES_FAILED',
+
+    FETCH_MACHINES: 'TENANCIES/FETCH_MACHINES',
+    FETCH_MACHINES_SUCCEEDED: 'TENANCIES/FETCH_MACHINES_SUCCEEDED',
+    FETCH_MACHINES_FAILED: 'TENANCIES/FETCH_MACHINES_FAILED',
 
     FETCH_MACHINE: 'TENANCIES/FETCH_MACHINE',
     FETCH_MACHINE_SUCCEEDED: 'TENANCIES/FETCH_MACHINE_SUCCEEDED',
@@ -86,14 +90,14 @@ export function fetchTenancyList() {
     };
 }
 
-export function fetchMachines(tenancyId) {
+export function fetchQuotas(tenancyId) {
     return {
-        type: Actions.FETCH_MACHINES,
+        type: Actions.FETCH_QUOTAS,
         tenancyId: tenancyId,
         apiRequest: true,
-        successAction: Actions.FETCH_MACHINES_SUCCEEDED,
-        failureAction: Actions.FETCH_MACHINES_FAILED,
-        options: { url: `/api/tenancies/${tenancyId}/machines/` }
+        successAction: Actions.FETCH_QUOTAS_SUCCEEDED,
+        failureAction: Actions.FETCH_QUOTAS_FAILED,
+        options: { url: `/api/tenancies/${tenancyId}/quotas/` }
     };
 }
 
@@ -116,6 +120,17 @@ export function fetchSizes(tenancyId) {
         successAction: Actions.FETCH_SIZES_SUCCEEDED,
         failureAction: Actions.FETCH_SIZES_FAILED,
         options: { url: `/api/tenancies/${tenancyId}/sizes/` }
+    };
+}
+
+export function fetchMachines(tenancyId) {
+    return {
+        type: Actions.FETCH_MACHINES,
+        tenancyId: tenancyId,
+        apiRequest: true,
+        successAction: Actions.FETCH_MACHINES_SUCCEEDED,
+        failureAction: Actions.FETCH_MACHINES_FAILED,
+        options: { url: `/api/tenancies/${tenancyId}/machines/` }
     };
 }
 
@@ -375,6 +390,19 @@ function machinesReducer(state = initialState, action) {
     }
 }
 
+function quotasReducer(state = initialState, action) {
+    switch(action.type) {
+        case Actions.FETCH_QUOTAS:
+            return { ...state, fetching: true };
+        case Actions.FETCH_QUOTAS_SUCCEEDED:
+            return { ...state, fetching: false, data: action.payload };
+        case Actions.FETCH_QUOTAS_FAILED:
+            return { ...state, fetching: false };
+        default:
+            return state;
+    }
+}
+
 function imagesReducer(state = initialState, action) {
     switch(action.type) {
         case Actions.FETCH_IMAGES:
@@ -420,6 +448,7 @@ export function reducer(state = initialState, action) {
                     {},
                     ...action.payload.map(t => {
                         const previous = state.data[t.id] || {
+                            quotas: initialState,
                             machines: initialState,
                             images: initialState,
                             sizes: initialState
@@ -440,6 +469,9 @@ export function reducer(state = initialState, action) {
                         ...state.data,
                         [tenancyId]: {
                             ...state.data[tenancyId],
+                            quotas: quotasReducer(
+                                state.data[tenancyId].quotas, action
+                            ),
                             machines: machinesReducer(
                                 state.data[tenancyId].machines, action
                             ),
@@ -477,6 +509,7 @@ function loadTenancyDataEpic(action$) {
             Observable.of(
                 ...Array.prototype.concat(
                     ...action.payload.map(t => [
+                        fetchQuotas(t.id),
                         fetchMachines(t.id),
                         fetchImages(t.id),
                         fetchSizes(t.id)
