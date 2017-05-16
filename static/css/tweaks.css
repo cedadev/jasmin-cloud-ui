@@ -42,6 +42,85 @@
     border-color: #ebccd1;
 }
 
+.notification-container {
+    width: 350px;
+    position: fixed;
+    top: 70px;
+    right: 30px;
+    z-index: 10000;
+}
+.notification {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+.notification-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+.notification-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+.notification-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+.notification-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+.notification button {
+    float: right;
+    padding: 0;
+    cursor: pointer;
+    background: 0 0;
+    border: 0;
+    color: #a6a6a6;
+}
+.notification-enter {
+  opacity: 0.01;
+}
+.notification-enter.notification-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+.notification-leave {
+  opacity: 1;
+}
+.notification-leave.notification-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+.notification:before {
+    float: left;
+    font: normal normal normal 14px/1 FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 22px;
+}
+.notification-info:before {
+    content: "\f05a";
+}
+.notification-success:before {
+    content: "\f058";
+}
+.notification-warning:before {
+    content: "\f071";
+}
+.notification-danger:before {
+    content: "\f06a";
+}
+.notification-content {
+    padding: 0 23px 0 30px;
+}
+
 .btn:focus {
     outline: none;
 }

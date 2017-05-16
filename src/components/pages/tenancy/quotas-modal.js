@@ -46,14 +46,8 @@ export class QuotasModal extends React.Component {
                             <dd><QuotaProgressBar quota={quotas.ram} /></dd>
                             <dt>Storage</dt>
                             <dd><QuotaProgressBar quota={quotas.storage} /></dd>
-                            {quotas.machines && <dt>Machines</dt>}
-                            {quotas.machines &&
-                                <dd><QuotaProgressBar quota={quotas.machines} /></dd>
-                            }
-                            {quotas.volumes && <dt>Volumes</dt>}
-                            {quotas.volumes &&
-                                <dd><QuotaProgressBar quota={quotas.volumes} /></dd>
-                            }
+                            <dt>External IPs</dt>
+                            <dd><QuotaProgressBar quota={quotas.external_ips} /></dd>
                         </dl>
                     )}
                 </Modal.Body>
