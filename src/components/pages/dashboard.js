@@ -21,6 +21,10 @@ class TenancyItem extends React.Component {
 }
 
 export class Dashboard extends React.Component {
+    componentDidMount() {
+        document.title = 'Dashboard | JASMIN Cloud Portal';
+    }
+
     render() {
         const { fetching, data: tenancies } = this.props.tenancies;
         if( fetching ) return <Loading />;

@@ -64,6 +64,10 @@ class MachineRow extends React.Component {
                             <th>RAM</th>
                             <td>{machine.size.ram}MB</td>
                         </tr>
+                        <tr>
+                            <th>Disk size</th>
+                            <td>{machine.size.disk}GB</td>
+                        </tr>
                     </tbody>
                 </Table>
             </Popover>

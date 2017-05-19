@@ -22,6 +22,17 @@ export class TenancyPage extends React.Component {
         this.state = { createMachineModalVisible: false, quotasModalVisible: false };
     }
 
+    setPageTitle(props) {
+        const { tenancyId, tenancies: { fetching, data: tenancies } } = props;
+        const tenancy = tenancies[tenancyId];
+        if( tenancy ) {
+            document.title = `${tenancy.name} | JASMIN Cloud Portal`;
+        }
+    }
+
+    componentDidMount = () => this.setPageTitle(this.props)
+    componentWillUpdate = (props) => this.setPageTitle(props)
+
     componentWillReceiveProps(nextProps) {
         // If we are transitioning from creating to not creating, hide the
         // create machine modal

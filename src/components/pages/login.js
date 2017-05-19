@@ -66,6 +66,10 @@ class LoginForm extends React.Component {
 
 
 export class LoginPage extends React.Component {
+    componentDidMount() {
+        document.title = 'Sign in | JASMIN Cloud Portal';
+    }
+
     render() {
         const { username, initialising, ...rest } = this.props;
         // If there is an active user, redirect to dashboard
