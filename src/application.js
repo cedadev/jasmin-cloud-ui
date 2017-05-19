@@ -32,7 +32,10 @@ import { TenancyPage } from './components/pages/tenancy';
  */
 
 const ConnectedNav = connect(
-    (state) => ({ username: state.session.username }),
+    (state) => ({
+        username: state.session.username,
+        tenancies: state.tenancies.data
+    }),
     (dispatch) => bindActionCreators({ signOut }, dispatch)
 )(Navigation);
 

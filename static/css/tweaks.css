@@ -227,3 +227,7 @@ caption {
 a.size-details {
     cursor: help;
 }
+
+.navbar-link:hover {
+    cursor: pointer;
+}
