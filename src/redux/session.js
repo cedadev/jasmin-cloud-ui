@@ -204,7 +204,7 @@ function sessionTerminatedEpic(action$) {
         .map(action => sessionTerminated());
 }
 
-function apiAuthenticationErrorEpic(action$) {
+function apiAuthenticationErrorEpic(action$, store) {
     return action$
         .filter(action => !!action.error)
         .filter(action => action.type !== Actions.INITIALISATION_FAILED)
@@ -212,6 +212,8 @@ function apiAuthenticationErrorEpic(action$) {
         .filter(action =>
             action.payload.status === 401 || action.payload.status === 403
         )
+        // Only process these errors if there is an active user
+        .filter(action => !!store.getState().session.username)
         .map(action => ({ ...action, type: Actions.AUTHENTICATION_FAILED }));
 }
 

@@ -529,6 +529,17 @@ function repeatFetchMachinesEpic(action$) {
         );
 }
 
+function fetchActiveMachinesEpic(action$) {
+    // Whenever the machine list for a tenancy is fetched, trigger more frequent
+    // fetches for any machines that are building or have tasks running
+    return action$.ofType(Actions.FETCH_MACHINES_SUCCEEDED)
+        .mergeMap(action => Observable.of(
+            ...action.payload
+                .filter(m => (m.status.type === 'BUILD' || !!m.task))
+                .map(m => fetchMachine(action.request.tenancyId, m.id))
+        ));
+}
+
 function fetchMachineAfterActionEpic(action$) {
     // When an action takes place on a machine, fetch the machine
     return action$
@@ -547,10 +558,14 @@ function fetchMachineAfterActionEpic(action$) {
 }
 
 function repeatFetchMachineUntilTaskCompleteEpic(action$) {
-    // When a fetched machine has a task in progress, fetch it again
+    // When a fetched machine has a task in progress, wait 1s and fetch it again
     return action$.ofType(Actions.FETCH_MACHINE_SUCCEEDED)
         .filter(action => !!action.payload.task)
-        .map(action => fetchMachine(action.request.tenancyId, action.payload.id));
+        .switchMap(action =>
+            Observable
+                .of(fetchMachine(action.request.tenancyId, action.payload.id))
+                .delay(1000)
+        );
 }
 
 function fetchQuotasAfterActionEpic(action$) {
@@ -585,6 +600,7 @@ export const epic = combineEpics(
     resetTenanciesOnSessionTerminatedEpic,
     loadTenancyDataEpic,
     repeatFetchMachinesEpic,
+    fetchActiveMachinesEpic,
     fetchMachineAfterActionEpic,
     repeatFetchMachineUntilTaskCompleteEpic,
     fetchQuotasAfterActionEpic,
