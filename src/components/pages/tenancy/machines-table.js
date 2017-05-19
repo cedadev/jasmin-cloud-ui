@@ -4,7 +4,7 @@
 
 import React from 'react';
 import {
-    Table, ButtonGroup, Button, ProgressBar, OverlayTrigger, Tooltip, Modal
+    Table, ButtonGroup, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal
 } from 'react-bootstrap';
 
 import moment from 'moment';
@@ -49,7 +49,37 @@ class MachineRow extends React.Component {
         this.closeConfirmDeleteModal()
     }
 
-    formatMachineStatus = (machine) => {
+    formatMachineSize(machine) {
+        const sizeDetails = (
+            <Popover
+              id={`machine-size-${machine.id}`}
+              title={<span>Size details: <code>{machine.size.name}</code></span>}>
+                <Table striped hover bordered>
+                    <tbody>
+                        <tr>
+                            <th>CPUs</th>
+                            <td>{machine.size.cpus}</td>
+                        </tr>
+                        <tr>
+                            <th>RAM</th>
+                            <td>{machine.size.ram}MB</td>
+                        </tr>
+                    </tbody>
+                </Table>
+            </Popover>
+        );
+        return (
+            <OverlayTrigger
+              placement="right"
+              overlay={sizeDetails}
+              trigger="click"
+              rootClose>
+                <a href="#" className="size-details">{machine.size.name}</a>
+            </OverlayTrigger>
+        );
+    }
+
+    formatMachineStatus(machine) {
         const statusStyleMap = {
             'BUILD': 'info',
             'ACTIVE': 'success',
@@ -79,15 +109,19 @@ class MachineRow extends React.Component {
         );
     }
 
-    formatTask = (task) => task ?
-        <ProgressBar active striped label={task} now={100} /> :
-        'None';
+    formatTask(task) {
+        return task ?
+            <ProgressBar active striped label={task} now={100} /> :
+            'None';
+    }
 
-    formatIpList = (ips) => (ips.length > 0) ?
-        <ul className="ip-list">
-            {ips.map(ip => <li key={ip}><code>{ip}</code></li>)}
-        </ul> :
-        (<code>-</code>);
+    formatIpList(ips) {
+        return (ips.length > 0) ?
+            <ul className="ip-list">
+                {ips.map(ip => <li key={ip}><code>{ip}</code></li>)}
+            </ul> :
+            (<code>-</code>);
+    }
 
     render() {
         const machine = this.props.machine;
@@ -102,7 +136,7 @@ class MachineRow extends React.Component {
             <tr className={highlightClass}>
                 <td><code>{machine.name}</code></td>
                 <td><code>{machine.image.name}</code></td>
-                <td><code>{machine.size.name}</code></td>
+                <td>{this.formatMachineSize(machine)}</td>
                 <td>{this.formatMachineStatus(machine)}</td>
                 <td>{machine.power_state}</td>
                 <td>{this.formatTask(machine.task)}</td>
