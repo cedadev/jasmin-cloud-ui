@@ -12,16 +12,11 @@ import { Redirect } from 'react-router';
 import { Loading, Form, Field, ControlContainer } from '../../utils';
 
 import { MachinesTable } from './machines-table';
-import { CreateMachineModal } from './create-machine-modal';
-import { QuotasModal } from './quotas-modal';
+import { CreateMachineModalButton } from './create-machine-modal';
+import { QuotasModalButton } from './quotas-modal';
 
 
 export class TenancyPage extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = { createMachineModalVisible: false, quotasModalVisible: false };
-    }
-
     setPageTitle(props) {
         const { tenancyId, tenancies: { fetching, data: tenancies } } = props;
         const tenancy = tenancies[tenancyId];
@@ -32,35 +27,6 @@ export class TenancyPage extends React.Component {
 
     componentDidMount = () => this.setPageTitle(this.props)
     componentWillUpdate = (props) => this.setPageTitle(props)
-
-    componentWillReceiveProps(nextProps) {
-        // If we are transitioning from creating to not creating, hide the
-        // create machine modal
-        const isCreating = (props) => {
-            const { tenancyId, tenancies: { data: tenancies } } = props;
-            try {
-                return !!tenancies[tenancyId].machines.creating;
-            }
-            catch(error) {
-                if( !(error instanceof TypeError) ) throw error;
-                return false;
-            }
-        }
-        if( isCreating(this.props) && !isCreating(nextProps) )
-            this.closeCreateMachineModal();
-    }
-
-    openCreateMachineModal = () => this.setState({ createMachineModalVisible: true })
-    closeCreateMachineModal = () => this.setState({ createMachineModalVisible: false })
-
-    openQuotasModal = () => this.setState({ quotasModalVisible: true })
-    closeQuotasModal = () => this.setState({ quotasModalVisible: false })
-
-    createMachine = (name, image, size) => {
-        this.props.createMachine(this.props.tenancyId, name, image, size);
-    }
-
-    refreshMachines = () => this.props.fetchMachines(this.props.tenancyId)
 
     render() {
         const { tenancyId, tenancies: { fetching, data: tenancies } } = this.props;
@@ -75,24 +41,19 @@ export class TenancyPage extends React.Component {
                     <Row>
                         <Col md={12}>
                             <ButtonGroup className="pull-right">
-                                <Button
-                                  bsStyle="success"
-                                  onClick={this.openCreateMachineModal}>
-                                    <i className="fa fa-fw fa-desktop"></i>
-                                    {' '}
-                                    New machine
-                                </Button>
-                                <Button
-                                  bsStyle="warning"
-                                  onClick={this.openQuotasModal}>
-                                    <i className="fa fa-fw fa-pie-chart"></i>
-                                    {' '}
-                                    Quotas
-                                </Button>
+                                <CreateMachineModalButton
+                                  creating={!!tenancy.machines.creating}
+                                  images={tenancy.images}
+                                  sizes={tenancy.sizes}
+                                  createMachine={(...args) => this.props.createMachine(tenancyId, ...args)} />
+                                <QuotasModalButton
+                                  quotas={tenancy.quotas}
+                                  fetchQuotas={() => this.props.fetchQuotas(tenancyId)} />
                                 <Button
                                   bsStyle="info"
-                                  onClick={this.refreshMachines}>
-                                    <i className="fa fa-fw fa-refresh"></i>
+                                  disabled={!!tenancy.machines.fetching}
+                                  onClick={() => this.props.fetchMachines(tenancyId)}>
+                                    <i className="fa fa-refresh"></i>
                                     {' '}
                                     Refresh
                                 </Button>
@@ -111,17 +72,6 @@ export class TenancyPage extends React.Component {
                               detachVolume={(mid, vid) => this.props.detachVolume(tenancyId, mid, vid)} />
                         </Col>
                     </Row>
-                    <CreateMachineModal
-                      show={this.state.createMachineModalVisible}
-                      close={this.closeCreateMachineModal}
-                      creating={!!tenancy.machines.creating}
-                      images={tenancy.images}
-                      sizes={tenancy.sizes}
-                      createMachine={this.createMachine} />
-                    <QuotasModal
-                      show={this.state.quotasModalVisible}
-                      close={this.closeQuotasModal}
-                      quotas={tenancy.quotas} />
                 </div>
             );
         }

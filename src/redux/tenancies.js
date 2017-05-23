@@ -39,6 +39,10 @@ const Actions = {
     FETCH_SIZES_SUCCEEDED: 'TENANCIES/FETCH_SIZES_SUCCEEDED',
     FETCH_SIZES_FAILED: 'TENANCIES/FETCH_SIZES_FAILED',
 
+    FETCH_EXTERNAL_IPS: 'TENANCIES/FETCH_EXTERNAL_IPS',
+    FETCH_EXTERNAL_IPS_SUCCEEDED: 'TENANCIES/FETCH_EXTERNAL_IPS_SUCCEEDED',
+    FETCH_EXTERNAL_IPS_FAILED: 'TENANCIES/FETCH_EXTERNAL_IPS_FAILED',
+
     FETCH_MACHINES: 'TENANCIES/FETCH_MACHINES',
     FETCH_MACHINES_SUCCEEDED: 'TENANCIES/FETCH_MACHINES_SUCCEEDED',
     FETCH_MACHINES_FAILED: 'TENANCIES/FETCH_MACHINES_FAILED',
@@ -73,7 +77,11 @@ const Actions = {
 
     DETACH_VOLUME: 'TENANCIES/DETACH_VOLUME',
     DETACH_VOLUME_SUCCEEDED: 'TENANCIES/DETACH_VOLUME_SUCCEEDED',
-    DETACH_VOLUME_FAILED: 'TENANCIES/DETACH_VOLUME_FAILED'
+    DETACH_VOLUME_FAILED: 'TENANCIES/DETACH_VOLUME_FAILED',
+
+    ALLOCATE_EXTERNAL_IP: 'TENANCIES/ALLOCATE_EXTERNAL_IP',
+    ALLOCATE_EXTERNAL_IP_SUCCEEDED: 'TENANCIES/ALLOCATE_EXTERNAL_IP_SUCCEEDED',
+    ALLOCATE_EXTERNAL_IP_FAILED: 'TENANCIES/ALLOCATE_EXTERNAL_IP_FAILED'
 };
 
 export function resetTenancyList() {
@@ -123,6 +131,17 @@ export function fetchSizes(tenancyId) {
     };
 }
 
+export function fetchExternalIps(tenancyId) {
+    return {
+        type: Actions.FETCH_EXTERNAL_IPS,
+        tenancyId: tenancyId,
+        apiRequest: true,
+        successAction: Actions.FETCH_EXTERNAL_IPS_SUCCEEDED,
+        failureAction: Actions.FETCH_EXTERNAL_IPS_FAILED,
+        options: { url: `/api/tenancies/${tenancyId}/external_ips/` }
+    };
+}
+
 export function fetchMachines(tenancyId) {
     return {
         type: Actions.FETCH_MACHINES,
@@ -157,7 +176,7 @@ export function fetchMachine(tenancyId, machineId) {
         apiRequest: true,
         successAction: Actions.FETCH_MACHINE_SUCCEEDED,
         failureAction: Actions.FETCH_MACHINE_FAILED,
-        options: { url: `/api/tenancies/${tenancyId}/machines/${machineId}` }
+        options: { url: `/api/tenancies/${tenancyId}/machines/${machineId}/` }
     };
 }
 
@@ -249,6 +268,20 @@ export function detachVolume(tenancyId, machineId, volumeId) {
         options: {
             url: `/api/tenancies/${tenancyId}/machines/${machineId}/volumes/${volumeId}/`,
             method: 'DELETE'
+        }
+    };
+}
+
+export function allocateExternalIp(tenancyId) {
+    return {
+        type: Actions.ALLOCATE_EXTERNAL_IP,
+        tenancyId: tenancyId,
+        apiRequest: true,
+        successAction: Actions.ALLOCATE_EXTERNAL_IP_SUCCEEDED,
+        failureAction: Actions.ALLOCATE_EXTERNAL_IP_FAILED,
+        options: {
+            url: `/api/tenancies/${tenancyId}/external_ips/`,
+            method: 'POST'
         }
     };
 }
@@ -435,6 +468,25 @@ function sizesReducer(state = initialState, action) {
     }
 }
 
+function externalIpsReducer(state = initialState, action) {
+    switch(action.type) {
+        case Actions.FETCH_EXTERNAL_IPS:
+            return { ...state, fetching: true };
+        case Actions.FETCH_EXTERNAL_IPS_SUCCEEDED:
+            return { fetching: false, data: action.payload };
+        case Actions.FETCH_EXTERNAL_IPS_FAILED:
+            return { ...state, fetching: false };
+        case Actions.ALLOCATE_EXTERNAL_IP:
+            return { ...state, allocating: true };
+        case Actions.ALLOCATE_EXTERNAL_IP_SUCCEEDED:
+            return { ...state, data: [...data, action.payload], allocating: false };
+        case Actions.ALLOCATE_EXTERNAL_IP_FAILED:
+            return { ...state, allocating: false };
+        default:
+            return state;
+    }
+}
+
 export function reducer(state = initialState, action) {
     switch(action.type) {
         case Actions.RESET_TENANCY_LIST:
@@ -451,7 +503,8 @@ export function reducer(state = initialState, action) {
                             quotas: initialState,
                             machines: initialState,
                             images: initialState,
-                            sizes: initialState
+                            sizes: initialState,
+                            externalIps: initialState
                         };
                         return { [t.id]: { ...previous, ...t } };
                     })
@@ -480,6 +533,9 @@ export function reducer(state = initialState, action) {
                             ),
                             sizes: sizesReducer(
                                 state.data[tenancyId].sizes, action
+                            ),
+                            externalIps: externalIpsReducer(
+                                state.data[tenancyId].externalIps, action
                             )
                         }
                     }
@@ -512,7 +568,8 @@ function loadTenancyDataEpic(action$) {
                         fetchQuotas(t.id),
                         fetchMachines(t.id),
                         fetchImages(t.id),
-                        fetchSizes(t.id)
+                        fetchSizes(t.id),
+                        fetchExternalIps(t.id)
                     ])
                 )
             )
@@ -558,9 +615,12 @@ function fetchMachineAfterActionEpic(action$) {
 }
 
 function repeatFetchMachineUntilTaskCompleteEpic(action$) {
-    // When a fetched machine has a task in progress, wait 1s and fetch it again
+    // When a fetched machine is building or has a task in progress, wait 1s and
+    // fetch it again
     return action$.ofType(Actions.FETCH_MACHINE_SUCCEEDED)
-        .filter(action => !!action.payload.task)
+        .filter(action =>
+            (action.payload.status.type === 'BUILD' || !!action.payload.task)
+        )
         .switchMap(action =>
             Observable
                 .of(fetchMachine(action.request.tenancyId, action.payload.id))
@@ -577,6 +637,7 @@ function fetchQuotasAfterActionEpic(action$) {
                 case Actions.DELETE_MACHINE_SUCCEEDED:
                 case Actions.ATTACH_VOLUME_SUCCEEDED:
                 case Actions.DETACH_VOLUME_SUCCEEDED:
+                case Actions.ALLOCATE_EXTERNAL_IP_SUCCEEDED:
                     return true;
                 default:
                     return false;
@@ -595,6 +656,16 @@ function repeatFetchQuotasEpic(action$) {
         );
 }
 
+function repeatFetchExternalIpsEpic(action$) {
+    // Whenever the external IPs for a tenancy are successfully fetched, wait for
+    // 2 mins and fetch them again
+    return action$.ofType(Actions.FETCH_EXTERNAL_IPS_SUCCEEDED)
+        .switchMap(action =>
+            Observable.of(fetchExternalIps(action.request.tenancyId))
+                .delay(2 * 60 * 1000)
+        );
+}
+
 export const epic = combineEpics(
     loadTenanciesOnSessionStartEpic,
     resetTenanciesOnSessionTerminatedEpic,
@@ -604,5 +675,6 @@ export const epic = combineEpics(
     fetchMachineAfterActionEpic,
     repeatFetchMachineUntilTaskCompleteEpic,
     fetchQuotasAfterActionEpic,
-    repeatFetchQuotasEpic
+    repeatFetchQuotasEpic,
+    repeatFetchExternalIpsEpic
 );

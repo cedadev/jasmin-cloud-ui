@@ -9,46 +9,49 @@ import {
 
 import moment from 'moment';
 
-import { MachineVolumesModal } from './machine-volumes-modal';
+import { MachineVolumesModalButton } from './machine-volumes-modal';
 
 
-class DeleteMachineConfirmation extends React.Component {
+class ConfirmDeleteModalButton extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = { visible: false };
+    }
+
+    open = () => this.setState({ visible: true });
+    close = () => this.setState({ visible: false });
+
+    onConfirm = () => {
+        this.props.onConfirm();
+        this.close();
+    }
+
     render() {
         return (
-            <Modal show={this.props.show}>
-                <Modal.Body>
-                    Are you sure? Once deleted, a machine cannot be restored.
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button onClick={this.props.onCancel}>Cancel</Button>
-                    <Button bsStyle="danger" onClick={this.props.onConfirm}>Delete machine</Button>
-                </Modal.Footer>
-            </Modal>
+            <Button
+              title="Delete machine"
+              bsStyle="danger"
+              bsSize="xs"
+              onClick={this.open}
+              disabled={this.props.disabled}>
+                <i className="fa fa-fw fa-ban" />
+                <span className="sr-only">Delete machine</span>
+                <Modal show={this.state.visible}>
+                    <Modal.Body>
+                        Are you sure? Once deleted, a machine cannot be restored.
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.close}>Cancel</Button>
+                        <Button bsStyle="danger" onClick={this.onConfirm}>Delete machine</Button>
+                    </Modal.Footer>
+                </Modal>
+            </Button>
         );
     }
 }
 
 
 class MachineRow extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            machineVolumesModalVisible: false,
-            confirmDeleteModalVisible: false
-        };
-    }
-
-    openConfirmDeleteModal = () => this.setState({ confirmDeleteModalVisible: true })
-    closeConfirmDeleteModal = () => this.setState({ confirmDeleteModalVisible: false })
-
-    openMachineVolumesModal = () => this.setState({ machineVolumesModalVisible: true })
-    closeMachineVolumesModal = () => this.setState({ machineVolumesModalVisible: false })
-
-    deleteMachineConfirmed = () => {
-        this.props.deleteMachine()
-        this.closeConfirmDeleteModal()
-    }
-
     formatMachineSize(machine) {
         const sizeDetails = (
             <Popover
@@ -155,15 +158,13 @@ class MachineRow extends React.Component {
                         </div>
                     )}
                     <ButtonGroup>
-                        <Button
-                          title="Manage volumes"
-                          bsStyle="primary"
-                          bsSize="xs"
-                          onClick={this.openMachineVolumesModal}
-                          disabled={disableControls}>
-                            <i className="fa fa-fw fa-database" />
-                            <span className="sr-only">Manage volumes</span>
-                        </Button>
+                        <MachineVolumesModalButton
+                          disabled={disableControls}
+                          volumes={machine.attached_volumes}
+                          attachingVolume={machine.attachingVolume}
+                          detachingVolume={machine.detachingVolume}
+                          attachVolume={this.props.attachVolume}
+                          detachVolume={this.props.detachVolume} />
                         <Button
                           title="Start machine"
                           bsStyle="success"
@@ -191,28 +192,10 @@ class MachineRow extends React.Component {
                             <i className="fa fa-fw fa-repeat" />
                             <span className="sr-only">Restart machine</span>
                         </Button>
-                        <Button
-                          title="Delete machine"
-                          bsStyle="danger"
-                          bsSize="xs"
-                          onClick={this.openConfirmDeleteModal}
-                          disabled={disableControls}>
-                            <i className="fa fa-fw fa-ban" />
-                            <span className="sr-only">Delete machine</span>
-                        </Button>
+                        <ConfirmDeleteModalButton
+                          disabled={disableControls}
+                          onConfirm={this.props.deleteMachine} />
                     </ButtonGroup>
-                    <MachineVolumesModal
-                      show={this.state.machineVolumesModalVisible}
-                      close={this.closeMachineVolumesModal}
-                      volumes={machine.attached_volumes}
-                      attachingVolume={machine.attachingVolume}
-                      detachingVolume={machine.detachingVolume}
-                      attachVolume={this.props.attachVolume}
-                      detachVolume={this.props.detachVolume} />
-                    <DeleteMachineConfirmation
-                      show={this.state.confirmDeleteModalVisible}
-                      onConfirm={this.deleteMachineConfirmed}
-                      onCancel={this.closeConfirmDeleteModal} />
                 </td>
             </tr>
         );

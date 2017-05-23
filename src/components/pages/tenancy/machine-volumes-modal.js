@@ -137,59 +137,76 @@ class MachineVolumeRow extends React.Component {
 }
 
 
-export class MachineVolumesModal extends React.Component {
+export class MachineVolumesModalButton extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = { visible: false };
+    }
+
+    open = () => this.setState({ visible: true });
+    close = () => this.setState({ visible: false });
+
     render() {
         const {
             show, close, volumes,
             attachingVolume, detachingVolume, attachVolume, detachVolume
         } = this.props;
         return (
-            <Modal show={show}>
-                <Modal.Header>
-                    <Modal.Title>Machine volumes</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Table striped hover className="volumes-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Device</th>
-                                <th>Size</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {volumes.length > 0 ?
-                                volumes.map(volume =>
-                                    <MachineVolumeRow
-                                      key={volume.id}
-                                      volume={volume}
-                                      attachingVolume={attachingVolume}
-                                      detachingVolume={detachingVolume}
-                                      detachVolume={() => detachVolume(volume.id)} />
-                                ) : (
+            <Button
+              title="Manage volumes"
+              bsStyle="primary"
+              bsSize="xs"
+              onClick={this.open}
+              disabled={this.props.disabled}>
+                <i className="fa fa-fw fa-database" />
+                <span className="sr-only">Manage volumes</span>
+                <Modal show={this.state.visible}>
+                    <Modal.Header>
+                        <Modal.Title>Machine volumes</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Table striped hover className="volumes-table">
+                            <thead>
                                 <tr>
-                                    <td colSpan={4} className="text-center">
-                                        <em className="text-muted">No additional volumes attached.</em>
-                                    </td>
+                                    <th>Name</th>
+                                    <th>Device</th>
+                                    <th>Size</th>
+                                    <th></th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </Table>
-                    <AttachVolumeForm
-                      attachingVolume={attachingVolume}
-                      detachingVolume={detachingVolume}
-                      attachVolume={attachVolume} />
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button
-                      bsStyle="primary"
-                      onClick={close}
-                      disabled={attachingVolume || !!detachingVolume}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+                            </thead>
+                            <tbody>
+                                {volumes.length > 0 ?
+                                    volumes.map(volume =>
+                                        <MachineVolumeRow
+                                          key={volume.id}
+                                          volume={volume}
+                                          attachingVolume={attachingVolume}
+                                          detachingVolume={detachingVolume}
+                                          detachVolume={() => detachVolume(volume.id)} />
+                                    ) : (
+                                    <tr>
+                                        <td colSpan={4} className="text-center">
+                                            <em className="text-muted">No additional volumes attached.</em>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </Table>
+                        <AttachVolumeForm
+                          attachingVolume={attachingVolume}
+                          detachingVolume={detachingVolume}
+                          attachVolume={attachVolume} />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                          bsStyle="primary"
+                          onClick={this.close}
+                          disabled={attachingVolume || !!detachingVolume}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            </Button>
         );
     }
 }

@@ -11,7 +11,7 @@ import { bindActionCreators } from 'redux';
 import { store } from './redux';
 import { authenticate, signOut } from './redux/session';
 import {
-    fetchMachines,
+    fetchMachines, fetchQuotas,
     createMachine, startMachine, stopMachine, restartMachine, deleteMachine,
     attachVolume, detachVolume
 } from './redux/tenancies';
@@ -59,7 +59,7 @@ const ConnectedTenancyPage = connect(
         tenancyId: props.match.params.id
     }),
     (dispatch) => bindActionCreators({
-        fetchMachines,
+        fetchMachines, fetchQuotas,
         createMachine, startMachine, stopMachine, restartMachine, deleteMachine,
         attachVolume, detachVolume
     }, dispatch)
