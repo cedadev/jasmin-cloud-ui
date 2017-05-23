@@ -148,8 +148,7 @@ export class MachineVolumesModalButton extends React.Component {
 
     render() {
         const {
-            show, close, volumes,
-            attachingVolume, detachingVolume, attachVolume, detachVolume
+            volumes, attachingVolume, detachingVolume, attachVolume, detachVolume
         } = this.props;
         return (
             <Button

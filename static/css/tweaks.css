@@ -189,7 +189,7 @@ caption {
     padding:0;
 }
 
-.volumes-table, .volume-add-form .table {
+.modal-body .table {
     margin-bottom: 0;
 }
 .volumes-table td:nth-child(1), .volume-add-form .control-label {

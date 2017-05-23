@@ -18,8 +18,7 @@ export class CreateMachineModalButton extends React.Component {
     close = () => this.setState({ visible: false, name: '', image: '', size: '' });
 
     componentWillReceiveProps(nextProps) {
-        // If we are transitioning from creating to not creating, we are done with
-        // the modal
+        // If transitioning from creating to not creating, the modal is done
         if( this.props.creating && !nextProps.creating ) this.close();
     }
 
@@ -46,7 +45,7 @@ export class CreateMachineModalButton extends React.Component {
                     <Form
                       horizontal
                       onSubmit={this.handleSubmit}
-                      disabled={creating || images.fetching || sizes.fetching}>
+                      disabled={creating || !images.data || !sizes.data}>
                         <Modal.Body>
                             <Field name="name" label="Machine name">
                                 <FormControl
@@ -59,13 +58,7 @@ export class CreateMachineModalButton extends React.Component {
                                   onChange={this.handleChange} />
                             </Field>
                             <Field name="image" label="Image">
-                                { images.fetching ? (
-                                    <FormControl.Static>
-                                        <i className="fa fa-fw fa-spinner fa-pulse" />
-                                        { ' ' }
-                                        Loading images...
-                                    </FormControl.Static>
-                                ) : (
+                                { images.data ? (
                                     <FormControl
                                       componentClass="select"
                                       required
@@ -76,16 +69,16 @@ export class CreateMachineModalButton extends React.Component {
                                             <option key={i.id} value={i.id}>{i.name}</option>
                                         )}
                                     </FormControl>
+                                ) : (
+                                    <FormControl.Static>
+                                        <i className="fa fa-spinner fa-pulse" />
+                                        {' '}
+                                        Loading images...
+                                    </FormControl.Static>
                                 ) }
                             </Field>
                             <Field name="size" label="Size">
-                                { sizes.fetching ? (
-                                    <FormControl.Static>
-                                        <i className="fa fa-fw fa-spinner fa-pulse" />
-                                        { ' ' }
-                                        Loading sizes...
-                                    </FormControl.Static>
-                                ) : (
+                                { sizes.data ? (
                                     <FormControl
                                       componentClass="select"
                                       required
@@ -96,19 +89,29 @@ export class CreateMachineModalButton extends React.Component {
                                             <option key={s.id} value={s.id}>{s.name}</option>
                                         )}
                                     </FormControl>
+                                ) : (
+                                    <FormControl.Static>
+                                        <i className="fa fa-spinner fa-pulse" />
+                                        {' '}
+                                        Loading sizes...
+                                    </FormControl.Static>
                                 ) }
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button onClick={this.close} disabled={creating}>Cancel</Button>
+                            <Button onClick={this.close}>Cancel</Button>
                             { creating ? (
-                                <Button bsStyle="primary" type="submit">
-                                    <i className="fa fa-fw fa-spinner fa-pulse" />
-                                    { ' ' }
+                                <Button bsStyle="success" type="submit">
+                                    <i className="fa fa-spinner fa-pulse" />
+                                    {' '}
                                     Creating machine...
                                 </Button>
                             ) : (
-                                <Button bsStyle="primary" type="submit">Create machine</Button>
+                                <Button bsStyle="success" type="submit">
+                                    <i className="fa fa-plus" />
+                                    {' '}
+                                    Create machine
+                                </Button>
                             ) }
                         </Modal.Footer>
                     </Form>

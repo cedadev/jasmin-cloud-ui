@@ -9,17 +9,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Loading } from '../utils';
 
 
-class TenancyItem extends React.Component {
-    render() {
-        const tenancy = this.props.tenancy;
-        return (
-            <LinkContainer to={`/tenancies/${tenancy.id}`}>
-                <ListGroupItem>{tenancy.name}</ListGroupItem>
-            </LinkContainer>
-        );
-    }
-}
-
 export class Dashboard extends React.Component {
     componentDidMount() {
         document.title = 'Dashboard | JASMIN Cloud Portal';
@@ -27,7 +16,7 @@ export class Dashboard extends React.Component {
 
     render() {
         const { fetching, data: tenancies } = this.props.tenancies;
-        if( fetching ) return <Loading />;
+        if( tenancies === null ) return <Loading />;
         return (
             <div>
                 <PageHeader>Dashboard</PageHeader>
@@ -36,7 +25,11 @@ export class Dashboard extends React.Component {
                         <Panel header="Available tenancies">
                             <ListGroup fill>
                                 {Object.values(tenancies).map((t) =>
-                                    <TenancyItem key={t.id} tenancy={t} />
+                                    <LinkContainer
+                                      key={t.id}
+                                      to={`/tenancies/${t.id}`}>
+                                        <ListGroupItem>{t.name}</ListGroupItem>
+                                    </LinkContainer>
                                 )}
                             </ListGroup>
                         </Panel>

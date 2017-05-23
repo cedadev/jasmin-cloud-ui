@@ -51,9 +51,7 @@ export class QuotasModalButton extends React.Component {
                         <Modal.Title>Tenancy Quotas</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        {fetching ? (
-                            <Loading />
-                        ) : (
+                        {quotas ? (
                             <dl className="quotas">
                                 <dt>CPUs</dt>
                                 <dd><QuotaProgressBar quota={quotas.cpus} /></dd>
@@ -64,6 +62,8 @@ export class QuotasModalButton extends React.Component {
                                 <dt>External IPs</dt>
                                 <dd><QuotaProgressBar quota={quotas.external_ips} /></dd>
                             </dl>
+                        ) : (
+                            <Loading />
                         )}
                     </Modal.Body>
                     <Modal.Footer>
@@ -71,7 +71,7 @@ export class QuotasModalButton extends React.Component {
                           bsStyle="info"
                           disabled={fetching}
                           onClick={this.props.fetchQuotas}>
-                            <i className="fa fa-refresh" />
+                            <i className={`fa ${fetching && 'fa-spin'} fa-refresh`} />
                             {' '}
                             Refresh
                         </Button>

@@ -10,7 +10,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 export class Navigation extends React.Component {
     render() {
-        const tenancies = Object.values(this.props.tenancies);
+        const tenancies = Object.values(this.props.tenancies || {});
         return (
             <Navbar fixedTop collapseOnSelect>
                 <Navbar.Header>

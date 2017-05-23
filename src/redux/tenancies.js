@@ -289,22 +289,24 @@ export function allocateExternalIp(tenancyId) {
 
 // Initially, fetching is set to true since we assume the first thing we will do
 // when possible is fetch the tenancy data
-const initialState = { fetching: true, data: {} };
+const initialState = { fetching: true, data: null };
 
-function mergeMachine(oldState = {}, newState) {
-    const newMachine = { ...oldState, ...newState };
+function mergeMachine(oldState, newState) {
+    const newMachine = Object.assign({}, oldState, newState);
     if( newState.hasOwnProperty('created') )
         newMachine.created = new Date(newState.created);
     return newMachine;
 }
 
-function updateMachineInState(state, machineId, newState) {
+function updateMachineInState(state, machineId, nextState) {
+    if( state.data === null ) return state;
     if( !state.data.hasOwnProperty(machineId) ) return state;
+    const previous = state.data[machineId];
     return {
         ...state,
         data: {
             ...state.data,
-            [machineId]: mergeMachine(state.data[machineId], newState)
+            [machineId]: mergeMachine(previous, nextState(previous))
         }
     };
 }
@@ -319,7 +321,7 @@ function machinesReducer(state = initialState, action) {
                 data: Object.assign(
                     {},
                     ...action.payload.map(m => ({
-                        [m.id]: mergeMachine(state.data[m.id], m)
+                        [m.id]: mergeMachine((state.data || {})[m.id], m)
                     }))
                 )
             };
@@ -330,16 +332,17 @@ function machinesReducer(state = initialState, action) {
         case Actions.CREATE_MACHINE_SUCCEEDED:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    [action.payload.id]: mergeMachine(undefined, action.payload)
-                },
+                data: Object.assign(
+                    {},
+                    state.data,
+                    { [action.payload.id]: mergeMachine(null, action.payload) }
+                ),
                 creating: false
             };
         case Actions.CREATE_MACHINE_FAILED:
             return { ...state, creating: false };
         case Actions.FETCH_MACHINE_SUCCEEDED:
-            return updateMachineInState(state, action.payload.id, action.payload);
+            return updateMachineInState(state, action.payload.id, () => action.payload);
         case Actions.START_MACHINE:
         case Actions.STOP_MACHINE:
         case Actions.RESTART_MACHINE:
@@ -347,19 +350,19 @@ function machinesReducer(state = initialState, action) {
             return updateMachineInState(
                 state,
                 action.machineId,
-                { actionInProgress: true }
+                () => ({ actionInProgress: true })
             );
         case Actions.ATTACH_VOLUME:
             return updateMachineInState(
                 state,
                 action.machineId,
-                { attachingVolume: true }
+                () => ({ attachingVolume: true })
             );
         case Actions.DETACH_VOLUME:
             return updateMachineInState(
                 state,
                 action.machineId,
-                { detachingVolume: action.volumeId }
+                () => ({ detachingVolume: action.volumeId })
             );
         case Actions.START_MACHINE_SUCCEEDED:
         case Actions.STOP_MACHINE_SUCCEEDED:
@@ -367,9 +370,10 @@ function machinesReducer(state = initialState, action) {
             return updateMachineInState(
                 state,
                 action.payload.id,
-                { ...action.payload, actionInProgress: false }
+                () => ({ ...action.payload, actionInProgress: false })
             );
         case Actions.DELETE_MACHINE_SUCCEEDED:
+            if( state.data === null ) return state;
             if( !state.data.hasOwnProperty(action.request.machineId) ) return state;
             const { [action.request.machineId]: deletedKey, ...newData } = state.data;
             return { ...state, data: newData };
@@ -377,25 +381,20 @@ function machinesReducer(state = initialState, action) {
             return updateMachineInState(
                 state,
                 action.request.machineId,
-                {
-                    attached_volumes: [
-                        ...state.data[action.request.machineId].attached_volumes,
-                        action.payload
-                    ],
+                prev => ({
+                    attached_volumes: [...prev.attached_volumes, action.payload],
                     attachingVolume: false
-                }
+                })
             );
         case Actions.DETACH_VOLUME_SUCCEEDED:
             return updateMachineInState(
                 state,
                 action.request.machineId,
-                {
-                    attached_volumes: state.
-                        data[action.request.machineId].
-                        attached_volumes.
-                        filter(v => v.id !== action.request.volumeId),
+                prev => ({
+                    attached_volumes: prev.attached_volumes
+                        .filter(v => v.id !== action.request.volumeId),
                     detachingVolume: null
-                }
+                })
             );
         case Actions.START_MACHINE_FAILED:
         case Actions.STOP_MACHINE_FAILED:
@@ -404,19 +403,19 @@ function machinesReducer(state = initialState, action) {
             return updateMachineInState(
                 state,
                 action.request.machineId,
-                { actionInProgress: false }
+                () => ({ actionInProgress: false })
             );
         case Actions.ATTACH_VOLUME_FAILED:
             return updateMachineInState(
                 state,
                 action.request.machineId,
-                { attachingVolume: false }
+                () => ({ attachingVolume: false })
             );
         case Actions.DETACH_VOLUME_FAILED:
             return updateMachineInState(
                 state,
                 action.request.machineId,
-                { detachingVolume: null }
+                () => ({ detachingVolume: null })
             );
         default:
             return state;
@@ -473,13 +472,30 @@ function externalIpsReducer(state = initialState, action) {
         case Actions.FETCH_EXTERNAL_IPS:
             return { ...state, fetching: true };
         case Actions.FETCH_EXTERNAL_IPS_SUCCEEDED:
-            return { fetching: false, data: action.payload };
+            return {
+                fetching: false,
+                // data is a map of external ip => internal ip
+                data: Object.assign(
+                    {},
+                    ...action.payload.map(ip =>
+                        ({ [ip.external_ip]: ip.internal_ip })
+                    )
+                )
+            };
         case Actions.FETCH_EXTERNAL_IPS_FAILED:
             return { ...state, fetching: false };
         case Actions.ALLOCATE_EXTERNAL_IP:
             return { ...state, allocating: true };
         case Actions.ALLOCATE_EXTERNAL_IP_SUCCEEDED:
-            return { ...state, data: [...data, action.payload], allocating: false };
+            return {
+                ...state,
+                data: Object.assign(
+                    {},
+                    state.data,
+                    { [action.payload.external_ip]: action.payload.internal_ip }
+                ),
+                allocating: false
+            };
         case Actions.ALLOCATE_EXTERNAL_IP_FAILED:
             return { ...state, allocating: false };
         default:
@@ -499,7 +515,7 @@ export function reducer(state = initialState, action) {
                 data: Object.assign(
                     {},
                     ...action.payload.map(t => {
-                        const previous = state.data[t.id] || {
+                        const previous = (state.data || {})[t.id] || {
                             quotas: initialState,
                             machines: initialState,
                             images: initialState,
@@ -513,35 +529,33 @@ export function reducer(state = initialState, action) {
         case Actions.FETCH_TENANCY_LIST_FAILED:
             return { ...state, fetching: false };
         default:
+            if( state.data === null ) return state;
             const tenancyId = action.tenancyId || at(action, 'request.tenancyId');
-            if( tenancyId ) {
-                if( !state.data.hasOwnProperty(tenancyId) ) return state;
-                return {
-                    ...state,
-                    data: {
-                        ...state.data,
-                        [tenancyId]: {
-                            ...state.data[tenancyId],
-                            quotas: quotasReducer(
-                                state.data[tenancyId].quotas, action
-                            ),
-                            machines: machinesReducer(
-                                state.data[tenancyId].machines, action
-                            ),
-                            images: imagesReducer(
-                                state.data[tenancyId].images, action
-                            ),
-                            sizes: sizesReducer(
-                                state.data[tenancyId].sizes, action
-                            ),
-                            externalIps: externalIpsReducer(
-                                state.data[tenancyId].externalIps, action
-                            )
-                        }
+            if( !tenancyId || !state.data.hasOwnProperty(tenancyId) ) return state;
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    [tenancyId]: {
+                        ...state.data[tenancyId],
+                        quotas: quotasReducer(
+                            state.data[tenancyId].quotas, action
+                        ),
+                        machines: machinesReducer(
+                            state.data[tenancyId].machines, action
+                        ),
+                        images: imagesReducer(
+                            state.data[tenancyId].images, action
+                        ),
+                        sizes: sizesReducer(
+                            state.data[tenancyId].sizes, action
+                        ),
+                        externalIps: externalIpsReducer(
+                            state.data[tenancyId].externalIps, action
+                        )
                     }
-                };
-            }
-            return state;
+                }
+            };
     }
 }
 

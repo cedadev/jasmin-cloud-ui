@@ -213,7 +213,7 @@ const _STATUS_STYLE_MAP = {
 export class MachinesTable extends React.Component {
     render() {
         const { fetching, data } = this.props.machines;
-        const machines = Object.values(data);
+        const machines = Object.values(data || {});
         // Sort the machines by name to ensure a consistent rendering
         machines.sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
         return (
