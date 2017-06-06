@@ -148,7 +148,8 @@ export class MachineVolumesModalButton extends React.Component {
 
     render() {
         const {
-            volumes, attachingVolume, detachingVolume, attachVolume, detachVolume
+            machine, volumes,
+            attachingVolume, detachingVolume, attachVolume, detachVolume
         } = this.props;
         return (
             <Button
@@ -159,9 +160,12 @@ export class MachineVolumesModalButton extends React.Component {
               disabled={this.props.disabled}>
                 <i className="fa fa-fw fa-database" />
                 <span className="sr-only">Manage volumes</span>
-                <Modal show={this.state.visible}>
-                    <Modal.Header>
-                        <Modal.Title>Machine volumes</Modal.Title>
+                <Modal
+                  backdrop="static"
+                  onHide={(!attachingVolume && !detachingVolume) ? this.close : undefined}
+                  show={this.state.visible}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Attached volumes: <code>{machine.name}</code></Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Table striped hover className="volumes-table">

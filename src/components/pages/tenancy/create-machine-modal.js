@@ -14,8 +14,8 @@ export class CreateMachineModalButton extends React.Component {
         this.state = { visible: false, name: '', image: '', size: '' }
     }
 
-    open = () => this.setState({ visible: true });
-    close = () => this.setState({ visible: false, name: '', image: '', size: '' });
+    open = () => this.setState({ visible: true })
+    close = () => this.setState({ visible: false, name: '', image: '', size: '' })
 
     componentWillReceiveProps(nextProps) {
         // If transitioning from creating to not creating, the modal is done
@@ -34,13 +34,17 @@ export class CreateMachineModalButton extends React.Component {
         return (
             <Button
               bsStyle="success"
-              onClick={this.open}>
+              onClick={this.open}
+              title="Create a new machine">
                 <i className="fa fa-desktop"></i>
                 {' '}
                 New machine
-                <Modal backdrop="static" show={this.state.visible}>
-                    <Modal.Header>
-                        <Modal.Title>Create a new virtual machine</Modal.Title>
+                <Modal
+                  backdrop="static"
+                  onHide={creating ? undefined : this.close}
+                  show={this.state.visible}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Create a new machine</Modal.Title>
                     </Modal.Header>
                     <Form
                       horizontal
@@ -99,7 +103,6 @@ export class CreateMachineModalButton extends React.Component {
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button onClick={this.close}>Cancel</Button>
                             { creating ? (
                                 <Button bsStyle="success" type="submit">
                                     <i className="fa fa-spinner fa-pulse" />

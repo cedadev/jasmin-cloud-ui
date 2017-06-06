@@ -13,7 +13,8 @@ import { authenticate, signOut } from './redux/session';
 import {
     fetchMachines, fetchQuotas,
     createMachine, startMachine, stopMachine, restartMachine, deleteMachine,
-    attachVolume, detachVolume
+    attachVolume, detachVolume,
+    allocateExternalIp, updateExternalIp
 } from './redux/tenancies';
 import { removeNotification } from './redux/notifications';
 
@@ -61,7 +62,8 @@ const ConnectedTenancyPage = connect(
     (dispatch) => bindActionCreators({
         fetchMachines, fetchQuotas,
         createMachine, startMachine, stopMachine, restartMachine, deleteMachine,
-        attachVolume, detachVolume
+        attachVolume, detachVolume,
+        allocateExternalIp, updateExternalIp
     }, dispatch)
 )(TenancyPage);
 

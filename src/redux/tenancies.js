@@ -81,7 +81,11 @@ const Actions = {
 
     ALLOCATE_EXTERNAL_IP: 'TENANCIES/ALLOCATE_EXTERNAL_IP',
     ALLOCATE_EXTERNAL_IP_SUCCEEDED: 'TENANCIES/ALLOCATE_EXTERNAL_IP_SUCCEEDED',
-    ALLOCATE_EXTERNAL_IP_FAILED: 'TENANCIES/ALLOCATE_EXTERNAL_IP_FAILED'
+    ALLOCATE_EXTERNAL_IP_FAILED: 'TENANCIES/ALLOCATE_EXTERNAL_IP_FAILED',
+
+    UPDATE_EXTERNAL_IP: 'TENANCIES/UPDATE_EXTERNAL_IP',
+    UPDATE_EXTERNAL_IP_SUCCEEDED: 'TENANCIES/UPDATE_EXTERNAL_IP_SUCCEEDED',
+    UPDATE_EXTERNAL_IP_FAILED: 'TENANCIES/UPDATE_EXTERNAL_IP_FAILED',
 };
 
 export function resetTenancyList() {
@@ -286,6 +290,22 @@ export function allocateExternalIp(tenancyId) {
     };
 }
 
+export function updateExternalIp(tenancyId, externalIp, machineId) {
+    return {
+        type: Actions.UPDATE_EXTERNAL_IP,
+        tenancyId: tenancyId,
+        externalIp: externalIp,
+        apiRequest: true,
+        successAction: Actions.UPDATE_EXTERNAL_IP_SUCCEEDED,
+        failureAction: Actions.UPDATE_EXTERNAL_IP_FAILED,
+        options: {
+            url: `/api/tenancies/${tenancyId}/external_ips/${externalIp}/`,
+            method: 'PUT',
+            body: { machine_id: machineId }
+        }
+    };
+}
+
 
 // Initially, fetching is set to true since we assume the first thing we will do
 // when possible is fetch the tenancy data
@@ -474,12 +494,11 @@ function externalIpsReducer(state = initialState, action) {
         case Actions.FETCH_EXTERNAL_IPS_SUCCEEDED:
             return {
                 fetching: false,
-                // data is a map of external ip => internal ip
                 data: Object.assign(
                     {},
-                    ...action.payload.map(ip =>
-                        ({ [ip.external_ip]: ip.internal_ip })
-                    )
+                    ...action.payload.map(ip => ({
+                        [ip.external_ip]: ip.machine_id
+                    }))
                 )
             };
         case Actions.FETCH_EXTERNAL_IPS_FAILED:
@@ -492,12 +511,31 @@ function externalIpsReducer(state = initialState, action) {
                 data: Object.assign(
                     {},
                     state.data,
-                    { [action.payload.external_ip]: action.payload.internal_ip }
+                    { [action.payload.external_ip]: action.payload.machine_id }
                 ),
                 allocating: false
             };
         case Actions.ALLOCATE_EXTERNAL_IP_FAILED:
             return { ...state, allocating: false };
+        case Actions.UPDATE_EXTERNAL_IP:
+            return { ...state, updating: true };
+        case Actions.UPDATE_EXTERNAL_IP_SUCCEEDED:
+            const machineId = action.payload.machine_id;
+            return {
+                ...state,
+                data: Object.assign(
+                    {},
+                    // Disassociate the machine id from the payload from all IPs
+                    ...Object.entries(state.data).map(([ip, mid]) => ({
+                        [ip]: (mid !== machineId) ? mid : null
+                    })),
+                    // Then associate it with the correct one
+                    { [action.payload.external_ip]: machineId }
+                ),
+                updating: false
+            };
+        case Actions.UPDATE_EXTERNAL_IP_FAILED:
+            return { ...state, updating: false };
         default:
             return state;
     }
@@ -530,7 +568,7 @@ export function reducer(state = initialState, action) {
             return { ...state, fetching: false };
         default:
             if( state.data === null ) return state;
-            const tenancyId = action.tenancyId || at(action, 'request.tenancyId');
+            const tenancyId = action.tenancyId || at(action, 'request.tenancyId')[0];
             if( !tenancyId || !state.data.hasOwnProperty(tenancyId) ) return state;
             return {
                 ...state,
@@ -594,10 +632,18 @@ function repeatFetchMachinesEpic(action$) {
     // Whenever the machines for a tenancy are successfully fetched, wait for
     // 2 mins and fetch them again
     return action$.ofType(Actions.FETCH_MACHINES_SUCCEEDED)
-        .switchMap(action =>
-            Observable.of(fetchMachines(action.request.tenancyId))
+        .mergeMap(action => {
+            const tenancyId = action.request.tenancyId;
+            // If a fetch is requested before the timer expires, cancel the fetch
+            // If the session is terminated while we are waiting, cancel the fetch
+            return Observable.of(fetchMachines(tenancyId))
                 .delay(2 * 60 * 1000)
-        );
+                .takeUntil(
+                    action$.ofType(Actions.FETCH_MACHINES)
+                        .filter(action => action.tenancyId === tenancyId)
+                )
+                .takeUntil(action$.ofType(SessionActions.SESSION_TERMINATED))
+        });
 }
 
 function fetchActiveMachinesEpic(action$) {
@@ -635,11 +681,22 @@ function repeatFetchMachineUntilTaskCompleteEpic(action$) {
         .filter(action =>
             (action.payload.status.type === 'BUILD' || !!action.payload.task)
         )
-        .switchMap(action =>
-            Observable
-                .of(fetchMachine(action.request.tenancyId, action.payload.id))
+        .mergeMap(action => {
+            const tenancyId = action.request.tenancyId;
+            const machineId = action.payload.id;
+            // If a fetch for the same machine is requested before the timer
+            // expires, cancel the fetch
+            // If the session is terminated while we are waiting, cancel the fetch
+            return Observable
+                .of(fetchMachine(tenancyId, machineId))
                 .delay(1000)
-        );
+                .takeUntil(
+                    action$.ofType(Actions.FETCH_MACHINE)
+                        .filter(action => action.tenancyId === tenancyId)
+                        .filter(action => action.machineId === machineId)
+                )
+                .takeUntil(action$.ofType(SessionActions.SESSION_TERMINATED))
+        });
 }
 
 function fetchQuotasAfterActionEpic(action$) {
@@ -664,20 +721,36 @@ function repeatFetchQuotasEpic(action$) {
     // Whenever the quotas for a tenancy are successfully fetched, wait for
     // 2 mins and fetch them again
     return action$.ofType(Actions.FETCH_QUOTAS_SUCCEEDED)
-        .switchMap(action =>
-            Observable.of(fetchQuotas(action.request.tenancyId))
+        .mergeMap(action => {
+            const tenancyId = action.request.tenancyId;
+            // If a fetch is requested before the timer expires, cancel the fetch
+            // If the session is terminated while we are waiting, cancel the fetch
+            return Observable.of(fetchQuotas(action.request.tenancyId))
                 .delay(2 * 60 * 1000)
-        );
+                .takeUntil(
+                    action$.ofType(Actions.FETCH_QUOTAS)
+                        .filter(action => action.tenancyId === tenancyId)
+                )
+                .takeUntil(action$.ofType(SessionActions.SESSION_TERMINATED))
+        });
 }
 
 function repeatFetchExternalIpsEpic(action$) {
     // Whenever the external IPs for a tenancy are successfully fetched, wait for
     // 2 mins and fetch them again
     return action$.ofType(Actions.FETCH_EXTERNAL_IPS_SUCCEEDED)
-        .switchMap(action =>
-            Observable.of(fetchExternalIps(action.request.tenancyId))
+        .mergeMap(action => {
+            const tenancyId = action.request.tenancyId;
+            // If a fetch is requested before the timer expires, cancel the fetch
+            // If the session is terminated while we are waiting, cancel the fetch
+            return Observable.of(fetchExternalIps(action.request.tenancyId))
                 .delay(2 * 60 * 1000)
-        );
+                .takeUntil(
+                    action$.ofType(Actions.FETCH_EXTERNAL_IPS)
+                        .filter(action => action.tenancyId === tenancyId)
+                )
+                .takeUntil(action$.ofType(SessionActions.SESSION_TERMINATED))
+        });
 }
 
 export const epic = combineEpics(

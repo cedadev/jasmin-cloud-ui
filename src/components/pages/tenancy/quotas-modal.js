@@ -41,13 +41,17 @@ export class QuotasModalButton extends React.Component {
         return (
             <Button
               bsStyle="warning"
-              onClick={this.open}>
+              onClick={this.open}
+              title="Show tenancy quotas">
                 <i className="fa fa-pie-chart"></i>
                 {' '}
                 Quotas
-
-                <Modal show={this.state.visible} className="quotas-modal">
-                    <Modal.Header>
+                <Modal
+                  backdrop="static"
+                  onHide={this.close}
+                  show={this.state.visible}
+                  className="quotas-modal">
+                    <Modal.Header closeButton>
                         <Modal.Title>Tenancy Quotas</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
@@ -75,7 +79,6 @@ export class QuotasModalButton extends React.Component {
                             {' '}
                             Refresh
                         </Button>
-                        <Button bsStyle="primary" onClick={this.close}>Close</Button>
                     </Modal.Footer>
                 </Modal>
             </Button>

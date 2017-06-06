@@ -51,15 +51,18 @@ export class TenancyPage extends React.Component {
                                   sizes={tenancy.sizes}
                                   createMachine={(...args) => this.props.createMachine(tenancy.id, ...args)} />
                                 <ExternalIpsModalButton
+                                  machines={tenancy.machines}
                                   externalIps={tenancy.externalIps}
-                                  allocateIp={() => console.log("Allocating IP")} />
+                                  allocateExternalIp={() => this.props.allocateExternalIp(tenancy.id)}
+                                  updateExternalIp={(...args) => this.props.updateExternalIp(tenancy.id, ...args)} />
                                 <QuotasModalButton
                                   quotas={tenancy.quotas}
                                   fetchQuotas={() => this.props.fetchQuotas(tenancy.id)} />
                                 <Button
                                   bsStyle="info"
                                   disabled={!!tenancy.machines.fetching}
-                                  onClick={() => this.props.fetchMachines(tenancy.id)}>
+                                  onClick={() => this.props.fetchMachines(tenancy.id)}
+                                  title="Refresh machine list">
                                     <i className="fa fa-refresh"></i>
                                     {' '}
                                     Refresh
@@ -71,6 +74,7 @@ export class TenancyPage extends React.Component {
                         <Col md={12}>
                             <MachinesTable
                               machines={tenancy.machines}
+                              externalIps={tenancy.externalIps.data}
                               startMachine={(mid) => this.props.startMachine(tenancy.id, mid)}
                               stopMachine={(mid) => this.props.stopMachine(tenancy.id, mid)}
                               restartMachine={(mid) => this.props.restartMachine(tenancy.id, mid)}

@@ -7,6 +7,7 @@ import {
     Table, ButtonGroup, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal
 } from 'react-bootstrap';
 
+import at from 'lodash/at';
 import moment from 'moment';
 
 import { MachineVolumesModalButton } from './machine-volumes-modal';
@@ -122,14 +123,6 @@ class MachineRow extends React.Component {
             'None';
     }
 
-    formatIpList(ips) {
-        return (ips.length > 0) ?
-            <ul className="ip-list">
-                {ips.map(ip => <li key={ip}><code>{ip}</code></li>)}
-            </ul> :
-            (<code>-</code>);
-    }
-
     render() {
         const machine = this.props.machine;
         const highlightClass = (machine.status.type === 'BUILD') ? 'info' :
@@ -139,6 +132,12 @@ class MachineRow extends React.Component {
             !!machine.actionInProgress ||
             !!machine.task
         );
+        const externalIp = at(
+            Object
+                .entries(this.props.externalIps || {})
+                .find(([ip, mid]) => mid === machine.id),
+            '[0]'
+        )[0];
         return (
             <tr className={highlightClass}>
                 <td><code>{machine.name}</code></td>
@@ -147,8 +146,8 @@ class MachineRow extends React.Component {
                 <td>{this.formatMachineStatus(machine)}</td>
                 <td>{machine.power_state}</td>
                 <td>{this.formatTask(machine.task)}</td>
-                <td>{this.formatIpList(machine.internal_ips)}</td>
-                <td>{this.formatIpList(machine.external_ips)}</td>
+                <td><code>{machine.internal_ip || '-'}</code></td>
+                <td><code>{externalIp || '-'}</code></td>
                 <td>{moment(machine.created).fromNow()}</td>
                 <td className="machine-actions">
                     {disableControls && (
@@ -160,6 +159,7 @@ class MachineRow extends React.Component {
                     <ButtonGroup>
                         <MachineVolumesModalButton
                           disabled={disableControls}
+                          machine={machine}
                           volumes={machine.attached_volumes}
                           attachingVolume={machine.attachingVolume}
                           detachingVolume={machine.detachingVolume}
@@ -248,6 +248,7 @@ export class MachinesTable extends React.Component {
                         <MachineRow
                           key={m.id}
                           machine={m}
+                          externalIps={this.props.externalIps}
                           startMachine={() => this.props.startMachine(m.id)}
                           stopMachine={() => this.props.stopMachine(m.id)}
                           restartMachine={() => this.props.restartMachine(m.id)}
