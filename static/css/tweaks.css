@@ -90,10 +90,10 @@
   opacity: 1;
   transition: opacity 300ms ease-in;
 }
-.notification-leave {
+.notification-exit {
   opacity: 1;
 }
-.notification-leave.notification-leave-active {
+.notification-exit.notification-exit-active {
   opacity: 0.01;
   transition: opacity 300ms ease-in;
 }

@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 
 class Notification extends React.Component {
@@ -32,17 +32,18 @@ export class Notifications extends React.Component {
         const { notifications, removeNotification } = this.props;
         return (
             <div className="notification-container">
-                <CSSTransitionGroup
-                  transitionName="notification"
-                  transitionEnterTimeout={300}
-                  transitionLeaveTimeout={300}>
+                <TransitionGroup>
                     {notifications.map((notification, i) =>
-                        <Notification
-                            key={i}
-                            notification={notification}
-                            removeNotification={() => removeNotification(i)} />
+                        <CSSTransition
+                          key={i}
+                          classNames="notification"
+                          timeout={{ enter: 300, exit: 300 }}>
+                            <Notification
+                              notification={notification}
+                              removeNotification={() => removeNotification(i)} />
+                        </CSSTransition>
                     )}
-                </CSSTransitionGroup>
+                </TransitionGroup>
             </div>
         );
     }
