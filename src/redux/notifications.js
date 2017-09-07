@@ -47,8 +47,10 @@ export function reducer(state = [], action) {
     }
 }
 
-// Raise an error notification for any action with the error flag except those
-// that are explicitly silenced
+/**
+ * This epic will raise an error notification for any action with the error flag
+ * except those that are explicitly silenced.
+ */
 export function epic(action$) {
     return action$
         .filter(action => !!action.error)
