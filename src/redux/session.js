@@ -19,10 +19,6 @@ import Cookies from 'js-cookie';
 import { notifyError } from './notifications';
 
 
-/*****
- **  STUFF TO DO WITH API CALLS
- *****/
-
 export class ApiError extends Error {
     constructor(message, status) {
         super(message)
@@ -32,6 +28,16 @@ export class ApiError extends Error {
 
 const CSRF_REQUIRED = ['POST', 'PUT', 'DELETE'];
 
+/**
+ * redux-observable epic that reacts to actions flagged as API requests by making
+ * the corresponding API call.
+ *
+ * If the request completes successfully, it dispatches the specified success action
+ * with the response data as the payload.
+ *
+ * If the request fails, it dispatches the specified failure action with an ``ApiError``
+ * as the payload.
+ */
 function apiRequestEpic(action$, store) {
     // Listen for actions with the apiRequest flag
     return action$.filter(action => action.apiRequest)
@@ -62,7 +68,8 @@ function apiRequestEpic(action$, store) {
                     let apiError;
                     if( res === null ) {
                         apiError = new ApiError(
-                            'Error communicating with API server.', error.status);
+                            'Error communicating with API server.', error.status
+                        );
                     }
                     else if( res.detail ) {
                         apiError = new ApiError(res.detail, error.status);
@@ -82,23 +89,25 @@ function apiRequestEpic(action$, store) {
 }
 
 
-/*****
- **  STUFF TO DO WITH SESSION MANAGEMENT
- *****/
-
+/**
+ * Actions dispatched during session management flows.
+ */
 export const Actions = {
     // These are just sentinel actions that be consumed by other modules
     SESSION_STARTED: 'USER/SESSION_STARTED',
     SESSION_TERMINATED: 'USER/SESSION_TERMINATED',
 
+    // Actions dispatched while attempting to initialise a session
     INITIALISE_SESSION: 'USER/INITIALISE_SESSION',
     INITIALISATION_SUCCEEDED: 'USER/INITIALISATION_SUCCEEDED',
     INITIALISATION_FAILED: 'USER/INITIALISATION_FAILED',
 
+    // Actions dispatched while attempting to authenticate a session
     AUTHENTICATE: 'USER/AUTHENTICATE',
     AUTHENTICATION_SUCCEEDED: 'USER/AUTHENTICATION_SUCCEEDED',
     AUTHENTICATION_FAILED: 'USER/AUTHENTICATION_FAILED',
 
+    // Actions dispatched while attempting to terminate a session
     SIGN_OUT: 'USER/SIGN_OUT',
     SIGN_OUT_SUCCEEDED: 'USER/SIGN_OUT_SUCCEEDED',
     SIGN_OUT_FAILED: 'USER/SIGN_OUT_FAILED'
@@ -118,6 +127,7 @@ export function initialiseSession() {
         apiRequest: true,
         successAction: Actions.INITIALISATION_SUCCEEDED,
         failureAction: Actions.INITIALISATION_FAILED,
+        failSilently: true,
         options: { url: '/api/session/' }
     };
 }
@@ -128,6 +138,7 @@ export function authenticate(username, password) {
         apiRequest: true,
         successAction: Actions.AUTHENTICATION_SUCCEEDED,
         failureAction: Actions.AUTHENTICATION_FAILED,
+        failSilently: true,
         options: {
             url: '/api/authenticate/',
             method: 'POST',
@@ -158,6 +169,9 @@ const initialState = {
     authenticationError: null
 };
 
+/**
+ * The redux reducer for the session state.
+ */
 export function reducer(state = initialState, action) {
     switch(action.type) {
         case Actions.INITIALISE_SESSION:
@@ -176,10 +190,16 @@ export function reducer(state = initialState, action) {
             return {
                 ...state,
                 username: action.payload.username,
-                authenticating: false
+                authenticating: false,
+                authenticationError: null
             };
         case Actions.AUTHENTICATION_FAILED:
-            return { ...state, username: null, authenticating: false };
+            return {
+                ...state,
+                username: null,
+                authenticating: false,
+                authenticationError: action.payload
+            };
         case Actions.SIGN_OUT:
             return { ...state, signingOut: true };
         case Actions.SIGN_OUT_SUCCEEDED:
@@ -191,12 +211,20 @@ export function reducer(state = initialState, action) {
     }
 }
 
+/**
+ * redux-observable epic to dispatch the generic SESSION_STARTED action when a
+ * session is successfully initialised or authenticated.
+ */
 function sessionStartedEpic(action$) {
     return action$.ofType(Actions.INITIALISATION_SUCCEEDED)
         .merge(action$.ofType(Actions.AUTHENTICATION_SUCCEEDED))
         .map(action => sessionStarted());
 }
 
+/**
+ * redux-observable epic to dispatch the generic SESSION_TERMINATED action when
+ * a session is terminated, either on purpose or due to an error.
+ */
 function sessionTerminatedEpic(action$) {
     return action$.ofType(Actions.SIGN_OUT_SUCCEEDED)
         .merge(action$.ofType(Actions.INITIALISATION_FAILED))
@@ -204,6 +232,10 @@ function sessionTerminatedEpic(action$) {
         .map(action => sessionTerminated());
 }
 
+/**
+ * redux-observable epic to dispatch an AUTHENTICATION_FAILED action whenever an
+ * API request fails with a 401 or 403.
+ */
 function apiAuthenticationErrorEpic(action$, store) {
     return action$
         .filter(action => !!action.error)

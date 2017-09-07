@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Row, Col, PageHeader, FormGroup, FormControl, Button } from 'react-bootstrap';
+import { Row, Col, PageHeader, FormGroup, FormControl, Button, Alert } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
 import { Form, Field, ControlContainer, Loading } from '../utils';
@@ -13,6 +13,12 @@ class LoginForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = { username: '', password: '' };
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // If transitioning from authenticating to not authenticating, reset the form
+        if( this.props.authenticating && !nextProps.authenticating )
+            this.setState({ username: '', password: '' });
     }
 
     handleChange = (e) => this.setState({ [e.target.id]: e.target.value });
@@ -66,12 +72,25 @@ class LoginForm extends React.Component {
 
 
 export class LoginPage extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { error: null };
+    }
+
     componentDidMount() {
         document.title = 'Sign in | JASMIN Cloud Portal';
+        // When the component mounts, reset the error
+        this.setState({ error: null });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        // If transitioning from authenticating to not authenticating, store the error
+        if( this.props.authenticating && !nextProps.authenticating )
+            this.setState({ error: nextProps.authenticationError });
     }
 
     render() {
-        const { username, initialising, ...rest } = this.props;
+        const { username, initialising, ...formProps } = this.props;
         // If there is an active user, redirect to dashboard
         if( username ) return <Redirect to="/dashboard" />;
         // If we are still initialising, don't render yet
@@ -85,7 +104,22 @@ export class LoginPage extends React.Component {
                             This is the same username and password as you use to sign
                             in to the JASMIN Accounts Portal.
                         </div>
-                        <LoginForm {...rest} />
+                    </Col>
+                </Row>
+                {this.state.error && (
+                    <Row>
+                        <Col md={6} mdOffset={3}>
+                            <div
+                              role="notification"
+                              className="notification notification-inline notification-danger">
+                                <div className="notification-content">{this.state.error.message}</div>
+                            </div>
+                        </Col>
+                    </Row>
+                )}
+                <Row>
+                    <Col md={8} mdOffset={2}>
+                        <LoginForm {...formProps} />
                     </Col>
                 </Row>
             </div>
