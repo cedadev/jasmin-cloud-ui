@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Row, Col, Panel } from 'react-bootstrap';
+import { Row, Col, Panel, Button } from 'react-bootstrap';
 import { Redirect } from 'react-router';
 
 import { Loading } from '../../utils';
@@ -90,16 +90,35 @@ export class TenancyOverviewPanel extends React.Component {
     render() {
         const { fetching, data: quotas } = this.props.tenancy.quotas;
         return (
-            <Row>
-                {quotas ? (
-                    <Col md={12}>
-                        <QuotaProgressCircle title="Machines" quota={quotas.machines} />
-                        <QuotaProgressCircle title="Volumes" quota={quotas.volumes} />
-                        <QuotaProgressCircle title="CPUs" quota={quotas.cpus} />
-                        <QuotaProgressCircle title="RAM" quota={quotas.ram} />
-                        <QuotaProgressCircle title="Storage" quota={quotas.storage} />
-                    </Col>
-                ) : (
+            quotas ? (
+                <div className="quotas-wrapper">
+                    <Row>
+                        <Col md={12}>
+                            <div className="pull-right">
+                                <Button
+                                  bsStyle="info"
+                                  disabled={fetching}
+                                  onClick={() => this.props.tenancyActions.quota.fetchList()}
+                                  title="Refresh quotas">
+                                    <i className={`fa fa-refresh ${fetching ? 'fa-spin' : ''}`}></i>
+                                    {'\u00A0'}
+                                    Refresh
+                                </Button>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md={12}>
+                            <QuotaProgressCircle title="Machines" quota={quotas.machines} />
+                            <QuotaProgressCircle title="Volumes" quota={quotas.volumes} />
+                            <QuotaProgressCircle title="CPUs" quota={quotas.cpus} />
+                            <QuotaProgressCircle title="RAM" quota={quotas.ram} />
+                            <QuotaProgressCircle title="Storage" quota={quotas.storage} />
+                        </Col>
+                    </Row>
+                </div>
+            ) : (
+                <Row>
                     <Col md={6} mdOffset={3}>
                         {fetching ? (
                             <Loading message="Loading quota information..."/>
@@ -111,8 +130,8 @@ export class TenancyOverviewPanel extends React.Component {
                             </div>
                         )}
                     </Col>
-                )}
-            </Row>
+                </Row>
+            )
         );
     }
 }

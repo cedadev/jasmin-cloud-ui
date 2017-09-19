@@ -209,6 +209,12 @@ body.machines-page #react-root, body.volumes-page #react-root {
     width: 99%;
 }
 
+.quotas-wrapper .row {
+    margin-bottom: 10px;
+}
+.quotas-wrapper .btn {
+    margin-right: 7px;
+}
 .quota-progress {
     width: 33.33%;
     float: left;
