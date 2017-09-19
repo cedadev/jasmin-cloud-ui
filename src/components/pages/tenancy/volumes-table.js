@@ -135,33 +135,51 @@ function VolumeRow(props) {
     );
 }
 
-export function VolumesTable(props) {
-    // Sort the volumes by name to ensure a consistent rendering
-    const volumes = Object.values(props.volumes)
-        .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
-    return (
-        <Table striped hover responsive>
-            <caption>
-                {volumes.length} volume{volumes.length !== 1 && 's'}
-            </caption>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Size</th>
-                    <th>Attached To</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {volumes.map(volume =>
-                    <VolumeRow
-                      key={volume.id}
-                      volume={volume}
-                      machines={props.machines}
-                      volumeActions={bindArgsToActions(props.volumeActions, volume.id)} />
-                )}
-            </tbody>
-        </Table>
-    );
+export class VolumesTable extends React.Component {
+    componentDidMount() {
+        // Responsive tables don't play nice with dropdown menus (the menu gets
+        // clipped by the responsive wrapper)
+        // To get around this, we add a margin to the bottom of the table that
+        // pushes the responsive wrapper out to the point where the bottom
+        // dropdown has space to render
+        // When this component mounts, we add a body class so that we can add a
+        // negative margin to pull the footer back up
+        // When it unmounts, we remove it again
+        document.body.classList.add('volumes-page');
+    }
+
+    componentWillUnmount() {
+        document.body.classList.remove('volumes-page')
+    }
+
+    render() {
+        // Sort the volumes by name to ensure a consistent rendering
+        const volumes = Object.values(this.props.volumes)
+            .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+        return (
+            <Table striped hover responsive>
+                <caption>
+                    {volumes.length} volume{volumes.length !== 1 && 's'}
+                </caption>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Size</th>
+                        <th>Attached To</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {volumes.map(volume =>
+                        <VolumeRow
+                          key={volume.id}
+                          volume={volume}
+                          machines={this.props.machines}
+                          volumeActions={bindArgsToActions(this.props.volumeActions, volume.id)} />
+                    )}
+                </tbody>
+            </Table>
+        );
+    }
 }

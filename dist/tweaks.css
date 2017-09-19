@@ -180,7 +180,7 @@ caption {
     color: #777;
 }
 
-body.machines-page #react-root {
+body.machines-page #react-root, body.volumes-page #react-root {
     margin-bottom: -160px;
 }
 .machine-status, .volume-status {
