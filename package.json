@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Web portal for administration of projects in the JASMIN Cloud.",
   "scripts": {
-    "watch": "webpack --watch -d --progress --color"
+    "watch": "webpack --watch --progress --color --config webpack.dev.js",
+    "build": "webpack --progress --color --config webpack.prod.js"
   },
   "repository": {
     "type": "git",
@@ -23,16 +24,18 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
-    "webpack": "^3.5.6"
+    "html-webpack-plugin": "^2.30.1",
+    "webpack": "^3.6.0",
+    "webpack-merge": "^4.1.0"
   },
   "dependencies": {
     "js-cookie": "^2.1.4",
     "moment": "^2.18.1",
     "react": "^15.6.1",
-    "react-bootstrap": "^0.31.2",
+    "react-bootstrap": "^0.31.3",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
-    "react-router-bootstrap": "^0.24.3",
+    "react-router-bootstrap": "^0.24.4",
     "react-router-dom": "^4.2.2",
     "react-transition-group": "^2.2.0",
     "redux": "^3.7.2",
