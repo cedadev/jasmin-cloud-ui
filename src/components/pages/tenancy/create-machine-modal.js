@@ -8,7 +8,7 @@ import { Button, Modal, FormControl } from 'react-bootstrap';
 import { Form, Field } from '../../utils';
 
 
-export class CreateMachineModalButton extends React.Component {
+export class CreateMachineButton extends React.Component {
     constructor(props) {
         super(props)
         this.state = { visible: false, name: '', image: '', size: '' }
@@ -17,16 +17,16 @@ export class CreateMachineModalButton extends React.Component {
     open = () => this.setState({ visible: true })
     close = () => this.setState({ visible: false, name: '', image: '', size: '' })
 
-    componentWillReceiveProps(nextProps) {
-        // If transitioning from creating to not creating, the modal is done
-        if( this.props.creating && !nextProps.creating ) this.close();
-    }
-
     handleChange = (e) => this.setState({ [e.target.id]: e.target.value });
 
-    handleSubmit = (event) => {
-        event.preventDefault();
-        this.props.createMachine(this.state.name, this.state.image, this.state.size);
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.create({
+            name: this.state.name,
+            image_id: this.state.image,
+            size_id: this.state.size
+        });
+        this.close();
     }
 
     render() {
@@ -34,14 +34,19 @@ export class CreateMachineModalButton extends React.Component {
         return (
             <Button
               bsStyle="success"
+              disabled={creating}
               onClick={this.open}
               title="Create a new machine">
-                <i className="fa fa-desktop"></i>
-                {' '}
-                New machine
+                { creating ? (
+                    <i className="fa fa-spinner fa-pulse" />
+                ) : (
+                    <i className="fa fa-desktop"></i>
+                )}
+                {'\u00A0\u00A0'}
+                { creating ? 'Creating machine...' : 'New machine' }
                 <Modal
                   backdrop="static"
-                  onHide={creating ? undefined : this.close}
+                  onHide={this.close}
                   show={this.state.visible}>
                     <Modal.Header closeButton>
                         <Modal.Title>Create a new machine</Modal.Title>
@@ -49,7 +54,7 @@ export class CreateMachineModalButton extends React.Component {
                     <Form
                       horizontal
                       onSubmit={this.handleSubmit}
-                      disabled={creating || !images.data || !sizes.data}>
+                      disabled={!images.data || !sizes.data}>
                         <Modal.Body>
                             <Field name="name" label="Machine name">
                                 <FormControl
@@ -74,11 +79,19 @@ export class CreateMachineModalButton extends React.Component {
                                         )}
                                     </FormControl>
                                 ) : (
-                                    <FormControl.Static>
-                                        <i className="fa fa-spinner fa-pulse" />
-                                        {' '}
-                                        Loading images...
-                                    </FormControl.Static>
+                                    images.fetching ? (
+                                        <FormControl.Static>
+                                            <i className="fa fa-spinner fa-pulse" />
+                                            {'\u00A0'}
+                                            Loading images...
+                                        </FormControl.Static>
+                                    ) : (
+                                        <FormControl.Static className="text-danger">
+                                            <i className="fa fa-exclamation-triangle" />
+                                            {'\u00A0'}
+                                            Failed to load images
+                                        </FormControl.Static>
+                                    )
                                 ) }
                             </Field>
                             <Field name="size" label="Size">
@@ -94,28 +107,28 @@ export class CreateMachineModalButton extends React.Component {
                                         )}
                                     </FormControl>
                                 ) : (
-                                    <FormControl.Static>
-                                        <i className="fa fa-spinner fa-pulse" />
-                                        {' '}
-                                        Loading sizes...
-                                    </FormControl.Static>
+                                    sizes.fetching ? (
+                                        <FormControl.Static>
+                                            <i className="fa fa-spinner fa-pulse" />
+                                            {'\u00A0'}
+                                            Loading sizes...
+                                        </FormControl.Static>
+                                    ) : (
+                                        <FormControl.Static className="text-danger">
+                                            <i className="fa fa-exclamation-triangle" />
+                                            {'\u00A0'}
+                                            Failed to load sizes
+                                        </FormControl.Static>
+                                    )
                                 ) }
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>
-                            { creating ? (
-                                <Button bsStyle="success" type="submit">
-                                    <i className="fa fa-spinner fa-pulse" />
-                                    {' '}
-                                    Creating machine...
-                                </Button>
-                            ) : (
-                                <Button bsStyle="success" type="submit">
-                                    <i className="fa fa-plus" />
-                                    {' '}
-                                    Create machine
-                                </Button>
-                            ) }
+                            <Button bsStyle="success" type="submit">
+                                <i className="fa fa-plus" />
+                                {'\u00A0'}
+                                Create machine
+                            </Button>
                         </Modal.Footer>
                     </Form>
                 </Modal>

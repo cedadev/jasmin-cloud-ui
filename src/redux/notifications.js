@@ -2,45 +2,54 @@
  * This module manages the Redux state for the messaging subsystem.
  */
 
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
 
-export const Actions = {
+
+export const actions = {
     NOTIFY: 'NOTIFICATIONS/NOTIFY',
-    REMOVE_NOTIFICATION: 'NOTIFICATIONS/REMOVE_NOTIFICATION',
-    CLEAR_NOTIFICATIONS: 'NOTIFICATIONS/CLEAR_NOTIFICATIONS'
+    REMOVE: 'NOTIFICATIONS/REMOVE',
+    CLEAR: 'NOTIFICATIONS/CLEAR'
 };
 
 
-export function notify(message, context) {
+function notify(message, context) {
     return {
-        type: Actions.NOTIFY,
+        type: actions.NOTIFY,
         payload: { message, context }
     };
 }
-export const notifyInfo    = (message) => notify(message, 'info')
-export const notifySuccess = (message) => notify(message, 'success')
-export const notifyWarning = (message) => notify(message, 'warning')
-export const notifyError   = (message) => notify(message, 'danger')
-
-export function removeNotification(index) {
-    return {
-        type: Actions.REMOVE_NOTIFICATION,
-        index: index
-    };
-}
-
-export function clearNotifications() {
-    return { type: Actions.CLEAR_NOTIFICATIONS };
-}
+export const actionCreators = {
+    notify,
+    info: (message) => notify(message, 'info'),
+    success: (message) => notify(message, 'success'),
+    warning: (message) => notify(message, 'warning'),
+    error: (message) => notify(message, 'danger'),
+    remove: (index) => ({ type: actions.REMOVE, index: index }),
+    clear: () => ({ type: actions.CLEAR })
+};
 
 
 export function reducer(state = [], action) {
     switch(action.type) {
-        case Actions.NOTIFY:
-            return [...state, action.payload];
-        case Actions.REMOVE_NOTIFICATION:
-            const index = action.index;
-            return state.slice(0, index).concat(state.slice(index + 1));
-        case Actions.CLEAR_NOTIFICATIONS:
+        case actions.NOTIFY:
+            // As well as context and message, we also record how many times we
+            // have seen the same notification before it is cleared
+            const index = state.findIndex(n =>
+                n.context === action.payload.context &&
+                n.message === action.payload.message
+            );
+            if( index >= 0 ) {
+                const prev = state[index];
+                const next = { ...prev, times: prev.times + 1 };
+                return [...state.slice(0, index), next].concat(state.slice(index + 1));
+            }
+            else {
+                return [...state, { ...action.payload, times: 1 }];
+            }
+        case actions.REMOVE:
+            return state.slice(0, action.index).concat(state.slice(action.index + 1));
+        case actions.CLEAR:
             return [];
         default:
             return state;
@@ -55,5 +64,5 @@ export function epic(action$) {
     return action$
         .filter(action => !!action.error)
         .filter(action => !action.silent)
-        .map(action => notifyError(action.payload.message));
+        .map(action => actionCreators.error(action.payload.message));
 }

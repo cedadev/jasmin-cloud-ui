@@ -3,94 +3,60 @@
  */
 
 import React from 'react';
-import {
-    Row, Col, PageHeader, Table, ButtonGroup, Button, Modal, FormControl,
-    ProgressBar, OverlayTrigger, Tooltip, FormGroup, ControlLabel, InputGroup
-} from 'react-bootstrap';
+import { PageHeader, Nav, NavItem } from 'react-bootstrap';
 import { Redirect } from 'react-router';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import { Loading, Form, Field, ControlContainer } from '../../utils';
-
-import { MachinesTable } from './machines-table';
-import { CreateMachineModalButton } from './create-machine-modal';
-import { QuotasModalButton } from './quotas-modal';
-import { ExternalIpsModalButton } from './external-ips-modal';
+import { Loading, bindArgsToActions } from '../../utils';
 
 
-export class TenancyPage extends React.Component {
-    getTenancy(props) {
-        const { tenancyId, tenancies: { data: tenancies } } = props;
-        if( tenancies === null ) return null;
-        return tenancies[tenancyId] || null;  // Convert undefined to null
+export function TenancyPage(props) {
+    const {
+        tenancyId,
+        tenancies: { fetching, data: tenancies },
+        tenancyActions
+    } = props;
+    // Extract the tenancy data for the given ID
+    const tenancy = (tenancies || {})[tenancyId];
+    if( tenancy ) {
+        // Bind the tenancyActions to the tenancyId
+        const boundTenancyActions = {
+            quota: bindArgsToActions(tenancyActions.quota, tenancyId),
+            image: bindArgsToActions(tenancyActions.image, tenancyId),
+            size: bindArgsToActions(tenancyActions.size, tenancyId),
+            externalIp: bindArgsToActions(tenancyActions.externalIp, tenancyId),
+            volume: bindArgsToActions(tenancyActions.volume, tenancyId),
+            machine: bindArgsToActions(tenancyActions.machine, tenancyId)
+        };
+        return (
+            <div>
+                <PageHeader>{tenancy.name}</PageHeader>
+                <Nav bsStyle="tabs" activeHref={props.match.url}>
+                    <LinkContainer exact to={`/tenancies/${tenancyId}`}>
+                        <NavItem>Overview</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={`/tenancies/${tenancyId}/machines`}>
+                        <NavItem>Machines</NavItem>
+                    </LinkContainer>
+                    <LinkContainer to={`/tenancies/${tenancyId}/volumes`}>
+                        <NavItem>Volumes</NavItem>
+                    </LinkContainer>
+                </Nav>
+                {React.Children.map(
+                    // Pass the tenancy data to the children
+                    props.children,
+                    child => React.cloneElement(child, {
+                        tenancy,
+                        tenancyActions: boundTenancyActions
+                    })
+                )}
+            </div>
+        );
     }
-
-    setPageTitle(props) {
-        const tenancy = this.getTenancy(props);
-        if( tenancy ) document.title = `${tenancy.name} | JASMIN Cloud Portal`;
+    else if( fetching ) {
+        return <Loading message="Loading tenancy details..." />;
     }
-
-    componentDidMount = () => this.setPageTitle(this.props)
-    componentWillUpdate = (props) => this.setPageTitle(props)
-
-    render() {
-        const fetching = this.props.tenancies.fetching;
-        const tenancy = this.getTenancy(this.props);
-        if( tenancy ) {
-            return (
-                <div>
-                    <PageHeader>
-                        Available machines{' '}
-                        <small>{tenancy.name}</small>
-                    </PageHeader>
-                    <Row>
-                        <Col md={12}>
-                            <ButtonGroup className="pull-right">
-                                <CreateMachineModalButton
-                                  creating={!!tenancy.machines.creating}
-                                  images={tenancy.images}
-                                  sizes={tenancy.sizes}
-                                  createMachine={(...args) => this.props.createMachine(tenancy.id, ...args)} />
-                                <ExternalIpsModalButton
-                                  machines={tenancy.machines}
-                                  externalIps={tenancy.externalIps}
-                                  allocateExternalIp={() => this.props.allocateExternalIp(tenancy.id)}
-                                  updateExternalIp={(...args) => this.props.updateExternalIp(tenancy.id, ...args)} />
-                                <QuotasModalButton
-                                  quotas={tenancy.quotas}
-                                  fetchQuotas={() => this.props.fetchQuotas(tenancy.id)} />
-                                <Button
-                                  bsStyle="info"
-                                  disabled={!!tenancy.machines.fetching}
-                                  onClick={() => this.props.fetchMachines(tenancy.id)}
-                                  title="Refresh machine list">
-                                    <i className="fa fa-refresh"></i>
-                                    {' '}
-                                    Refresh
-                                </Button>
-                            </ButtonGroup>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            <MachinesTable
-                              machines={tenancy.machines}
-                              externalIps={tenancy.externalIps.data}
-                              startMachine={(mid) => this.props.startMachine(tenancy.id, mid)}
-                              stopMachine={(mid) => this.props.stopMachine(tenancy.id, mid)}
-                              restartMachine={(mid) => this.props.restartMachine(tenancy.id, mid)}
-                              deleteMachine={(mid) => this.props.deleteMachine(tenancy.id, mid)}
-                              attachVolume={(mid, size) => this.props.attachVolume(tenancy.id, mid, size)}
-                              detachVolume={(mid, vid) => this.props.detachVolume(tenancy.id, mid, vid)} />
-                        </Col>
-                    </Row>
-                </div>
-            );
-        }
-        else if( fetching ) {
-            return <Loading />;
-        }
-        else {
-            return <Redirect to="/dashboard" />;
-        }
+    else {
+        return <Redirect to="/dashboard" />;
     }
 }

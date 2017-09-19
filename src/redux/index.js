@@ -6,13 +6,19 @@ import { combineReducers, applyMiddleware, compose, createStore } from 'redux';
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import {
-    reducer as sessionReducer, epic as sessionEpic, initialiseSession
+    actionCreators as sessionActionCreators,
+    reducer as sessionReducer,
+    epic as sessionEpic
 } from './session';
+
 import {
-    reducer as tenanciesReducer, epic as tenanciesEpic
+    reducer as tenanciesReducer,
+    epic as tenanciesEpic
 } from './tenancies';
+
 import {
-    reducer as notificationReducer, epic as notificationEpic
+    reducer as notificationReducer,
+    epic as notificationEpic
 } from './notifications';
 
 
@@ -31,4 +37,4 @@ export const store = createStore(
 );
 
 // Initialise the session
-store.dispatch(initialiseSession());
+store.dispatch(sessionActionCreators.initialise());
