@@ -42,7 +42,9 @@ export class AttachExternalIpMenuItem extends React.Component {
             .filter(ip => !ip.updating && !ip.machine)
             .map(ip => ip.external_ip);
         return (
-            <MenuItem onSelect={this.open} disabled={!!machineExternalIp}>
+            <MenuItem
+              onSelect={this.open}
+              disabled={!!machineExternalIp || !machine.nat_allowed}>
                 Attach external IP
                 <Modal
                   backdrop="static"
