@@ -1,0 +1,14 @@
+#! /usr/bin/env bash
+
+#
+# Pre-commit hook for the jasmin-cloud-ui repository
+# 
+# Runs a production build before every commit to create the dist directory
+# and adds it to the commit
+#
+
+set -ex
+
+rm -rf dist
+npm run build
+git add dist

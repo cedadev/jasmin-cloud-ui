@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Web portal interface for administration of tenancies in the JASMIN Cloud.",
   "scripts": {
-    "watch": "webpack --watch --progress --color --config webpack.dev.js",
+    "watch": "webpack --watch --progress --config webpack.dev.js",
     "build": "webpack --progress --config webpack.prod.js"
   },
   "repository": {

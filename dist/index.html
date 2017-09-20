@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="some keywords">
+        <meta name="description" content="JASMIN Theme example page">
+
+        <!-- Replace with page title -->
+        <title>JASMIN Cloud Portal</title>
+        <link rel="shortcut icon" href="/jasmin_theme/img/favicon.ico">
+
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/jasmin_theme/css/bootstrap-theme.css" />
+        <link rel="stylesheet" href="/jasmin_theme/css/jasmin.css" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/tweaks.css" />
+    </head>
+
+    <body>
+        <div id="react-root"></div>
+
+        <footer>
+            <div class="container">
+                <div class="row">
+                    <div id="nerc-logo" class="col-sm-6">
+                        <a href="http://www.nerc.ac.uk" title="NERC">
+                            <img src="/jasmin_theme/img/nerc-long-logo-261.png" title="NERC logo"
+                                 height="53" width="261" alt="NERC logo" />
+                        </a>
+                    </div>
+                    <div id="stfc-logo" class="col-sm-6">
+                        <a href="http://www.stfc.ac.uk" title="STFC">
+                            <img src="/jasmin_theme/img/STFCMediumColourTrans.png" title="STFC logo"
+                                 height="57" width="261" alt="STFC logo" />
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="site-info">
+                            Copyright &copy; 2017 <a href="http://www.stfc.ac.uk">STFC</a> |
+                            All Rights Reserved |
+                            <a href="https://accounts.jasmin.ac.uk/account/accessibility/" target="_blank">Accessibility</a> |
+                            <a href="https://accounts.jasmin.ac.uk/account/privacy/" target="_blank">Privacy</a> |
+                            <a href="https://accounts.jasmin.ac.uk/account/support/" target="_blank">Support</a> |
+                            <a href="https://accounts.jasmin.ac.uk/account/conditions/" target="_blank">Terms and Conditions</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>!function(e,o,n){window.HSCW=o,window.HS=n,n.beacon=n.beacon||{};var t=n.beacon;t.userConfig={},t.readyQueue=[],t.config=function(e){this.userConfig=e},t.ready=function(e){this.readyQueue.push(e)},o.config={docs:{enabled:!0,baseUrl:"//jasmin-help.helpscoutdocs.com/"},contact:{enabled:!0,formId:"71e2f368-bd39-11e6-91aa-0a5fecc78a4d"}};var r=e.getElementsByTagName("script")[0],c=e.createElement("script");c.type="text/javascript",c.async=!0,c.src="https://djtflbt20bdde.cloudfront.net/",r.parentNode.insertBefore(c,r)}(document,window.HSCW||{},window.HS||{});</script>
+        <script>
+            HS.beacon.config({
+                color: '#ff6600',
+                topArticles: true,
+                icon: 'question',
+                translation: {
+                    searchLabel: 'Search JASMIN documentation',
+                    searchErrorLabel: 'There was a problem searching the Help pages. Visit: help.ceda.ac.uk or email support@ceda.ac.uk'
+                },
+                topics: [
+                    { val: 'jasmin-help', label: 'Help with JASMIN/CEMS'},
+                    { val: 'account-problem', label: 'Help with my account'},
+                    { val: 'bug-flag', label: 'Found a bug?'},
+                    { val: 'content-flag', label: 'Content on this page looks wrong'}
+                ],
+                attachment: true,
+                instructions:'Drop CEDA Support a message below and we\'ll try to help.'
+            });
+            HS.beacon.ready(function() {
+                HS.beacon.suggest([]);
+                // If the user doesn't have the cookie, pop ourselves up, but set the cookie
+                if( document.cookie.match(/^(.*; ?)?hs_beacon_shown=[^;]+/) === null ) {
+                    // Open the Beacon as soon as it's ready
+                    this.open();
+                    setTimeout(this.close, 3000);
+                    // Set cookie that expires at end of session
+                    document.cookie = "hs_beacon_shown=1; expires=; path=/; ";
+                }
+            });
+        </script>
+    <script type="text/javascript" src="/bundle.js?a648675dae95e80b2ca1"></script></body>
+</html>

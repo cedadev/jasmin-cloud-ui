@@ -1,0 +1,299 @@
+/* Customisations to bootstrap theme for JASMIN theme (order: bootstrap - bootstrap-theme - this) */
+
+/* CSS rules for sticky footer */
+
+html {
+    margin : 0;
+    padding : 0;
+    height : 100%;
+    box-sizing : border-box;
+}
+
+body {
+    position : relative;
+    margin : 0;
+    min-height : 100%;
+    padding-top: 70px;
+    padding-bottom : 245px;
+}
+
+footer {
+    position : absolute;
+    bottom : 0px;
+    height : 225px;
+    width : 100%;
+    background-color : #F8F8F8;
+    border-top : 1px solid #E7E7E7;
+    padding : 25px 0 0 0;
+    text-align: center;
+}
+
+footer img {
+    margin-bottom: 15px;
+}
+
+@media (min-width: 768px) {
+    body {
+        padding-bottom : 160px;
+    }
+    footer {
+        height : 140px;
+    }
+    #nerc-logo {
+        text-align: left;
+    }
+    #stfc-logo {
+        text-align: right;
+    }
+}
+
+.page-header {
+    margin-top : 10px;
+}
+
+.form-group:last-child, .help-block:last-child {
+    margin-bottom: 0;
+}
+
+/* Close the gap between help blocks to 5px */
+.help-block {
+    margin-bottom : 5px;
+}
+
+/* Add a border between consecutive panel bodies */
+.panel-body + .panel-body {
+    border-top: 1px solid #ddd;
+}
+
+/* Set the color of the placeholder text for errored fields
+
+   NOTE: These rules are not combined on purpose
+         This is because if a browser finds a rule with an unrecognised selector,
+         it is free to ignore the entire rule
+*/
+.has-error .form-control::-webkit-input-placeholder {
+    color : #d4a2a0 !important;
+}
+.has-error .form-control:-moz-placeholder {
+    color : #d4a2a0 !important;
+}
+.has-error .form-control::-moz-placeholder {
+    color : #d4a2a0 !important;
+}
+.has-error .form-control:-ms-input-placeholder {
+    color : #d4a2a0 !important;
+}
+
+/* Make the alerts with icons look better */
+.alert-with-icon {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+.alert-with-icon > .fa, .alert-with-icon > *:nth-child(2) {
+    display: table-cell;
+    vertical-align: middle;
+}
+.alert-with-icon > .fa {
+    font-size : 25px;
+    padding-right : 15px;
+}
+.alert-with-icon > *:nth-child(2) *:last-child {
+    margin-bottom: 0;
+}
+
+/* Pull the breadcrumbs up until they are attached to the bottom of the header */
+.breadcrumb {
+    margin-top: -20px;
+    border-radius: 0 0 4px 4px;
+}
+
+/* Classes to use wizard-like steps instead of breadcrumbs */
+.steps {
+    list-style: none;
+    margin-top: -21px;
+    margin-bottom: 20px;
+    border-radius: 0 0 4px 4px;
+    overflow: hidden;
+    padding: 0;
+    border: 1px solid #d9d9d9;
+}
+.steps:after {
+    display: table;
+    content: "";
+    clear:both;
+}
+.steps li {
+    list-style-type: none;
+    display: inline-block;
+    float: left;
+    padding-left: 13px;
+    padding-right: 13px;
+    position: relative;
+    height: 50px;
+    line-height: 50px;
+    background-color: #f5f5f5;
+    text-align: center;
+    color: #777;
+}
+.steps li:first-child {
+    padding-left: 0;
+}
+.steps li:last-child {
+    padding-right: 0;
+}
+.steps li:not(:first-child)::before {
+    content: '';
+    border-left: 25px solid #d9d9d9;
+    border-top: 25px solid #f5f5f5;
+    border-bottom: 25px solid #f5f5f5;
+    border-right: 0;
+    position: absolute;
+    top: 0;
+    left: -12px;
+    z-index: 1;
+}
+.steps li:not(:last-child)::after {
+    content: '';
+    border-left: 25px solid #f5f5f5;
+    border-top: 25px solid transparent;
+    border-bottom: 25px solid transparent;
+    border-right: 0;
+    position: absolute;
+    top: 0;
+    right: -12px;
+    z-index: 2;
+}
+.steps li .badge {
+    margin-right: 5px;
+}
+.steps li.active {
+    background-color: #d9edf7;
+    color: #31708f;
+}
+.steps li.active::before {
+    border-top: 25px solid #d9edf7;
+    border-bottom: 25px solid #d9edf7;
+}
+.steps li.active::after {
+    border-left: 25px solid #d9edf7;
+}
+.steps li.active .badge {
+    background-color: #31708f;
+}
+.steps li.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+.steps li.success::before {
+    border-top: 25px solid #dff0d8;
+    border-bottom: 25px solid #dff0d8;
+}
+.steps li.success::after {
+    border-left: 25px solid #dff0d8;
+}
+.steps li.success .badge {
+    background-color: #3c763d;
+}
+.steps li.danger {
+    background-color: #f2dede;
+    color: #a94442;
+}
+.steps li.danger::before {
+    border-top: 25px solid #f2dede;
+    border-bottom: 25px solid #f2dede;
+}
+.steps li.danger::after {
+    border-left: 25px solid #f2dede;
+}
+.steps li.danger .badge {
+    background-color: #a94442;
+}
+.steps-2 li {
+    width: 50%;
+}
+.steps-3 li {
+    width: 33.33333%;
+}
+.steps-4 li {
+    width: 25%;
+}
+
+.splash-header {
+    border-radius: 6px 6px 0 0;
+    overflow: hidden;
+    background: url(../img/banner.jpg) top left no-repeat;
+}
+.splash-header h1 {
+    margin: 0;
+    padding: 40px;
+    color: #fff;
+}
+.splash-body {
+    font-size: 21px;
+    font-weight: 200;
+    border: 1px solid #ddd;
+    border-radius: 0 0 6px 6px;
+    padding: 20px 25px;
+}
+.splash-body .well {
+    margin-bottom: 0;
+}
+.splash-body .btn {
+    margin-bottom: 10px;
+    text-align: left;
+}
+.splash-body .btn:last-child {
+    margin-bottom: 0;
+}
+
+/* change the URL to a picture of your choice - the higher quality the better! */
+.business-header {
+	height: 200px;
+	background: url(../img/banner.jpg) top left no-repeat;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.business-header-page {
+	height: 80px;
+	background: url(../img/banner.jpg) top left no-repeat;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* adjust the color and text shadow to optimize legibility once you have an image set - you can also change the vertical positioning if desired  */
+.tagline {
+	color: #fff;
+	text-shadow: 0 0 10px #000;
+}
+
+.img-pad-1px-right {
+  display: inline-block;
+  height: auto;
+  max-width: 100%;
+  text-align: right;
+  padding-top: 1px;
+  padding-left: 0px;
+  padding-bottom: 0px;
+  padding-right: 0px;
+}
+
+#ticker_container {
+  padding:1px;
+  border: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  overflow: auto;
+}
+
+.nav .badge {
+    margin-left : 3px;
+}
+
+.input-group-addon label {
+    display: inline;
+    margin: 0;
+    font-weight: 400;
+}
