@@ -199,7 +199,7 @@ body.machines-page #react-root, body.volumes-page #react-root {
     width: 100px;
 }
 
-.modal-body .table {
+.modal-body .table, .modal-body p:last-child {
     margin-bottom: 0;
 }
 .volumes-table td:nth-child(1), .volume-add-form .control-label {

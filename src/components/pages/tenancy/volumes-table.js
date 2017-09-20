@@ -38,7 +38,8 @@ class ConfirmDeleteMenuItem extends React.Component {
                 Delete volume
                 <Modal show={this.state.visible}>
                     <Modal.Body>
-                        Are you sure? Once deleted, a volume cannot be restored.
+                        <p>Are you sure you want to delete {this.props.name}?</p>
+                        <p><strong>Once deleted, a volume cannot be restored.</strong></p>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.close}>Cancel</Button>
@@ -93,6 +94,7 @@ function VolumeActionsDropdown(props) {
                 Detach volume from machine
             </MenuItem>
             <ConfirmDeleteMenuItem
+              name={props.volume.name}
               disabled={!['AVAILABLE', 'ERROR'].includes(props.volume.status.toUpperCase())}
               onConfirm={props.volumeActions.delete} />
         </DropdownButton>

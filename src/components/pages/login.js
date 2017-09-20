@@ -94,7 +94,7 @@ export class LoginPage extends React.Component {
         // If there is an active user, redirect to dashboard
         if( username ) return <Redirect to="/dashboard" />;
         // If we are still initialising, don't render yet
-        if( initialising ) return <Loading />;
+        if( initialising ) return <Loading message="Initialising..." />;
         return (
             <div>
                 <PageHeader>Sign in with your JASMIN account</PageHeader>

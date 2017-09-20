@@ -35,7 +35,8 @@ class ConfirmDeleteMenuItem extends React.Component {
                 Delete machine
                 <Modal show={this.state.visible}>
                     <Modal.Body>
-                        Are you sure? Once deleted, a machine cannot be restored.
+                        <p>Are you sure you want to delete {this.props.name}?</p>
+                        <p><strong>Once deleted, a machine cannot be restored.</strong></p>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.close}>Cancel</Button>
@@ -154,7 +155,9 @@ function MachineActionsDropdown(props) {
               disabled={props.machine.status.name !== 'ACTIVE'}>
                 Restart machine
             </MenuItem>
-            <ConfirmDeleteMenuItem onConfirm={props.machineActions.delete} />
+            <ConfirmDeleteMenuItem
+              name={props.machine.name}
+              onConfirm={props.machineActions.delete} />
         </DropdownButton>
     );
 }
