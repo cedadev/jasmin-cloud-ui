@@ -224,7 +224,7 @@ body.machines-page #react-root, body.volumes-page #react-root {
     .quota-progress { width: 25%; }
 }
 @media (min-width: 992px) {
-    .quota-progress { width: 20%; }
+    .quota-progress { width: 16.667%; }
 }
 .quota-progress-background {
     stroke: #f5f5f5;

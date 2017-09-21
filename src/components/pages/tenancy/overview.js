@@ -111,6 +111,7 @@ export class TenancyOverviewPanel extends React.Component {
                         <Col md={12}>
                             <QuotaProgressCircle title="Machines" quota={quotas.machines} />
                             <QuotaProgressCircle title="Volumes" quota={quotas.volumes} />
+                            <QuotaProgressCircle title="External IPs" quota={quotas.external_ips} />
                             <QuotaProgressCircle title="CPUs" quota={quotas.cpus} />
                             <QuotaProgressCircle title="RAM" quota={quotas.ram} />
                             <QuotaProgressCircle title="Storage" quota={quotas.storage} />
