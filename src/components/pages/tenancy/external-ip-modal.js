@@ -8,7 +8,7 @@ import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
-import { Loading, Form, Field } from '../../utils';
+import { Loading, Form, Field, RichSelect } from '../../utils';
 
 
 export class AttachExternalIpMenuItem extends React.Component {
@@ -61,7 +61,7 @@ export class AttachExternalIpMenuItem extends React.Component {
                             <Field name="externalIp" label="External IP">
                                 { externalIps ? (
                                     <FormControl
-                                      componentClass="select"
+                                      componentClass={RichSelect}
                                       disabled={isEmpty(availableIps)}
                                       required
                                       value={this.state.externalIp}

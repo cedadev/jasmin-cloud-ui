@@ -262,3 +262,13 @@ a.size-details {
 .navbar-link:hover {
     cursor: pointer;
 }
+
+.bootstrap-select .btn-default {
+    box-shadow: none;
+    text-shadow: none;
+    background-image: none;
+}
+
+.bootstrap-select.btn-group .dropdown-menu li small {
+    padding-left: 1em;
+}

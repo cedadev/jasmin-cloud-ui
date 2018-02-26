@@ -5,7 +5,7 @@
 import React from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 
-import { Form, Field } from '../../utils';
+import { Form, Field, RichSelect } from '../../utils';
 
 
 export class CreateMachineButton extends React.Component {
@@ -69,7 +69,7 @@ export class CreateMachineButton extends React.Component {
                             <Field name="image" label="Image">
                                 { images.data ? (
                                     <FormControl
-                                      componentClass="select"
+                                      componentClass={RichSelect}
                                       required
                                       value={this.state.image}
                                       onChange={this.handleChange}>
@@ -97,13 +97,18 @@ export class CreateMachineButton extends React.Component {
                             <Field name="size" label="Size">
                                 { sizes.data ? (
                                     <FormControl
-                                      componentClass="select"
+                                      componentClass={RichSelect}
                                       required
                                       value={this.state.size}
                                       onChange={this.handleChange}>
                                         <option value="">Select a size...</option>
                                         {Object.values(sizes.data).map(s =>
-                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                            <option
+                                              key={s.id}
+                                              value={s.id}
+                                              data-subtext={`${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`}>
+                                                {s.name}
+                                            </option>
                                         )}
                                     </FormControl>
                                 ) : (

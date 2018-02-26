@@ -8,7 +8,7 @@ import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
-import { Loading, Form, Field } from '../../utils';
+import { Loading, Form, Field, RichSelect } from '../../utils';
 
 
 export class AttachVolumeMenuItem extends React.Component {
@@ -47,7 +47,7 @@ export class AttachVolumeMenuItem extends React.Component {
                             <Field name="machine" label="Attach To">
                                 { machines.data ? (
                                     <FormControl
-                                      componentClass="select"
+                                      componentClass={RichSelect}
                                       disabled={isEmpty(machines.data)}
                                       required
                                       value={this.state.machine}

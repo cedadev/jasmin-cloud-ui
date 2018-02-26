@@ -8,6 +8,9 @@ import {
     Alert, FormGroup, ControlLabel, HelpBlock, Modal, Form as BSForm
 } from 'react-bootstrap';
 
+import $ from 'jquery';
+import 'bootstrap-select';
+
 
 /**
  * This function takes an "actions" object, which is a map of name => function,
@@ -109,4 +112,64 @@ export function ControlContainer(props) {
             {children}
         </div>
     );
+}
+
+
+/**
+ * React component for a rich select
+ *
+ * Utilises bootstrap-select under the hood (https://silviomoreto.github.io/bootstrap-select/)
+ */
+export class RichSelect extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = { open: false };
+    }
+
+    componentDidUpdate() {
+        var select = $(this.selectInput)
+        select.selectpicker('refresh');
+        select.parent().toggleClass('open', this.state.open);
+    }
+
+    componentWillUnmount() {
+        var select = $(this.selectInput).find('select');
+        // Find the other control components
+        var button = select.siblings('button');
+        var items = select.siblings('.dropdown-menu').find('li a');
+
+        $('html').off('click');
+        button.off('click');
+        items.off('click');
+    }
+
+    componentDidMount() {
+        var self = this;
+        // First, make the select a custom select
+        var select = $(this.selectInput);
+        select.selectpicker();
+        // Find the other control components
+        var button = select.siblings('button');
+        var items = select.siblings('.dropdown-menu').find('li a');
+
+        $('html').click(function () {
+            self.setState({ open: false });
+        });
+
+        button.click(function (e) {
+            e.stopPropagation();
+            self.setState({ open: !self.state.open });
+        });
+
+        items.click(function () {
+            if (self.props.multiple) return;
+            self.setState({ open: !self.state.open });
+        });
+    }
+
+    render() {
+        return (
+            <select ref={(s) => { this.selectInput = s; }} {...this.props}>{this.props.children}</select>
+        );
+    }
 }
