@@ -179,48 +179,55 @@ function apiRequestEpic(action$, store) {
     // Listen for actions with the apiRequest flag
     return action$
         .filter(action => action.apiRequest)
-        .mergeMap(action => {
-            // The action then has an expected structure
-            const { options, successAction, failureAction } = action;
-            const method = options.method || 'GET';
-            // Make sure we ask for JSON
-            const headers = { 'Content-Type': 'application/json' };
-            // For POST/PUT/DELETE, include the CSRF token if present
-            if( ['POST', 'PUT', 'DELETE'].includes(method.toUpperCase()) ) {
-                const csrfToken = Cookies.get('csrftoken');
-                if( csrfToken ) headers['X-CSRFToken'] = csrfToken;
-            }
-            // Make the API request
-            // If the session is terminated, discard any active requests
-            return ajax({ ...options,
-                          withCredentials: true, // Include cookies with the request
-                          headers: headers,
-                          responseType: 'json' /* Ask for JSON please! */ })
-                .map(response => ({
-                    type: successAction,
-                    payload: response.response,
-                    request: action
-                }))
-                .catch(error => {
-                    // Transform AjaxErrors into ApiErrors by inspecting the response for details
-                    const response = error.xhr.response;
-                    const apiError = response === null ?
-                        new ApiError(
-                            'Error communicating with API server.', error.status
-                        ) : (
-                            response.detail ?
-                                new ApiError(response.detail, error.status):
-                                new ApiError(JSON.stringify(response), error.status)
-                        );
-                    return Observable.of({
-                        type: failureAction,
-                        error: true,
-                        silent: !!action.failSilently,
-                        payload: apiError,
+        .mergeMap(
+            action => {
+                // The action then has an expected structure
+                const { options, successAction, failureAction } = action;
+                const method = options.method || 'GET';
+                // Make sure we ask for JSON
+                const headers = { 'Content-Type': 'application/json' };
+                // For POST/PUT/DELETE, include the CSRF token if present
+                if( ['POST', 'PUT', 'DELETE'].includes(method.toUpperCase()) ) {
+                    const csrfToken = Cookies.get('csrftoken');
+                    if( csrfToken ) headers['X-CSRFToken'] = csrfToken;
+                }
+                // Make the API request
+                // If the session is terminated, discard any active requests
+                return ajax({ ...options,
+                              withCredentials: true, // Include cookies with the request
+                              headers: headers,
+                              responseType: 'json' /* Ask for JSON please! */ })
+                    .map(response => ({
+                        type: successAction,
+                        payload: response.response,
                         request: action
+                    }))
+                    .catch(error => {
+                        // Transform AjaxErrors into ApiErrors by inspecting the response for details
+                        const response = error.xhr.response;
+                        const apiError = response === null ?
+                            new ApiError(
+                                'Error communicating with API server.', error.status
+                            ) : (
+                                response.detail ?
+                                    new ApiError(response.detail, error.status):
+                                    new ApiError(JSON.stringify(response), error.status)
+                            );
+                        return Observable.of({
+                            type: failureAction,
+                            error: true,
+                            silent: !!action.failSilently,
+                            payload: apiError,
+                            request: action
+                        });
                     });
-                });
-        })
+            },
+            // Allow at most 2 concurrent requests
+            // This means one long-running request, like a large list fetch,
+            // won't block other small requests, but our requests are reasonably
+            // rate limited
+            2
+        );
 }
 
 
