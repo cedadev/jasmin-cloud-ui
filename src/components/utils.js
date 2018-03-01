@@ -155,15 +155,18 @@ export class RichSelect extends React.Component {
         $('html').click(function () {
             self.setState({ open: false });
         });
-
+        // If another bootstrap-select receives focus, close
+        $('body').on('focus', '.bootstrap-select .btn', function(e) {
+            if( $(e.target).is(button) ) return;
+            self.setState({ open: false });
+        });
         button.click(function (e) {
             e.stopPropagation();
             self.setState({ open: !self.state.open });
         });
-
         items.click(function () {
             if (self.props.multiple) return;
-            self.setState({ open: !self.state.open });
+            self.setState({ open: false });
         });
     }
 

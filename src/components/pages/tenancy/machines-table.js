@@ -182,9 +182,11 @@ function MachineRow(props) {
         <tr className={highlightClass}>
             <td>{machine.name}</td>
             <td>{(props.images[machine.image.id] || {}).name || '-'}</td>
-            <td>
-                <MachineSize machine={machine} size={props.sizes[machine.size.id]} />
-            </td>
+            <td>{
+                props.sizes[machine.size.id] ?
+                    <MachineSize machine={machine} size={props.sizes[machine.size.id]} /> :
+                    '-'
+            }</td>
             <td><MachineStatus machine={machine} /></td>
             <td>{machine.power_state}</td>
             <td>{machine.task ?
