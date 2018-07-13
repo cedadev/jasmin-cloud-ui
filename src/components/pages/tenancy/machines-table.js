@@ -77,7 +77,7 @@ function MachineSize(props) {
           overlay={sizeDetails}
           trigger="click"
           rootClose>
-            <a href="#" className="size-details">{props.size.name}</a>
+            <a className="size-details">{props.size.name}</a>
         </OverlayTrigger>
     );
 }
@@ -181,12 +181,8 @@ function MachineRow(props) {
     return (
         <tr className={highlightClass}>
             <td>{machine.name}</td>
-            <td>{(props.images[(machine.image || {}).id] || {}).name || '-'}</td>
-            <td>{
-                props.sizes[(machine.size || {}).id] ?
-                    <MachineSize machine={machine} size={props.sizes[machine.size.id]} /> :
-                    '-'
-            }</td>
+            <td>{(machine.image || {}).name || '-'}</td>
+            <td>{machine.size ? <MachineSize machine={machine} size={machine.size} /> : '-'}</td>
             <td><MachineStatus machine={machine} /></td>
             <td>{machine.power_state}</td>
             <td>{machine.task ?

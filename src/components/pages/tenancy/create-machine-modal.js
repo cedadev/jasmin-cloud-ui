@@ -7,6 +7,8 @@ import { Button, Modal, FormControl } from 'react-bootstrap';
 
 import { Form, Field, RichSelect } from '../../utils';
 
+import sortBy from 'lodash/sortBy';
+
 
 export class CreateMachineButton extends React.Component {
     constructor(props) {
@@ -102,7 +104,7 @@ export class CreateMachineButton extends React.Component {
                                       value={this.state.size}
                                       onChange={this.handleChange}>
                                         <option value="">Select a size...</option>
-                                        {Object.values(sizes.data).map(s =>
+                                        {sortBy(Object.values(sizes.data), ['cpus', 'ram', 'disk']).map(s =>
                                             <option
                                               key={s.id}
                                               value={s.id}
