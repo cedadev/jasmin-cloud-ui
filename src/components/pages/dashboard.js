@@ -19,6 +19,9 @@ export class Dashboard extends React.Component {
     render() {
         const { fetching, data: tenancies } = this.props.tenancies;
         if( tenancies !== null && !isEmpty(tenancies) ) {
+            // Sort the tenancies by name before rendering
+            const sorted = Object.values(tenancies)
+                .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
             return (
                 <div>
                     <PageHeader>Dashboard</PageHeader>
@@ -26,7 +29,7 @@ export class Dashboard extends React.Component {
                         <Col md={6} mdOffset={3}>
                             <Panel header="Available tenancies">
                                 <ListGroup fill>
-                                    {Object.values(tenancies).map((t) =>
+                                    {sorted.map((t) =>
                                         <LinkContainer
                                           key={t.id}
                                           to={`/tenancies/${t.id}`}>

@@ -9,7 +9,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 
 export const Navigation = (props) => {
-    const tenancies = Object.values(props.tenancies || {});
+    const tenancies = Object.values(props.tenancies || {})
+        .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
     return (
         <Navbar fixedTop collapseOnSelect>
             <Navbar.Header>
