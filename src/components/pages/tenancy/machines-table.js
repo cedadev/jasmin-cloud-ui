@@ -181,9 +181,9 @@ function MachineRow(props) {
     return (
         <tr className={highlightClass}>
             <td>{machine.name}</td>
-            <td>{(props.images[machine.image.id] || {}).name || '-'}</td>
+            <td>{(props.images[(machine.image || {}).id] || {}).name || '-'}</td>
             <td>{
-                props.sizes[machine.size.id] ?
+                props.sizes[(machine.size || {}).id] ?
                     <MachineSize machine={machine} size={props.sizes[machine.size.id]} /> :
                     '-'
             }</td>
