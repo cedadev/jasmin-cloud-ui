@@ -34,18 +34,20 @@ export class CreateMachineButton extends React.Component {
     render() {
         const { creating, images, sizes } = this.props;
         return (
-            <Button
-              bsStyle="success"
-              disabled={creating}
-              onClick={this.open}
-              title="Create a new machine">
-                { creating ? (
-                    <i className="fa fa-spinner fa-pulse" />
-                ) : (
-                    <i className="fa fa-desktop"></i>
-                )}
-                {'\u00A0\u00A0'}
-                { creating ? 'Creating machine...' : 'New machine' }
+            <>
+                <Button
+                  bsStyle="success"
+                  disabled={creating}
+                  onClick={this.open}
+                  title="Create a new machine">
+                    { creating ? (
+                        <i className="fa fa-spinner fa-pulse" />
+                    ) : (
+                        <i className="fa fa-desktop"></i>
+                    )}
+                    {'\u00A0\u00A0'}
+                    { creating ? 'Creating machine...' : 'New machine' }
+                </Button>
                 <Modal
                   backdrop="static"
                   onHide={this.close}
@@ -139,7 +141,7 @@ export class CreateMachineButton extends React.Component {
                         </Modal.Footer>
                     </Form>
                 </Modal>
-            </Button>
+            </>
         );
     }
 }

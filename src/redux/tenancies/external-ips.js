@@ -2,10 +2,9 @@
  * This module contains Redux bits for loading tenancy external ips.
  */
 
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/merge';
+import { map, merge, filter } from 'rxjs/operators';
 
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 
 import { createTenancyResource } from './resource';
 
@@ -26,15 +25,18 @@ export const epic = combineEpics(
     resourceEpic,
     // An update of an external IP record may affect others, so refresh the
     // whole list
-    action$ => action$
-        .ofType(actions.UPDATE_SUCCEEDED)
-        .map(action => actionCreators.fetchList(action.request.tenancyId)),
+    action$ => action$.pipe(
+        ofType(actions.UPDATE_SUCCEEDED),
+        map(action => actionCreators.fetchList(action.request.tenancyId))
+    ),
     // When a machine is deleted or a fetch fails with a 404, refresh the IP list
     // in case it had an external IP
-    action$ => action$
-        .ofType(machineActions.DELETE_SUCCEEDED)
-        .merge(action$
-            .ofType(machineActions.FETCH_ONE_FAILED)
-            .filter(action => action.payload.status === 404))
-        .map(action => actionCreators.fetchList(action.request.tenancyId))
+    action$ => action$.pipe(
+        ofType(machineActions.DELETE_SUCCEEDED),
+        merge(action$.pipe(
+            ofType(machineActions.FETCH_ONE_FAILED),
+            filter(action => action.payload.status === 404)
+        )),
+        map(action => actionCreators.fetchList(action.request.tenancyId))
+    )
 );

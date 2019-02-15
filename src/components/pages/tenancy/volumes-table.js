@@ -31,11 +31,13 @@ class ConfirmDeleteMenuItem extends React.Component {
 
     render() {
         return (
-            <MenuItem
-              className="danger"
-              disabled={this.props.disabled}
-              onSelect={this.open}>
-                Delete volume
+            <>
+                <MenuItem
+                  className="danger"
+                  disabled={this.props.disabled}
+                  onSelect={this.open}>
+                    Delete volume
+                </MenuItem>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -46,7 +48,7 @@ class ConfirmDeleteMenuItem extends React.Component {
                         <Button bsStyle="danger" onClick={this.onConfirm}>Delete volume</Button>
                     </Modal.Footer>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }
@@ -115,7 +117,7 @@ function VolumeRow(props) {
     // Try and find the attached machine
     const attachedTo = (props.machines.data || {})[(volume.machine || {}).id];
     return (
-        <tr className={highlightClass}>
+        <tr className={highlightClass || undefined}>
             <td>{volume.name}</td>
             <td><VolumeStatus status={volume.status} /></td>
             <td>{volume.size} GB</td>

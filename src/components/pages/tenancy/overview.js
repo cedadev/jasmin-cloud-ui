@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { Row, Col, Panel, Button } from 'react-bootstrap';
-import { Redirect } from 'react-router';
 
 import { Loading } from '../../utils';
 
@@ -16,7 +15,7 @@ class QuotaProgressCircle extends React.Component {
         this.state = { fraction: 0 };
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
         this.initialTimeout = setTimeout(() => {
             this.requestAnimationFrame = window.requestAnimationFrame(() => {
                 this.setState({
@@ -26,13 +25,13 @@ class QuotaProgressCircle extends React.Component {
         }, 0);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState({
-            fraction: nextProps.quota.used / nextProps.quota.allocated
-        });
+    componentDidUpdate = (prevProps) => {
+        const prevFraction = prevProps.quota.used / prevProps.quota.allocated;
+        const fraction = this.props.quota.used / this.props.quota.allocated;
+        if( prevFraction !== fraction ) this.setState({ fraction });
     }
 
-    componentWillUnmount() {
+    componentWillUnmount = () => {
         clearTimeout(this.initialTimeout);
         window.cancelAnimationFrame(this.requestAnimationFrame);
     }
@@ -44,6 +43,7 @@ class QuotaProgressCircle extends React.Component {
             ${quota.allocated}${quota.units || ''} used
         `;
         // We don't use this.state.fraction because we want this to be fixed
+        // This only makes a different during the initial animation
         const percent = Math.round((quota.used / quota.allocated) * 100);
         const context = (percent <= 60 ? 'success' : (percent <= 80 ? 'warning' : 'danger'));
         const radius = 50 - (strokeWidth / 2);
@@ -55,24 +55,30 @@ class QuotaProgressCircle extends React.Component {
         `;
         return (
             <div className="quota-progress">
-                <Panel header={<h3>{title}</h3>} footer={label}>
-                    <svg viewBox="0 0 100 100">
-                        <path
-                          className="quota-progress-background"
-                          strokeWidth={strokeWidth}
-                          d={pathDescription}
-                          fillOpacity={0} />
-                        <path
-                          className={`quota-progress-bar ${context}`}
-                          strokeWidth={strokeWidth}
-                          d={pathDescription}
-                          fillOpacity={0}
-                          strokeDasharray={circumference}
-                          strokeDashoffset={(1 - this.state.fraction) * circumference} />
-                        <text className="quota-progress-text" x={50} y={50}>
-                            {percent}%
-                        </text>
-                    </svg>
+                <Panel>
+                    <Panel.Heading>
+                        <Panel.Title componentClass="h3">{title}</Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body>
+                        <svg viewBox="0 0 100 100">
+                            <path
+                            className="quota-progress-background"
+                            strokeWidth={strokeWidth}
+                            d={pathDescription}
+                            fillOpacity={0} />
+                            <path
+                            className={`quota-progress-bar ${context}`}
+                            strokeWidth={strokeWidth}
+                            d={pathDescription}
+                            fillOpacity={0}
+                            strokeDasharray={circumference}
+                            strokeDashoffset={(1 - this.state.fraction) * circumference} />
+                            <text className="quota-progress-text" x={50} y={50}>
+                                {percent}%
+                            </text>
+                        </svg>
+                    </Panel.Body>
+                    <Panel.Footer>{label}</Panel.Footer>
                 </Panel>
             </div>
         );
@@ -85,7 +91,7 @@ export class TenancyOverviewPanel extends React.Component {
     }
 
     componentDidMount = () => this.setPageTitle(this.props)
-    componentWillUpdate = (props) => this.setPageTitle(props)
+    componentDidUpdate = (props) => this.setPageTitle(props)
 
     render() {
         const { fetching, data: quotas } = this.props.tenancy.quotas;

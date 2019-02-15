@@ -15,9 +15,9 @@ class LoginForm extends React.Component {
         this.state = { username: '', password: '' };
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentDidUpdate(prevProps) {
         // If transitioning from authenticating to not authenticating, reset the form
-        if( this.props.authenticating && !nextProps.authenticating )
+        if( prevProps.authenticating && !this.props.authenticating )
             this.setState({ username: '', password: '' });
     }
 
@@ -80,13 +80,14 @@ export class LoginPage extends React.Component {
     componentDidMount() {
         document.title = 'Sign in | JASMIN Cloud Portal';
         // When the component mounts, reset the error
-        this.setState({ error: null });
+        if( this.state.error !== null )
+            this.setState({ error: null });
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentDidUpdate(prevProps) {
         // If transitioning from authenticating to not authenticating, store the error
-        if( this.props.authenticating && !nextProps.authenticating )
-            this.setState({ error: nextProps.authenticationError });
+        if( prevProps.authenticating && !this.props.authenticating )
+            this.setState({ error: this.props.authenticationError });
     }
 
     render() {

@@ -3,12 +3,11 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
-import { Loading, Form, Field, RichSelect } from '../../utils';
+import { Form, Field, RichSelect } from '../../utils';
 
 
 export class AttachExternalIpMenuItem extends React.Component {
@@ -42,10 +41,12 @@ export class AttachExternalIpMenuItem extends React.Component {
             .filter(ip => !ip.updating && !ip.machine)
             .map(ip => ip.external_ip);
         return (
-            <MenuItem
-              onSelect={this.open}
-              disabled={!!machineExternalIp || !machine.nat_allowed}>
-                Attach external IP
+            <>
+                <MenuItem
+                  onSelect={this.open}
+                  disabled={!!machineExternalIp || !machine.nat_allowed}>
+                    Attach external IP
+                </MenuItem>
                 <Modal
                   backdrop="static"
                   onHide={!!creating ? undefined : this.close}
@@ -116,7 +117,7 @@ export class AttachExternalIpMenuItem extends React.Component {
                         </Modal.Footer>
                     </Form>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }

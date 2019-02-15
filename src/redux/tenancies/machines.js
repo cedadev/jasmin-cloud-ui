@@ -2,10 +2,9 @@
  * This module contains Redux bits for loading tenancy external ips.
  */
 
-import 'rxjs/add/operator/merge';
-import 'rxjs/add/operator/map';
+import { merge, map } from 'rxjs/operators';
 
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 
 import { createTenancyResource, nextStateEntry } from './resource';
 
@@ -187,11 +186,12 @@ export function reducer(state, action) {
 export const epic = combineEpics(
     resourceEpic,
     // When a power action takes place on a machine, refresh the machine
-    action$ => action$
-        .ofType(actions.START_SUCCEEDED)
-        .merge(action$.ofType(actions.STOP_SUCCEEDED))
-        .merge(action$.ofType(actions.RESTART_SUCCEEDED))
-        .map(action =>
+    action$ => action$.pipe(
+        ofType(actions.START_SUCCEEDED),
+        merge(action$.pipe(ofType(actions.STOP_SUCCEEDED))),
+        merge(action$.pipe(ofType(actions.RESTART_SUCCEEDED))),
+        map(action =>
             actionCreators.fetchOne(action.request.tenancyId, action.payload.id)
         )
+    )
 );

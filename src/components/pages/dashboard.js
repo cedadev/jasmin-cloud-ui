@@ -18,7 +18,7 @@ export class Dashboard extends React.Component {
 
     render() {
         const { fetching, data: tenancies } = this.props.tenancies;
-        if( tenancies !== null && !isEmpty(tenancies) ) {
+        if( !isEmpty(tenancies || {}) ) {
             // Sort the tenancies by name before rendering
             const sorted = Object.values(tenancies)
                 .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
@@ -27,8 +27,9 @@ export class Dashboard extends React.Component {
                     <PageHeader>Dashboard</PageHeader>
                     <Row>
                         <Col md={6} mdOffset={3}>
-                            <Panel header="Available tenancies">
-                                <ListGroup fill>
+                            <Panel>
+                                <Panel.Heading>Available tenancies</Panel.Heading>
+                                <ListGroup fill="true">
                                     {sorted.map((t) =>
                                         <LinkContainer
                                           key={t.id}
@@ -52,7 +53,8 @@ export class Dashboard extends React.Component {
                     <PageHeader>Dashboard</PageHeader>
                     <Row>
                         <Col md={6} mdOffset={3}>
-                            <Panel header="Available tenancies">
+                            <Panel>
+                                <Panel.Heading>Available tenancies</Panel.Heading>
                                 You do not belong to any tenancies.
                             </Panel>
                         </Col>

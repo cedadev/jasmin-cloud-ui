@@ -3,7 +3,6 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
@@ -31,8 +30,10 @@ export class AttachVolumeMenuItem extends React.Component {
     render() {
         const { volume, machines } = this.props;
         return (
-            <MenuItem onSelect={this.open} disabled={!!volume.machine}>
-                Attach volume to machine
+            <>
+                <MenuItem onSelect={this.open} disabled={!!volume.machine}>
+                    Attach volume to machine
+                </MenuItem>
                 <Modal
                   backdrop="static"
                   onHide={this.close}
@@ -87,7 +88,7 @@ export class AttachVolumeMenuItem extends React.Component {
                         </Modal.Footer>
                     </Form>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }

@@ -31,8 +31,10 @@ class ConfirmDeleteMenuItem extends React.Component {
 
     render() {
         return (
-            <MenuItem className="danger" onSelect={this.open}>
-                Delete machine
+            <>
+                <MenuItem className="danger" onSelect={this.open}>
+                    Delete machine
+                </MenuItem>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -43,7 +45,7 @@ class ConfirmDeleteMenuItem extends React.Component {
                         <Button bsStyle="danger" onClick={this.onConfirm}>Delete machine</Button>
                     </Modal.Footer>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }
@@ -179,7 +181,7 @@ function MachineRow(props) {
             ) && 'warning')
         );
     return (
-        <tr className={highlightClass}>
+        <tr className={highlightClass || undefined}>
             <td>{machine.name}</td>
             <td>{(machine.image || {}).name || '-'}</td>
             <td>{machine.size ? <MachineSize machine={machine} size={machine.size} /> : '-'}</td>

@@ -4,7 +4,6 @@
 
 import React from 'react';
 import { Row, Col, ButtonGroup, Button } from 'react-bootstrap';
-import { Redirect } from 'react-router';
 
 import { Loading } from '../../utils';
 
@@ -18,7 +17,7 @@ export class TenancyMachinesPanel extends React.Component {
     }
 
     componentDidMount = () => this.setPageTitle(this.props)
-    componentWillUpdate = (props) => this.setPageTitle(props)
+    componentDidUpdate = (props) => this.setPageTitle(props)
 
     render() {
         const { fetching, data: machines, creating = false } = this.props.tenancy.machines;
