@@ -49,6 +49,18 @@ import {
     epic as machineEpic
 } from './machines';
 
+import {
+    actionCreators as clusterTypeActionCreators,
+    reducer as clusterTypeReducer,
+    epic as clusterTypeEpic
+} from './cluster-types';
+
+import {
+    actionCreators as clusterActionCreators,
+    reducer as clusterReducer,
+    epic as clusterEpic
+} from './clusters';
+
 
 const tenancyActions = {
     RESET: 'TENANCIES/RESET',
@@ -85,6 +97,8 @@ export const actionCreators = {
     externalIp: externalIpActionCreators,
     volume: volumeActionCreators,
     machine: machineActionCreators,
+    clusterType: clusterTypeActionCreators,
+    cluster: clusterActionCreators
 }
 
 
@@ -131,7 +145,9 @@ export function reducer(state = initialState, action) {
                     sizes: sizeReducer(undefined, action),
                     externalIps: externalIpReducer(undefined, action),
                     volumes: volumeReducer(undefined, action),
-                    machines: machineReducer(undefined, action)
+                    machines: machineReducer(undefined, action),
+                    clusterTypes: clusterTypeReducer(undefined, action),
+                    clusters: clusterReducer(undefined, action)
                 }
             };
         default:
@@ -148,7 +164,9 @@ export function reducer(state = initialState, action) {
                     sizes: sizeReducer(state.current.sizes, action),
                     externalIps: externalIpReducer(state.current.externalIps, action),
                     volumes: volumeReducer(state.current.volumes, action),
-                    machines: machineReducer(state.current.machines, action)
+                    machines: machineReducer(state.current.machines, action),
+                    clusterTypes: clusterTypeReducer(state.current.clusterTypes, action),
+                    clusters: clusterReducer(state.current.clusters, action)
                 }
             };
     }
@@ -191,7 +209,9 @@ export const epic = combineEpics(
             sizeActionCreators.fetchList(action.tenancyId),
             externalIpActionCreators.fetchList(action.tenancyId),
             volumeActionCreators.fetchList(action.tenancyId),
-            machineActionCreators.fetchList(action.tenancyId)
+            machineActionCreators.fetchList(action.tenancyId),
+            clusterTypeActionCreators.fetchList(action.tenancyId),
+            clusterActionCreators.fetchList(action.tenancyId)
         ))
     ),
     // Whenever there is a 404 on a list operation of a tenancy resource, reset the current tenancy
@@ -209,5 +229,7 @@ export const epic = combineEpics(
     sizeEpic,
     externalIpEpic,
     volumeEpic,
-    machineEpic
+    machineEpic,
+    clusterTypeEpic,
+    clusterEpic
 );

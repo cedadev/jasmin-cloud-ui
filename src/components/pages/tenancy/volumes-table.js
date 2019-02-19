@@ -128,7 +128,7 @@ function VolumeRow(props) {
                     '-'
                 )}
             </td>
-            <td className="volume-actions">
+            <td className="resource-actions">
                 <VolumeActionsDropdown
                   disabled={!!highlightClass}
                   volume={volume}
@@ -149,11 +149,11 @@ export class VolumesTable extends React.Component {
         // When this component mounts, we add a body class so that we can add a
         // negative margin to pull the footer back up
         // When it unmounts, we remove it again
-        document.body.classList.add('volumes-page');
+        document.body.classList.add('resource-page');
     }
 
     componentWillUnmount() {
-        document.body.classList.remove('volumes-page')
+        document.body.classList.remove('resource-page')
     }
 
     render() {

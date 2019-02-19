@@ -194,7 +194,7 @@ function MachineRow(props) {
             <td>{machine.internal_ip || '-'}</td>
             <td>{(externalIp || {}).external_ip || '-'}</td>
             <td>{moment(machine.created).fromNow()}</td>
-            <td className="machine-actions">
+            <td className="resource-actions">
                 <MachineActionsDropdown
                   disabled={!!highlightClass}
                   machine={machine}
@@ -218,11 +218,11 @@ export class MachinesTable extends React.Component {
         // When this component mounts, we add a body class so that we can add a
         // negative margin to pull the footer back up
         // When it unmounts, we remove it again
-        document.body.classList.add('machines-page');
+        document.body.classList.add('resource-page');
     }
 
     componentWillUnmount() {
-        document.body.classList.remove('machines-page')
+        document.body.classList.remove('resource-page')
     }
 
     render() {

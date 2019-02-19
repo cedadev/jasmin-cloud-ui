@@ -39,7 +39,9 @@ export class TenancyPage extends React.Component {
                 size: bindArgsToActions(tenancyActions.size, tenancy.id),
                 externalIp: bindArgsToActions(tenancyActions.externalIp, tenancy.id),
                 volume: bindArgsToActions(tenancyActions.volume, tenancy.id),
-                machine: bindArgsToActions(tenancyActions.machine, tenancy.id)
+                machine: bindArgsToActions(tenancyActions.machine, tenancy.id),
+                clusterType: bindArgsToActions(tenancyActions.clusterType, tenancy.id),
+                cluster: bindArgsToActions(tenancyActions.cluster, tenancy.id)
             };
             return (
                 <div>
@@ -53,6 +55,9 @@ export class TenancyPage extends React.Component {
                         </LinkContainer>
                         <LinkContainer to={`/tenancies/${tenancy.id}/volumes`}>
                             <NavItem>Volumes</NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={`/tenancies/${tenancy.id}/clusters`}>
+                            <NavItem>Clusters</NavItem>
                         </LinkContainer>
                     </Nav>
                     {React.Children.map(

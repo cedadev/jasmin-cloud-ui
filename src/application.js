@@ -22,6 +22,7 @@ import { TenancyPage } from './components/pages/tenancy';
 import { TenancyOverviewPanel } from './components/pages/tenancy/overview';
 import { TenancyMachinesPanel } from './components/pages/tenancy/machines';
 import { TenancyVolumesPanel } from './components/pages/tenancy/volumes';
+import { TenancyClustersPanel } from './components/pages/tenancy/clusters';
 
 
 /**
@@ -66,7 +67,9 @@ const ConnectedTenancyPage = connect(
             size: bindActionCreators(tenancyActions.size, dispatch),
             externalIp: bindActionCreators(tenancyActions.externalIp, dispatch),
             volume: bindActionCreators(tenancyActions.volume, dispatch),
-            machine: bindActionCreators(tenancyActions.machine, dispatch)
+            machine: bindActionCreators(tenancyActions.machine, dispatch),
+            clusterType: bindActionCreators(tenancyActions.clusterType, dispatch),
+            cluster: bindActionCreators(tenancyActions.cluster, dispatch)
         }
     })
 )(TenancyPage);
@@ -83,15 +86,15 @@ const NotFound = connect(
 
 const ProtectedRoute = connect(
     (state) => ({ session: state.session })
-)(({ component: Component, ...rest }) => {
+)(({ component: Component, session, ...rest }) => {
     return (
         <Route
             {...rest}
             render={props =>
-                rest.session.username ? (
+                session.username ? (
                     <Component {...props} />
                 ) : (
-                    (rest.session.initialising || rest.session.authenticating) ? (
+                    (session.initialising || session.authenticating) ? (
                         <div></div>
                     ) : (
                         <Redirect to="/login" />
@@ -111,6 +114,9 @@ const TenancyMachinesPage = props => (
 const TenancyVolumesPage = props => (
     <ConnectedTenancyPage {...props}><TenancyVolumesPanel /></ConnectedTenancyPage>
 );
+const TenancyClustersPage = props => (
+    <ConnectedTenancyPage {...props}><TenancyClustersPanel /></ConnectedTenancyPage>
+);
 
 
 export class Application extends React.Component {
@@ -127,6 +133,7 @@ export class Application extends React.Component {
                     <ProtectedRoute exact path="/tenancies/:id" component={TenancyOverviewPage} />
                     <ProtectedRoute exact path="/tenancies/:id/machines" component={TenancyMachinesPage} />
                     <ProtectedRoute exact path="/tenancies/:id/volumes" component={TenancyVolumesPage} />
+                    <ProtectedRoute exact path="/tenancies/:id/clusters" component={TenancyClustersPage} />
                     <Route component={NotFound} />
                 </Switch>
             </Grid>

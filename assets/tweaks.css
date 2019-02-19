@@ -180,7 +180,7 @@ caption {
     color: #777;
 }
 
-body.machines-page #react-root, body.volumes-page #react-root {
+body.resource-page #react-root {
     margin-bottom: -160px;
 }
 .machine-status, .volume-status {
@@ -192,10 +192,10 @@ body.machines-page #react-root, body.volumes-page #react-root {
 }
 /* The following two rules ensure the actions column is always the same size
    however wide the table is */
-.machine-actions, .volume-actions {
+.resource-actions {
     width: 1%;
 }
-.machine-actions .btn-group, .volume-actions .btn-group {
+.resource-actions .btn-group {
     width: 100px;
 }
 
