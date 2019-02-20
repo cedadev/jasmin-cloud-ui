@@ -10,6 +10,6 @@ const {
     actionCreators,
     reducer,
     epic,
-} = createTenancyResource('cluster_type');
+} = createTenancyResource('cluster_type', { id: ct => ct.name });
 
 export { actions, actionCreators, reducer, epic };

@@ -8,6 +8,7 @@ import { Row, Col, ButtonGroup, Button } from 'react-bootstrap';
 import { Loading } from '../../utils';
 
 import { ClustersTable } from './clusters-table';
+import { CreateClusterButton } from './create-cluster-modal';
 
 
 export class TenancyClustersPanel extends React.Component {
@@ -26,6 +27,10 @@ export class TenancyClustersPanel extends React.Component {
                     <Row>
                         <Col md={12}>
                             <ButtonGroup className="pull-right">
+                                <CreateClusterButton
+                                  creating={creating}
+                                  clusterTypes={this.props.tenancy.clusterTypes}
+                                  create={this.props.tenancyActions.cluster.create} />
                                 <Button
                                   bsStyle="info"
                                   disabled={fetching}
