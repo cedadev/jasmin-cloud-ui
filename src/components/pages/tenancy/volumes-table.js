@@ -8,7 +8,7 @@ import {
     DropdownButton, MenuItem
 } from 'react-bootstrap';
 
-import moment from 'moment';
+import sortBy from 'lodash/sortBy';
 
 import { bindArgsToActions } from '../../utils';
 
@@ -158,8 +158,7 @@ export class VolumesTable extends React.Component {
 
     render() {
         // Sort the volumes by name to ensure a consistent rendering
-        const volumes = Object.values(this.props.volumes)
-            .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+        const volumes = sortBy(Object.values(this.props.volumes), ['name']);
         return (
             <Table striped hover responsive>
                 <caption>

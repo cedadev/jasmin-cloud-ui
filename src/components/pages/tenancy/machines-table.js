@@ -10,6 +10,8 @@ import {
 
 import moment from 'moment';
 
+import sortBy from 'lodash/sortBy';
+
 import { bindArgsToActions } from '../../utils';
 
 import { AttachExternalIpMenuItem } from './external-ip-modal';
@@ -131,9 +133,9 @@ function MachineActionsDropdown(props) {
           disabled={props.disabled}>
             <AttachExternalIpMenuItem
               machine={props.machine}
-              machineExternalIp={props.machineExternalIp}
               externalIps={props.externalIps}
-              externalIpActions={props.externalIpActions} />
+              externalIpActions={props.externalIpActions}
+              disabled={!!props.machineExternalIp || !props.machine.nat_allowed} />
             <MenuItem
               onSelect={() => props.externalIpActions.update(
                   props.machineExternalIp,
@@ -227,8 +229,7 @@ export class MachinesTable extends React.Component {
 
     render() {
         // Sort the machines by name to ensure a consistent rendering
-        const machines = Object.values(this.props.machines)
-            .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+        const machines = sortBy(Object.values(this.props.machines), ['name']);
         return (
             <Table striped hover responsive>
                 <caption>

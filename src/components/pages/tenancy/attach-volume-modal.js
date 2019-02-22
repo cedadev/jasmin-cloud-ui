@@ -7,7 +7,8 @@ import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
-import { Loading, Form, Field, RichSelect } from '../../utils';
+import { Form, Field } from '../../utils';
+import { MachineSelectControl } from './resource-utils';
 
 
 export class AttachVolumeMenuItem extends React.Component {
@@ -43,40 +44,15 @@ export class AttachVolumeMenuItem extends React.Component {
                     </Modal.Header>
                     <Form
                       horizontal
+                      disabled={isEmpty(machines.data)}
                       onSubmit={this.handleSubmit}>
                         <Modal.Body>
                             <Field name="machine" label="Attach To">
-                                { machines.data ? (
-                                    <FormControl
-                                      componentClass={RichSelect}
-                                      disabled={isEmpty(machines.data)}
-                                      required
-                                      value={this.state.machine}
-                                      onChange={this.handleChange}>
-                                        {isEmpty(machines.data) ? (
-                                            <option value="">No machines available</option>
-                                        ) : (
-                                            <option value="">Select a machine...</option>
-                                        )}
-                                        {Object.values(machines.data).map(machine =>
-                                            <option key={machine.id} value={machine.id}>{machine.name}</option>
-                                        )}
-                                    </FormControl>
-                                ) : (
-                                    machines.fetching ? (
-                                        <FormControl.Static>
-                                            <i className="fa fa-spinner fa-pulse" />
-                                            {'\u00A0'}
-                                            Loading machines...
-                                        </FormControl.Static>
-                                    ) : (
-                                        <FormControl.Static className="text-danger">
-                                            <i className="fa fa-exclamation-triangle" />
-                                            {'\u00A0'}
-                                            Failed to load machines
-                                        </FormControl.Static>
-                                    )
-                                ) }
+                                <MachineSelectControl
+                                  resource={this.props.machines}
+                                  required
+                                  value={this.state.machine}
+                                  onChange={this.handleChange} />
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>

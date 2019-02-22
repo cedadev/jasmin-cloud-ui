@@ -3,9 +3,9 @@
  */
 
 import React from 'react';
-import { Row, Col, Panel, Button } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 
-import { Loading } from '../../utils';
+import { ResourcePanel } from './resource-utils';
 
 
 class QuotaProgressCircle extends React.Component {
@@ -85,60 +85,36 @@ class QuotaProgressCircle extends React.Component {
     }
 }
 
+
+const Quotas = (props) => (
+    <>
+        <QuotaProgressCircle title="Machines" quota={props.resourceData.machines} />
+        <QuotaProgressCircle title="Volumes" quota={props.resourceData.volumes} />
+        <QuotaProgressCircle title="External IPs" quota={props.resourceData.external_ips} />
+        <QuotaProgressCircle title="CPUs" quota={props.resourceData.cpus} />
+        <QuotaProgressCircle title="RAM" quota={props.resourceData.ram} />
+        <QuotaProgressCircle title="Storage" quota={props.resourceData.storage} />
+    </>
+);
+
+
 export class TenancyOverviewPanel extends React.Component {
-    setPageTitle(props) {
-        document.title = `Overview | ${props.tenancy.name} | JASMIN Cloud Portal`;
+    setPageTitle = () => {
+        document.title = `Overview | ${this.props.tenancy.name} | JASMIN Cloud Portal`;
     }
 
-    componentDidMount = () => this.setPageTitle(this.props)
-    componentDidUpdate = (props) => this.setPageTitle(props)
+    componentDidMount = () => this.setPageTitle()
+    componentDidUpdate = () => this.setPageTitle()
 
     render() {
-        const { fetching, data: quotas } = this.props.tenancy.quotas;
         return (
-            quotas ? (
-                <div className="quotas-wrapper">
-                    <Row>
-                        <Col md={12}>
-                            <div className="pull-right">
-                                <Button
-                                  bsStyle="info"
-                                  disabled={fetching}
-                                  onClick={() => this.props.tenancyActions.quota.fetchList()}
-                                  title="Refresh quotas">
-                                    <i className={`fa fa-refresh ${fetching ? 'fa-spin' : ''}`}></i>
-                                    {'\u00A0'}
-                                    Refresh
-                                </Button>
-                            </div>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            <QuotaProgressCircle title="Machines" quota={quotas.machines} />
-                            <QuotaProgressCircle title="Volumes" quota={quotas.volumes} />
-                            <QuotaProgressCircle title="External IPs" quota={quotas.external_ips} />
-                            <QuotaProgressCircle title="CPUs" quota={quotas.cpus} />
-                            <QuotaProgressCircle title="RAM" quota={quotas.ram} />
-                            <QuotaProgressCircle title="Storage" quota={quotas.storage} />
-                        </Col>
-                    </Row>
-                </div>
-            ) : (
-                <Row>
-                    <Col md={6} mdOffset={3}>
-                        {fetching ? (
-                            <Loading message="Loading quota information..."/>
-                        ) : (
-                            <div
-                              role="notification"
-                              className="notification notification-inline notification-danger">
-                                <div className="notification-content">Unable to load quota information</div>
-                            </div>
-                        )}
-                    </Col>
-                </Row>
-            )
+            <ResourcePanel
+              resource={this.props.tenancy.quotas}
+              resourceActions={this.props.tenancyActions.quota}
+              resourceName="quota information"
+              className="quotas-wrapper">
+                <Quotas />
+            </ResourcePanel>
         );
     }
 }

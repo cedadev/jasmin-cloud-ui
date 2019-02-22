@@ -117,7 +117,7 @@ export function ControlContainer(props) {
 /**
  * React component for a rich select
  *
- * Utilises bootstrap-select under the hood (https://silviomoreto.github.io/bootstrap-select/)
+ * Utilises bootstrap-select under the hood (https://developer.snapappointments.com/bootstrap-select/)
  */
 export class RichSelect extends React.Component {
     constructor(props) {
@@ -140,7 +140,7 @@ export class RichSelect extends React.Component {
         });
         button.click((e) => {
             e.stopPropagation();
-            this.setState({ open: !this.state.open });
+            this.setState({ open: !this.state.open && !this.props.disabled });
         });
         select.siblings('.dropdown-menu').find('li a').click(() => {
             if (this.props.multiple) return;

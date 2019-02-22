@@ -5,9 +5,8 @@
 import React from 'react';
 import { Button, Modal, FormControl } from 'react-bootstrap';
 
-import { Form, Field, RichSelect } from '../../utils';
-
-import sortBy from 'lodash/sortBy';
+import { Form, Field } from '../../utils';
+import { ImageSelectControl, SizeSelectControl } from './resource-utils';
 
 
 export class CreateMachineButton extends React.Component {
@@ -55,10 +54,7 @@ export class CreateMachineButton extends React.Component {
                     <Modal.Header closeButton>
                         <Modal.Title>Create a new machine</Modal.Title>
                     </Modal.Header>
-                    <Form
-                      horizontal
-                      onSubmit={this.handleSubmit}
-                      disabled={!images.data || !sizes.data}>
+                    <Form horizontal onSubmit={this.handleSubmit}>
                         <Modal.Body>
                             <Field name="name" label="Machine name">
                                 <FormControl
@@ -71,65 +67,18 @@ export class CreateMachineButton extends React.Component {
                                   onChange={this.handleChange} />
                             </Field>
                             <Field name="image" label="Image">
-                                { images.data ? (
-                                    <FormControl
-                                      componentClass={RichSelect}
-                                      required
-                                      value={this.state.image}
-                                      onChange={this.handleChange}>
-                                        <option value="">Select an image...</option>
-                                        {Object.values(images.data).map(i =>
-                                            <option key={i.id} value={i.id}>{i.name}</option>
-                                        )}
-                                    </FormControl>
-                                ) : (
-                                    images.fetching ? (
-                                        <FormControl.Static>
-                                            <i className="fa fa-spinner fa-pulse" />
-                                            {'\u00A0'}
-                                            Loading images...
-                                        </FormControl.Static>
-                                    ) : (
-                                        <FormControl.Static className="text-danger">
-                                            <i className="fa fa-exclamation-triangle" />
-                                            {'\u00A0'}
-                                            Failed to load images
-                                        </FormControl.Static>
-                                    )
-                                ) }
+                                <ImageSelectControl
+                                  resource={images}
+                                  required
+                                  value={this.state.image}
+                                  onChange={this.handleChange} />
                             </Field>
                             <Field name="size" label="Size">
-                                { sizes.data ? (
-                                    <FormControl
-                                      componentClass={RichSelect}
-                                      required
-                                      value={this.state.size}
-                                      onChange={this.handleChange}>
-                                        <option value="">Select a size...</option>
-                                        {sortBy(Object.values(sizes.data), ['cpus', 'ram', 'disk']).map(s =>
-                                            <option
-                                              key={s.id}
-                                              value={s.id}
-                                              data-subtext={`${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`}>
-                                                {s.name}
-                                            </option>
-                                        )}
-                                    </FormControl>
-                                ) : (
-                                    sizes.fetching ? (
-                                        <FormControl.Static>
-                                            <i className="fa fa-spinner fa-pulse" />
-                                            {'\u00A0'}
-                                            Loading sizes...
-                                        </FormControl.Static>
-                                    ) : (
-                                        <FormControl.Static className="text-danger">
-                                            <i className="fa fa-exclamation-triangle" />
-                                            {'\u00A0'}
-                                            Failed to load sizes
-                                        </FormControl.Static>
-                                    )
-                                ) }
+                                <SizeSelectControl
+                                  resource={sizes}
+                                  required
+                                  value={this.state.change}
+                                  onChange={this.handleChange} />
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>

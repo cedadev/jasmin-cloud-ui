@@ -8,6 +8,9 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
+import get from 'lodash/get';
+import sortBy from 'lodash/get';
+
 import { actionCreators as sessionActions } from './redux/session';
 import { actionCreators as tenancyActions } from './redux/tenancies';
 import { actionCreators as notificationActions } from './redux/notifications';
@@ -39,12 +42,14 @@ const ConnectedNav = connect(
     }, dispatch)
 )(Navigation);
 
+
 const ConnectedNotifications = connect(
     (state) => ({ notifications: state.notifications }),
     (dispatch) => ({
         notificationActions: bindActionCreators(notificationActions, dispatch)
     })
 )(Notifications);
+
 
 const ConnectedLoginPage = connect(
     (state) => state.session,
@@ -53,9 +58,11 @@ const ConnectedLoginPage = connect(
     }, dispatch)
 )(LoginPage);
 
+
 const ConnectedDashboard = connect(
     (state) => ({ tenancies: state.tenancies }),
 )(Dashboard);
+
 
 const ConnectedTenancyPage = connect(
     (state) => ({ tenancies: state.tenancies }),
@@ -74,6 +81,7 @@ const ConnectedTenancyPage = connect(
     })
 )(TenancyPage);
 
+
 const NotFound = connect(
     undefined,
     (dispatch) => ({
@@ -83,6 +91,7 @@ const NotFound = connect(
     props.notificationActions.warning('The page you requested was not found');
     return <Redirect to="/dashboard" />;
 });
+
 
 const ProtectedRoute = connect(
     (state) => ({ session: state.session })
@@ -104,6 +113,7 @@ const ProtectedRoute = connect(
         />
     );
 });
+
 
 const TenancyOverviewPage = props => (
     <ConnectedTenancyPage {...props}><TenancyOverviewPanel /></ConnectedTenancyPage>
