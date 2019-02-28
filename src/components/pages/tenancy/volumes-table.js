@@ -65,7 +65,7 @@ function VolumeStatus(props) {
         'OTHER': 'warning'
     };
     return (
-        <span className={`volume-status text-${statusStyleMap[props.status]}`}>
+        <span className={`resource-status text-${statusStyleMap[props.status]}`}>
             {props.status}
         </span>
     );

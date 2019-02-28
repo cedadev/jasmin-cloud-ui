@@ -5,10 +5,10 @@
 import React from 'react';
 import { Button, Modal, Badge, Table, FormControl } from 'react-bootstrap';
 
-import { Loading, Form, Field, RichSelect } from '../../utils';
-
 import sortBy from 'lodash/sortBy';
-import get from 'lodash/get';
+
+import { Loading, Form, Field } from '../../utils';
+import { ClusterParameterField } from './cluster-parameter-field';
 
 
 class ClusterTypeForm extends React.Component {
@@ -73,49 +73,6 @@ class ClusterTypeForm extends React.Component {
 }
 
 
-// FormControl sends through type=undefined, so remove it from props
-const TextControl = ({ type, ...props }) => (<input type="text" {...props} />);
-const NumberControl = ({ type, ...props }) => (<input type="number" {...props} />);
-const IntegerControl = ({ type, ...props }) => (<NumberControl step="1" {...props} />);
-const ChoiceControl = ({ choices, ...props }) => (
-    <RichSelect {...props}>
-        <option value="">Select one...</option>
-        {choices.map(c => <option key={c}>{c}</option>)}
-    </RichSelect>
-);
-const kindToControlMap = {
-    'integer': IntegerControl,
-    'number': NumberControl,
-    'choice': ChoiceControl
-};
-
-const DefaultStaticControl = (props) => (<FormControl.Static>{props.value}</FormControl.Static>);
-const kindToStaticControlMap = {
-};
-
-const ClusterParameterField = (props) => {
-    const { parameter, value, onChange, isCreate } = props;
-    const Control = get(kindToControlMap, parameter.kind, TextControl);
-    const StaticControl = get(kindToStaticControlMap, parameter.kind, DefaultStaticControl);
-    return (
-        <Field
-          name={parameter.name}
-          label={parameter.label}
-          helpText={parameter.description}>
-            {parameter.immutable && !isCreate ?
-                <StaticControl value={value} /> :
-                <FormControl
-                  componentClass={Control}
-                  required={parameter.required}
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  {...parameter.options} />
-            }
-        </Field>
-    );
-}
-
-
 class ClusterParametersForm extends React.Component {
     constructor(props) {
         super(props)
@@ -138,8 +95,7 @@ class ClusterParametersForm extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        console.log(this.state);
-        //this.props.onSubmit(this.state);
+        this.props.onSubmit(this.state);
     }
 
     render() {
@@ -163,6 +119,7 @@ class ClusterParametersForm extends React.Component {
                     {parameters.map(p => (
                         <ClusterParameterField
                           key={p.name}
+                          tenancy={this.props.tenancy}
                           isCreate={true}
                           parameter={p}
                           value={this.state.parameterValues[p.name]}
@@ -200,9 +157,17 @@ export class CreateClusterButton extends React.Component {
     }
 
     handleClusterTypeSelected = (clusterType) => this.setState({ clusterType });
+    handleClusterParamsSubmitted = ({ name, parameterValues }) => {
+        this.props.create({
+            name,
+            cluster_type: this.state.clusterType,
+            parameter_values: parameterValues
+        });
+        this.close();
+    }
 
     render() {
-        const { creating, clusterTypes: { fetching, data: clusterTypes } } = this.props;
+        const { creating, tenancy: { clusterTypes } } = this.props;
         return (
             <>
                 <Button
@@ -226,31 +191,37 @@ export class CreateClusterButton extends React.Component {
                         <Modal.Title>Create a new cluster</Modal.Title>
                     </Modal.Header>
                     <ul className="steps steps-2">
-                        <li className={this.state.clusterType ? 'success' : 'active'}>
-                            <Badge>1</Badge> Cluster type
+                        <li className={this.state.name ? 'success' : 'active'}>
+                            <Badge>1</Badge> Cluster name
                         </li>
                         <li className={this.state.clusterType ? 'active' : undefined}>
-                            <Badge>2</Badge> Cluster parameters
+                            <Badge>2</Badge> Cluster options
                         </li>
                     </ul>
-                    {clusterTypes ? (
-                        this.state.clusterType ?
-                            <ClusterParametersForm
-                              clusterType={clusterTypes[this.state.clusterType]}
-                              goBack={() => this.setState({ clusterType: '' })} /> :
+                    {clusterTypes.data ? (
+                        !this.state.clusterType ? (
                             <ClusterTypeForm
-                              clusterTypes={clusterTypes}
+                              clusterTypes={clusterTypes.data}
                               onSubmit={this.handleClusterTypeSelected} />
-                    ) : (
-                        fetching ? (
-                            <Loading message="Loading cluster types..."/>
                         ) : (
-                            <div
-                              role="notification"
-                              className="notification notification-inline notification-danger">
-                                <div className="notification-content">Unable to load cluster types</div>
-                            </div>
+                            <ClusterParametersForm
+                              tenancy={this.props.tenancy}
+                              clusterType={clusterTypes.data[this.state.clusterType]}
+                              goBack={() => this.setState({ clusterType: '' })}
+                              onSubmit={this.handleClusterParamsSubmitted} />
                         )
+                    ) : (
+                        <Modal.Body>
+                            {clusterTypes.fetching ? (
+                                <Loading message="Loading cluster types..."/>
+                            ) : (
+                                <div
+                                role="notification"
+                                className="notification notification-inline notification-danger">
+                                    <div className="notification-content">Unable to load cluster types</div>
+                                </div>
+                            )}
+                        </Modal.Body>
                     )}
                 </Modal>
             </>

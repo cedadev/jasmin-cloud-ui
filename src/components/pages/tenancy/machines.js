@@ -39,7 +39,7 @@ export class TenancyMachinesPanel extends React.Component {
               resourceActions={tenancyActions.machine}
               resourceName="machines"
               createButtonComponent={CreateMachineButton}
-              createButtonExtraProps={({ images: images, sizes: sizes })}>
+              createButtonExtraProps={({ images, sizes })}>
                 <Machines
                   images={images}
                   sizes={sizes}

@@ -99,7 +99,7 @@ function MachineStatus(props) {
         </Tooltip>
     );
     return (
-        <span className={`machine-status text-${statusStyleMap[props.machine.status.type]}`}>
+        <span className={`resource-status text-${statusStyleMap[props.machine.status.type]}`}>
             {props.machine.status.name}
             {statusTooltip && (
                 <OverlayTrigger placement="top" overlay={statusTooltip}>

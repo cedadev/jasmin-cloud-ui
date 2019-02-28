@@ -3,12 +3,99 @@
  */
 
 import React from 'react';
-import {
-    Table, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal,
-    DropdownButton, MenuItem
-} from 'react-bootstrap';
+import { Table, Button, Modal, DropdownButton, MenuItem, Form, FormControl } from 'react-bootstrap';
 
-import { bindArgsToActions } from '../../utils';
+import sortBy from 'lodash/sortBy';
+import get from 'lodash/get';
+
+import moment from 'moment';
+
+import { bindArgsToActions, Field } from '../../utils';
+import { ClusterParameterField } from './cluster-parameter-field';
+
+
+class UpdateClusterParametersMenuItem extends React.Component {
+    state = { visible: false, parameterValues: {} }
+
+    open = () => this.setState({ visible: true });
+    close = () => this.setState({ visible: false });
+
+    componentDidUpdate(_, prevState) {
+        // If transitioning from not open to open, reset the parameters
+        if( !prevState.visible && this.state.visible ) {
+            // By matching the cluster's parameter_values against the parameters
+            // for the cluster type, we can account for times when the required
+            // parameters have changed
+            const { cluster, tenancy: { clusterTypes: { data: clusterTypes } } } = this.props;
+            const parameters = get(clusterTypes, [cluster.cluster_type, 'parameters'], []);
+            this.setState({
+                parameterValues: Object.assign(
+                    {},
+                    ...parameters.map(p => ({
+                        [p.name]: get(cluster.parameter_values, p.name) || p.default || ''
+                    }))
+                )
+            });
+        }
+    }
+
+    handleChange = (name) => (value) => this.setState({
+        parameterValues: { ...this.state.parameterValues, [name]: value }
+    })
+
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.onSubmit({ parameter_values: this.state.parameterValues });
+        this.close();
+    }
+
+    render() {
+        const { cluster, tenancy } = this.props;
+        const { clusterTypes: { data: clusterTypes } } = tenancy;
+        const clusterType = get(clusterTypes, cluster.cluster_type);
+        const parameters = get(clusterType, 'parameters', []);
+        // If the cluster has a cluster type that doesn't exist, disable updates
+        // It will either become available, or it no longer exists
+        return (
+            <>
+                <MenuItem onSelect={this.open} disabled={!clusterType}>
+                    Update cluster options
+                </MenuItem>
+                <Modal
+                  backdrop="static"
+                  onHide={this.close}
+                  show={this.state.visible}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Update cluster: {cluster.name}</Modal.Title>
+                    </Modal.Header>
+                    <Form horizontal onSubmit={this.handleSubmit}>
+                        <Modal.Body>
+                            <Field name="clusterType" label="Cluster Type">
+                                <FormControl.Static>{clusterType.label}</FormControl.Static>
+                            </Field>
+                            {parameters.map(p => (
+                                <ClusterParameterField
+                                  key={p.name}
+                                  tenancy={this.props.tenancy}
+                                  isCreate={false}
+                                  parameter={p}
+                                  value={this.state.parameterValues[p.name]}
+                                  onChange={this.handleChange(p.name)} />
+                            ))}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button bsStyle="success" type="submit">
+                                <i className="fa fa-save" />
+                                {'\u00A0'}
+                                Update cluster
+                            </Button>
+                        </Modal.Footer>
+                    </Form>
+                </Modal>
+            </>
+        );
+    }
+}
 
 
 class ConfirmDeleteMenuItem extends React.Component {
@@ -21,7 +108,7 @@ class ConfirmDeleteMenuItem extends React.Component {
     close = () => this.setState({ visible: false });
 
     onConfirm = () => {
-        //this.props.onConfirm();
+        this.props.onConfirm();
         this.close();
     }
 
@@ -46,6 +133,22 @@ class ConfirmDeleteMenuItem extends React.Component {
     }
 }
 
+
+function ClusterStatus(props) {
+    const statusStyleMap = {
+        'CONFIGURING': 'info',
+        'READY': 'success',
+        'DELETING': 'danger',
+        'ERROR': 'danger'
+    };
+    return (
+        <span className={`resource-status text-${statusStyleMap[props.status]}`}>
+            {props.status}
+        </span>
+    );
+}
+
+
 function ClusterActionsDropdown(props) {
     const buttonTitle = props.disabled ?
         <span>
@@ -61,7 +164,13 @@ function ClusterActionsDropdown(props) {
           title={buttonTitle}
           pullRight
           disabled={props.disabled}>
-            <MenuItem>Cluster properties</MenuItem>
+            <MenuItem onClick={props.clusterActions.patch}>
+                Patch cluster
+            </MenuItem>
+            <UpdateClusterParametersMenuItem
+              cluster={props.cluster}
+              tenancy={props.tenancy}
+              onSubmit={props.clusterActions.update} />
             <ConfirmDeleteMenuItem
               name={props.cluster.name}
               onConfirm={props.clusterActions.delete} />
@@ -70,26 +179,29 @@ function ClusterActionsDropdown(props) {
 }
 
 function ClusterRow(props) {
-    const cluster = props.cluster;
-/*    const highlightClass = (machine.status.type === 'BUILD') ?
+    const { cluster, tenancy } = props;
+    const { clusterTypes: { data: clusterTypes } } = tenancy;
+    const highlightClass = (cluster.status === 'CONFIGURING') ?
         'info' :
-        ((machine.status.type === 'DELETED') ?
-            'danger' :
-            ((!!machine.updating ||
-              !!machine.deleting ||
-              !!machine.task ||
-              // An updating external IP counts as an action in progress
-              !!(externalIp || {}).updating
-            ) && 'warning')
-        );*/
-    const highlightClass = null;
+        (cluster.updating ?
+            'warning' :
+            ((cluster.status == 'DELETING' ||
+              cluster.status == 'ERROR'
+            ) && 'danger')
+        );
     return (
         <tr className={highlightClass || undefined}>
             <td>{cluster.name}</td>
+            <td>{get(clusterTypes, [cluster.cluster_type, 'label'], '-')}</td>
+            <td><ClusterStatus status={cluster.status} /></td>
+            <td>{moment(cluster.created).fromNow()}</td>
+            <td>{moment(cluster.updated).fromNow()}</td>
+            <td>{moment(cluster.patched).fromNow()}</td>
             <td className="resource-actions">
                 <ClusterActionsDropdown
                   disabled={!!highlightClass}
                   cluster={cluster}
+                  tenancy={tenancy}
                   clusterActions={props.clusterActions} />
             </td>
         </tr>
@@ -116,8 +228,7 @@ export class ClustersTable extends React.Component {
 
     render() {
         // Sort the clusters by name to ensure a consistent rendering
-        const clusters = Object.values(this.props.clusters)
-            .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+        const clusters = sortBy(Object.values(this.props.clusters), 'name');
         return (
             <Table striped hover responsive>
                 <caption>
@@ -126,6 +237,11 @@ export class ClustersTable extends React.Component {
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Cluster Type</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Patched</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -134,7 +250,8 @@ export class ClustersTable extends React.Component {
                         <ClusterRow
                           key={cluster.id}
                           cluster={cluster}
-                          clusterActions={bindArgsToActions(this.props.clusterActions, cluster.name)} />
+                          tenancy={this.props.tenancy}
+                          clusterActions={bindArgsToActions(this.props.clusterActions, cluster.id)} />
                     )}
                 </tbody>
             </Table>

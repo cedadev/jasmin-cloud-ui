@@ -183,10 +183,10 @@ caption {
 body.resource-page #react-root {
     margin-bottom: -160px;
 }
-.machine-status, .volume-status {
+.resource-status {
     font-weight: bold;
 }
-.machine-status .tooltip-trigger {
+.resource-status .tooltip-trigger {
     color: inherit;
     cursor: help;
 }
