@@ -3,7 +3,17 @@
  */
 
 import React from 'react';
-import { Table, Button, Modal, DropdownButton, MenuItem, Form, FormControl } from 'react-bootstrap';
+import {
+    Table,
+    Button,
+    Modal,
+    DropdownButton,
+    MenuItem,
+    Form,
+    FormControl,
+    Tooltip,
+    OverlayTrigger
+} from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
@@ -71,7 +81,7 @@ class UpdateClusterParametersMenuItem extends React.Component {
                     <Form horizontal onSubmit={this.handleSubmit}>
                         <Modal.Body>
                             <Field name="clusterType" label="Cluster Type">
-                                <FormControl.Static>{clusterType.label}</FormControl.Static>
+                                <FormControl.Static>{get(clusterType, 'label', '-')}</FormControl.Static>
                             </Field>
                             {parameters.map(p => (
                                 <ClusterParameterField
@@ -98,6 +108,40 @@ class UpdateClusterParametersMenuItem extends React.Component {
 }
 
 
+class ConfirmPatchMenuItem extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = { visible: false };
+    }
+
+    open = () => this.setState({ visible: true });
+    close = () => this.setState({ visible: false });
+
+    onConfirm = () => {
+        this.props.onConfirm();
+        this.close();
+    }
+
+    render() {
+        return (
+            <>
+                <MenuItem onSelect={this.open}>Patch cluster</MenuItem>
+                <Modal show={this.state.visible}>
+                    <Modal.Body>
+                        <p>Are you sure you want to patch {this.props.name}?</p>
+                        <p><strong>This is a potentially disruptive operation, and may affect workloads on the cluster. Once started, it cannot be stopped.</strong></p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={this.close}>Cancel</Button>
+                        <Button bsStyle="warning" onClick={this.onConfirm}>Patch cluster</Button>
+                    </Modal.Footer>
+                </Modal>
+            </>
+        );
+    }
+}
+
+
 class ConfirmDeleteMenuItem extends React.Component {
     constructor(props) {
         super(props)
@@ -115,9 +159,7 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <MenuItem className="danger" onSelect={this.open}>
-                    Delete cluster
-                </MenuItem>
+                <MenuItem className="danger" onSelect={this.open}>Delete cluster</MenuItem>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -149,6 +191,24 @@ function ClusterStatus(props) {
 }
 
 
+function ClusterPatched(props) {
+    const threshold = moment().subtract(2, 'weeks');
+    const at = moment(props.at);
+    const tooltip = (
+        <Tooltip id={`${props.name}-patched`}>This cluster has not been patched recently.</Tooltip>
+    );
+    return at.isAfter(threshold) ?
+        at.fromNow() :
+        <OverlayTrigger placement="top" overlay={tooltip}>
+            <strong className="text-danger">
+                <i className="fa fa-exclamation-circle"></i>
+                {'\u00A0'}
+                {at.fromNow()}
+            </strong>
+        </OverlayTrigger>;
+}
+
+
 function ClusterActionsDropdown(props) {
     const buttonTitle = props.disabled ?
         <span>
@@ -164,9 +224,9 @@ function ClusterActionsDropdown(props) {
           title={buttonTitle}
           pullRight
           disabled={props.disabled}>
-            <MenuItem onClick={props.clusterActions.patch}>
-                Patch cluster
-            </MenuItem>
+            <ConfirmPatchMenuItem
+              name={props.cluster.name}
+              onConfirm={props.clusterActions.patch} />
             <UpdateClusterParametersMenuItem
               cluster={props.cluster}
               tenancy={props.tenancy}
@@ -196,7 +256,7 @@ function ClusterRow(props) {
             <td><ClusterStatus status={cluster.status} /></td>
             <td>{moment(cluster.created).fromNow()}</td>
             <td>{moment(cluster.updated).fromNow()}</td>
-            <td>{moment(cluster.patched).fromNow()}</td>
+            <td><ClusterPatched at={cluster.patched} /></td>
             <td className="resource-actions">
                 <ClusterActionsDropdown
                   disabled={!!highlightClass}
