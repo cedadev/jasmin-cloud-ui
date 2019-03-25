@@ -191,8 +191,8 @@ export class CreateClusterButton extends React.Component {
                         <Modal.Title>Create a new cluster</Modal.Title>
                     </Modal.Header>
                     <ul className="steps steps-2">
-                        <li className={this.state.name ? 'success' : 'active'}>
-                            <Badge>1</Badge> Cluster name
+                        <li className={this.state.clusterType ? 'success' : 'active'}>
+                            <Badge>1</Badge> Cluster type
                         </li>
                         <li className={this.state.clusterType ? 'active' : undefined}>
                             <Badge>2</Badge> Cluster options

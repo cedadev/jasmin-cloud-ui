@@ -8,7 +8,6 @@ import { FormControl } from 'react-bootstrap';
 import get from 'lodash/get';
 
 import {
-    ImageSelectControl,
     SizeSelectControl,
     ExternalIpSelectControl,
     VolumeSelectControl,
@@ -23,16 +22,13 @@ const TextControl = ({ tenancy: _, type, ...props }) => (
     <FormControl type="text" {...props} />
 );
 
-
 const NumberControl = ({ tenancy: _, type, ...props }) => (
     <FormControl type="number" {...props} />
 );
 
-
 const IntegerControl = ({ tenancy: _, type, ...props }) => (
     <NumberControl step="1" {...props} />
 );
-
 
 const ChoiceControl = ({ tenancy: _, choices, ...props }) => (
     <FormControl componentClass={RichSelect} {...props}>
@@ -40,7 +36,6 @@ const ChoiceControl = ({ tenancy: _, choices, ...props }) => (
         {choices.map(c => <option key={c}>{c}</option>)}
     </FormControl>
 );
-
 
 const CloudSizeControl = ({ tenancy, min_cpus, min_ram, ...props }) => {
     const filterSizes = (size) => {
@@ -56,12 +51,35 @@ const CloudSizeControl = ({ tenancy, min_cpus, min_ram, ...props }) => {
     );
 };
 
+const CloudMachineControl = ({ tenancy, ...props }) => (
+    <MachineSelectControl resource={tenancy.machines} {...props} />
+);
+
+const CloudIpControl = ({ tenancy, value, ...props }) => (
+    <ExternalIpSelectControl resource={tenancy.externalIps} {...props} />
+);
+
+const CloudVolumeControl = ({ tenancy, min_size, ...props }) => (
+    <VolumeSelectControl
+      resource={tenancy.volumes}
+      resourceFilter={(v) => (!min_size || v.size >= min_size)}
+      {...props} />
+);
+
+const CloudClusterControl = ({ tenancy, ...props }) => (
+    <ClusterSelectControl resource={tenancy.clusters} {...props} />
+);
+
 
 const kindToControlMap = {
     'integer': IntegerControl,
     'number': NumberControl,
     'choice': ChoiceControl,
-    'cloud.size': CloudSizeControl
+    'cloud.size': CloudSizeControl,
+    'cloud.machine': CloudMachineControl,
+    'cloud.ip': CloudIpControl,
+    'cloud.volume': CloudVolumeControl,
+    'cloud.cluster': CloudClusterControl,
 };
 
 

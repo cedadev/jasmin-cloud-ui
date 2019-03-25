@@ -245,9 +245,7 @@ function ClusterRow(props) {
         'info' :
         (cluster.updating ?
             'warning' :
-            ((cluster.status == 'DELETING' ||
-              cluster.status == 'ERROR'
-            ) && 'danger')
+            (cluster.status == 'DELETING' && 'danger')
         );
     return (
         <tr className={highlightClass || undefined}>

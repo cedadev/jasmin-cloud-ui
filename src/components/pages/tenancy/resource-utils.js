@@ -136,14 +136,16 @@ export const SizeSelectControl = (props) => (
         {...props} />
 );
 
-export const ExternalIpSelectControl = (props) => (
+export const ExternalIpSelectControl = ({ value, ...props }) => (
     <ResourceSelectControl
         resourceName="external ip"
         resourceToOption={(ip) => (
             <option key={ip.external_ip} value={ip.external_ip}>{ip.external_ip}</option>
         )}
         sortResources={(ips) => sortBy(ips, ['external_ip'])}
-        resourceFilter={(ip) => !ip.updating && !ip.machine}
+        // The currently selected IP should be permitted, regardless of state
+        resourceFilter={(ip) => (ip.external_ip === value) || (!ip.updating && !ip.machine)}
+        value={value}
         {...props} />
 );
 
