@@ -2,12 +2,10 @@
  * This module contains Redux stuff for loading tenancies.
  */
 
-import { of } from 'rxjs';
-import { map, mergeMap, delay, takeUntil, filter } from 'rxjs/operators';
+import { of, merge } from 'rxjs';
+import { map, mergeMap, delay, takeUntil, filter, withLatestFrom, partition } from 'rxjs/operators';
 
 import get from 'lodash/get';
-import first from 'lodash/first';
-import last from 'lodash/last';
 
 import { combineEpics, ofType } from 'redux-observable';
 
@@ -199,31 +197,35 @@ export const epic = combineEpics(
         ofType(sessionActions.TERMINATED),
         map(_ => tenancyActionCreators.reset())
     ),
-    // Whenever a tenancy switch happens and the state has changed, fetch the tenancy resources
-    action$ => action$.pipe(
-        ofType(actions.SWITCH),
-        filter(action => !!action.tenancyId),
-        mergeMap(action => of(
-            quotaActionCreators.fetchList(action.tenancyId),
-            imageActionCreators.fetchList(action.tenancyId),
-            sizeActionCreators.fetchList(action.tenancyId),
-            externalIpActionCreators.fetchList(action.tenancyId),
-            volumeActionCreators.fetchList(action.tenancyId),
-            machineActionCreators.fetchList(action.tenancyId),
-            clusterTypeActionCreators.fetchList(action.tenancyId),
-            clusterActionCreators.fetchList(action.tenancyId)
-        ))
-    ),
-    // Whenever there is a 404 on a list operation of a tenancy resource, reset the current tenancy
-    action$ => action$.pipe(
-        filter(action => {
-            const parts = action.type.split("/");
-            return first(parts) === 'TENANCIES' && last(parts) === 'FETCH_LIST_FAILED';
-        }),
-        filter(action => !!action.error),
-        filter(action => get(action, 'payload.status') === 404),
-        map(_ => tenancyActionCreators.switchTo(null))
-    ),
+    // Whenever a tenancy switch happens to a tenancy that is in the current
+    // state, fetch the tenancy resources
+    // Whenever a tenancy switch happens to a tenancy that is not in the current
+    // state, force a switch to no tenancy
+    (action$, state$) => {
+        const [present, notPresent] = action$.pipe(
+            ofType(actions.SWITCH),
+            filter(action => !!action.tenancyId),
+            withLatestFrom(state$),
+            partition(([action, state]) => (state.tenancies.data || {}).hasOwnProperty(action.tenancyId))
+        );
+        return merge(
+            present.pipe(
+                mergeMap(([action,]) => of(
+                    quotaActionCreators.fetchList(action.tenancyId),
+                    imageActionCreators.fetchList(action.tenancyId),
+                    sizeActionCreators.fetchList(action.tenancyId),
+                    externalIpActionCreators.fetchList(action.tenancyId),
+                    volumeActionCreators.fetchList(action.tenancyId),
+                    machineActionCreators.fetchList(action.tenancyId),
+                    clusterTypeActionCreators.fetchList(action.tenancyId),
+                    clusterActionCreators.fetchList(action.tenancyId)
+                ))
+            ),
+            notPresent.pipe(
+                map(_ => tenancyActionCreators.switchTo(null))
+            )
+        );
+    },
     quotaEpic,
     imageEpic,
     sizeEpic,
