@@ -62,7 +62,7 @@ import {
 } from './clusters';
 
 
-const tenancyActions = {
+export const actions = {
     RESET: 'TENANCIES/RESET',
 
     FETCH_LIST: 'TENANCIES/FETCH_LIST',
@@ -75,16 +75,16 @@ const tenancyActions = {
 
 
 const tenancyActionCreators = {
-    reset: () => ({ type: tenancyActions.RESET }),
+    reset: () => ({ type: actions.RESET }),
     fetchList: () => ({
-        type: tenancyActions.FETCH_LIST,
+        type: actions.FETCH_LIST,
         apiRequest: true,
-        successAction: tenancyActions.FETCH_LIST_SUCCEEDED,
-        failureAction: tenancyActions.FETCH_LIST_FAILED,
+        successAction: actions.FETCH_LIST_SUCCEEDED,
+        failureAction: actions.FETCH_LIST_FAILED,
         options: { url: '/api/tenancies/' }
     }),
     switchTo: (tenancyId) => ({
-        type: tenancyActions.SWITCH,
+        type: actions.SWITCH,
         tenancyId
     })
 }
@@ -111,11 +111,11 @@ const initialState = {
 };
 export function reducer(state = initialState, action) {
     switch(action.type) {
-        case tenancyActions.RESET:
+        case actions.RESET:
             return initialState;
-        case tenancyActions.FETCH_LIST:
+        case actions.FETCH_LIST:
             return { ...state, fetching: true };
-        case tenancyActions.FETCH_LIST_SUCCEEDED:
+        case actions.FETCH_LIST_SUCCEEDED:
             // As well as updating the list, also update the current tenancy
             const nextData = Object.assign({}, ...action.payload.map(t => ({ [t.id]: t })));
             return {
@@ -126,9 +126,9 @@ export function reducer(state = initialState, action) {
                     { ...state.current, ...get(nextData, state.current.id, {}) } :
                     null
             };
-        case tenancyActions.FETCH_LIST_FAILED:
+        case actions.FETCH_LIST_FAILED:
             return { ...state, fetching: false };
-        case tenancyActions.SWITCH:
+        case actions.SWITCH:
             const switchTo = action.tenancyId;
             // Giving switchTo as null means clear the current tenancy
             if( switchTo === null ) return { ...state, current: null };
@@ -182,14 +182,14 @@ export const epic = combineEpics(
     // Whenever the tenancy list is fetched successfully, wait 30 mins
     // before fetching them again
     action$ => action$.pipe(
-        ofType(tenancyActions.FETCH_LIST_SUCCEEDED),
+        ofType(actions.FETCH_LIST_SUCCEEDED),
         mergeMap(_ => {
             // Cancel the timer if:
             //   * A separate fetch is requested before the timer expires
             //   * The session is terminated before the timer expires
             return of(tenancyActionCreators.fetchList()).pipe(
                 delay(30 * 60 * 1000),
-                takeUntil(action$.pipe(ofType(tenancyActions.FETCH_LIST))),
+                takeUntil(action$.pipe(ofType(actions.FETCH_LIST))),
                 takeUntil(action$.pipe(ofType(sessionActions.TERMINATED)))
             );
         })
@@ -201,7 +201,7 @@ export const epic = combineEpics(
     ),
     // Whenever a tenancy switch happens and the state has changed, fetch the tenancy resources
     action$ => action$.pipe(
-        ofType(tenancyActions.SWITCH),
+        ofType(actions.SWITCH),
         filter(action => !!action.tenancyId),
         mergeMap(action => of(
             quotaActionCreators.fetchList(action.tenancyId),

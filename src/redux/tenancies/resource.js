@@ -4,11 +4,12 @@
  */
 
 import { of } from 'rxjs';
-import { mergeMap, delay, takeUntil, filter, map, merge } from 'rxjs/operators';
+import { filter, map, merge, mergeMap, delay, takeUntil } from 'rxjs/operators';
 
 import { combineEpics, ofType } from 'redux-observable';
 
 import { actions as sessionActions } from '../session';
+import { actions as tenancyActions } from './index';
 
 
 export function createActions(resourceName) {
@@ -263,8 +264,7 @@ export function createReducer(actions, id, transform) {
 
 export function createEpic(actions, actionCreators, isActive, id) {
     return combineEpics(
-        // Whenever the resource list is fetched successfully, wait 2 mins before
-        // fetching them again
+        // Whenever a resource list is fetched successfully, wait 1 min before fetching it again
         action$ => action$.pipe(
             ofType(actions.FETCH_LIST_SUCCEEDED),
             mergeMap(action => {
@@ -272,17 +272,22 @@ export function createEpic(actions, actionCreators, isActive, id) {
                 // Cancel the timer if:
                 //   * A separate fetch is requested before the timer expires
                 //   * The session is terminated before the timer expires
+                //   * A switch takes place to a different tenancy before the timer expires
                 return of(actionCreators.fetchList(tenancyId)).pipe(
-                    delay(2 * 60 * 1000),
+                    delay(60 * 1000),
                     takeUntil(action$.pipe(
                         ofType(actions.FETCH_LIST),
                         filter(action => action.tenancyId === tenancyId)
                     )),
-                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED)))
+                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED))),
+                    takeUntil(action$.pipe(
+                        ofType(tenancyActions.SWITCH),
+                        filter(action => action.tenancyId !== tenancyId)
+                    ))
                 );
             })
         ),
-        // Whenever the resource list is fetched, trigger an individual fetch for any
+        // Whenever a resource list is fetched, trigger an individual fetch for any
         // 'active' resources, as determined by the given predicate
         action$ => action$.pipe(
             ofType(actions.FETCH_LIST_SUCCEEDED),
@@ -294,7 +299,7 @@ export function createEpic(actions, actionCreators, isActive, id) {
                     )
             ))
         ),
-        // When a fetched, created or updated resource is active, wait 1s and
+        // When a resource is fetched, created or updated and is active, wait 1s and
         // fetch it again
         action$ => action$.pipe(
             ofType(actions.FETCH_ONE_SUCCEEDED),
@@ -308,6 +313,7 @@ export function createEpic(actions, actionCreators, isActive, id) {
                 //   * A fetch for the same resource is requested before the
                 //     timer expires
                 //   * The session is terminated while we are waiting
+                //   * A switch takes place to a different tenancy before the timer expires
                 return of(actionCreators.fetchOne(tenancyId, resourceId)).pipe(
                     delay(1000),
                     takeUntil(
@@ -317,7 +323,11 @@ export function createEpic(actions, actionCreators, isActive, id) {
                             filter(action => action.resourceId === resourceId)
                         )
                     ),
-                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED)))
+                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED))),
+                    takeUntil(action$.pipe(
+                        ofType(tenancyActions.SWITCH),
+                        filter(action => action.tenancyId !== tenancyId)
+                    ))
                 );
             })
         ),
@@ -337,7 +347,7 @@ export function createEpic(actions, actionCreators, isActive, id) {
 
 export function createTenancyResource(resourceName, options = {}) {
     const {
-        isActive = resource => false,
+        isActive = _ => false,
         id = resource => resource.id,
         transform = resource => resource
     } = options;
