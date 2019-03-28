@@ -5,6 +5,8 @@
 import React from 'react';
 import { FormControl } from 'react-bootstrap';
 
+import ReactMarkdown from 'react-markdown';
+
 import get from 'lodash/get';
 
 import {
@@ -55,7 +57,7 @@ const CloudMachineControl = ({ tenancy, ...props }) => (
     <MachineSelectControl resource={tenancy.machines} {...props} />
 );
 
-const CloudIpControl = ({ tenancy, value, ...props }) => (
+const CloudIpControl = ({ tenancy, ...props }) => (
     <ExternalIpSelectControl resource={tenancy.externalIps} {...props} />
 );
 
@@ -90,7 +92,7 @@ export const ClusterParameterField = (props) => {
         <Field
           name={parameter.name}
           label={parameter.label}
-          helpText={parameter.description}>
+          helpText={<ReactMarkdown source={parameter.description} />}>
             <Control
               tenancy={tenancy}
               required={parameter.required}

@@ -41,17 +41,25 @@ class UpdateClusterParametersMenuItem extends React.Component {
             this.setState({
                 parameterValues: Object.assign(
                     {},
-                    ...parameters.map(p => ({
-                        [p.name]: get(cluster.parameter_values, p.name) || p.default || ''
-                    }))
+                    ...parameters
+                        .map(p => ([p.name, get(cluster.parameter_values, p.name, p.default || '')]))
+                        .filter(([_, value]) => value !== '')
+                        .map(([name, value]) => ({ [name]: value }))
                 )
             });
         }
     }
 
-    handleChange = (name) => (value) => this.setState({
-        parameterValues: { ...this.state.parameterValues, [name]: value }
-    })
+    handleChange = (name) => (value) => {
+        if( value !== '' ) {
+            this.setState({
+                parameterValues: { ...this.state.parameterValues, [name]: value }
+            });
+        } else {
+            const { [name]: _, ...nextParams } = this.state.parameterValues;
+            this.setState({ parameterValues: nextParams });
+        }
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -89,7 +97,7 @@ class UpdateClusterParametersMenuItem extends React.Component {
                                   tenancy={this.props.tenancy}
                                   isCreate={false}
                                   parameter={p}
-                                  value={this.state.parameterValues[p.name]}
+                                  value={this.state.parameterValues[p.name] || ''}
                                   onChange={this.handleChange(p.name)} />
                             ))}
                         </Modal.Body>

@@ -75,23 +75,29 @@ class ClusterTypeForm extends React.Component {
 
 class ClusterParametersForm extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             name: '',
             parameterValues: Object.assign(
                 {},
-                ...props.clusterType.parameters.map(p => ({ [p.name]: p.default || '' }))
+                ...props.clusterType.parameters
+                    .filter(p => p.required)
+                    .map(p => ({ [p.name]: p.default || '' }))
             )
-        }
+        };
     }
 
     handleNameChange = (e) => this.setState({ name: e.target.value })
-    handleParameterValueChange = (name) => (value) => this.setState({
-        parameterValues: {
-            ...this.state.parameterValues,
-            [name]: value
+    handleParameterValueChange = (name) => (value) => {
+        if( value !== '' ) {
+            this.setState({
+                parameterValues: { ...this.state.parameterValues, [name]: value }
+            });
+        } else {
+            const { [name]: _, ...nextParams } = this.state.parameterValues;
+            this.setState({ parameterValues: nextParams });
         }
-    })
+    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -122,7 +128,7 @@ class ClusterParametersForm extends React.Component {
                           tenancy={this.props.tenancy}
                           isCreate={true}
                           parameter={p}
-                          value={this.state.parameterValues[p.name]}
+                          value={this.state.parameterValues[p.name] || ''}
                           onChange={this.handleParameterValueChange(p.name)} />
                     ))}
                 </Modal.Body>
