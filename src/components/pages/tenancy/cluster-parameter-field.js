@@ -68,8 +68,11 @@ const CloudVolumeControl = ({ tenancy, min_size, ...props }) => (
       {...props} />
 );
 
-const CloudClusterControl = ({ tenancy, ...props }) => (
-    <ClusterSelectControl resource={tenancy.clusters} {...props} />
+const CloudClusterControl = ({ tenancy, tag, ...props }) => (
+    <ClusterSelectControl
+      resource={tenancy.clusters}
+      resourceFilter={(c) => !tag || c.tags.includes(tag)}
+      {...props} />
 );
 
 
