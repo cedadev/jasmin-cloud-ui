@@ -56,7 +56,9 @@ export class TenancyPage extends React.Component {
                         <LinkContainer to={`/tenancies/${tenancy.id}/volumes`}>
                             <NavItem>Volumes</NavItem>
                         </LinkContainer>
-                        <LinkContainer to={`/tenancies/${tenancy.id}/clusters`}>
+                        <LinkContainer
+                          to={`/tenancies/${tenancy.id}/clusters`}
+                          disabled={!get(tenancy, 'clusters.enabled', false)}>
                             <NavItem>Clusters</NavItem>
                         </LinkContainer>
                     </Nav>

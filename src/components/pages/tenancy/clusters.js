@@ -3,6 +3,9 @@
  */
 
 import React from 'react';
+import { Redirect } from 'react-router-dom';
+
+import get from 'lodash/get';
 
 import { ResourcePanel } from './resource-utils';
 import { ClustersTable } from './clusters-table';
@@ -27,6 +30,9 @@ export class TenancyClustersPanel extends React.Component {
 
     render() {
         const { tenancy, tenancyActions } = this.props;
+        if( !get(tenancy.clusters, 'enabled', true) ) {
+            return <Redirect to={`/tenancies/${tenancy.id}`} />;
+        }
         return (
             <ResourcePanel
               resource={tenancy.clusters}

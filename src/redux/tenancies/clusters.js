@@ -2,7 +2,7 @@
  * This module contains Redux bits for loading clusters sizes.
  */
 
-import { map } from 'rxjs/operators';
+import { map, filter } from 'rxjs/operators';
 
 import { combineEpics, ofType } from 'redux-observable';
 
@@ -38,6 +38,14 @@ const {
 export const actionCreators = {
     ...resourceActionCreators,
 
+    // A cluster fetchList operation should fail silently
+    // That way, we can check for a 404, which indicates clusters not supported,
+    // without resulting in a notification
+    fetchList: tenancyId => ({
+        ...resourceActionCreators.fetchList(tenancyId),
+        failSilently: true
+    }),
+
     patch: (tenancyId, clusterId) => ({
         type: actions.PATCH,
         tenancyId,
@@ -55,6 +63,12 @@ export const actionCreators = {
 
 export function reducer(state, action) {
     switch(action.type) {
+        // When a fetchList succeeds, enable clusters in the interface
+        case actions.FETCH_LIST_SUCCEEDED:
+            return { ...resourceReducer(state, action), enabled: true };
+        // When a fetchList fails, disable clusters in the interface
+        case actions.FETCH_LIST_FAILED:
+            return { ...resourceReducer(state, action), enabled: false };
         case actions.PATCH:
             // Only set the updating flag to true if we know about the cluster
             if( state.data.hasOwnProperty(action.clusterId) )
@@ -112,6 +126,13 @@ export function reducer(state, action) {
 
 export const epic = combineEpics(
     resourceEpic,
+    // When a list operation fails with anything that is not a 404,
+    // reissue it as not silent
+    action$ => action$.pipe(
+        ofType(actions.FETCH_LIST_FAILED),
+        filter(action => action.payload.status !== 404),
+        map(action => ({ ...action, failSilently: false }))
+    ),
     // When a patch takes place on a cluster, refresh it
     action$ => action$.pipe(
         ofType(actions.PATCH_SUCCEEDED),
