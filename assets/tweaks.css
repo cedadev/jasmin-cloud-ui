@@ -286,3 +286,7 @@ a.size-details {
 td label {
     margin-bottom: 0;
 }
+
+.nav li.disabled {
+    cursor: not-allowed;
+}
