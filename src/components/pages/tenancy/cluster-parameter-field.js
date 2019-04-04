@@ -20,8 +20,8 @@ import { Field, RichSelect } from '../../utils';
 
 
 // FormControl sends through type=undefined, so remove it from props
-const TextControl = ({ tenancy: _, type, ...props }) => (
-    <FormControl type="text" {...props} />
+const TextControl = ({ tenancy: _, type, secret, ...props }) => (
+    <FormControl type={secret ? "password" : "text"} {...props} />
 );
 
 const NumberControl = ({ tenancy: _, type, ...props }) => (
@@ -68,12 +68,19 @@ const CloudVolumeControl = ({ tenancy, min_size, ...props }) => (
       {...props} />
 );
 
-const CloudClusterControl = ({ tenancy, tag, ...props }) => (
-    <ClusterSelectControl
-      resource={tenancy.clusters}
-      resourceFilter={(c) => !tag || c.tags.includes(tag)}
-      {...props} />
-);
+const CloudClusterControl = ({ tenancy, tag, value, ...props }) => {
+    const hasTag = (c) => !tag || c.tags.includes(tag);
+    const isReady = (c) => (value === c.name) || (c.status === 'READY');
+    return (
+        <ClusterSelectControl
+          resource={tenancy.clusters}
+          resourceFilter={(c) => hasTag(c) && isReady(c)}
+          // We work in names for clusters
+          resourceToOption={(c) => <option key={c.name} value={c.name}>{c.name}</option>}
+          value={value}
+          {...props} />
+    );
+};
 
 
 const kindToControlMap = {

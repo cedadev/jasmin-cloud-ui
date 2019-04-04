@@ -279,14 +279,14 @@ a.size-details {
     border-bottom-color: #e5e5e5;
 }
 
-.table-selection tr, .table-selection label {
-    cursor: pointer;
-}
-
-td label {
-    margin-bottom: 0;
-}
-
 .nav li.disabled {
     cursor: not-allowed;
+}
+
+.cluster-type-select .panel {
+    cursor: pointer;
+}
+.cluster-type-select .img-responsive {
+    margin: 0 auto;
+    max-height: 80px;
 }

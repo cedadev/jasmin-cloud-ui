@@ -131,7 +131,8 @@ export const epic = combineEpics(
     action$ => action$.pipe(
         ofType(actions.FETCH_LIST_FAILED),
         filter(action => action.payload.status !== 404),
-        map(action => ({ ...action, failSilently: false }))
+        filter(action => !!action.silent),
+        map(action => ({ ...action, silent: false }))
     ),
     // When a patch takes place on a cluster, refresh it
     action$ => action$.pipe(

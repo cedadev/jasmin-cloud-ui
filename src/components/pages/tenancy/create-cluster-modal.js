@@ -3,73 +3,63 @@
  */
 
 import React from 'react';
-import { Button, Modal, Badge, Table, FormControl } from 'react-bootstrap';
+import { Col, Row, Clearfix, Button, Modal, Badge, Panel, FormControl, Image } from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
+
+import ReactMarkdown from 'react-markdown';
 
 import { Loading, Form, Field } from '../../utils';
 import { ClusterParameterField } from './cluster-parameter-field';
 
 
-class ClusterTypeForm extends React.Component {
-    state = { selected: '' }
+class ClusterTypePanel extends React.Component {
+    state = { hovering: false };
 
-    setSelected = (selected) => this.setState({ selected })
-    handleChange = (e) => this.setSelected(e.target.value)
-
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.props.onSubmit(this.state.selected);
-    }
+    handleMouseEnter = () => this.setState({ hovering: true })
+    handleMouseLeave = () => this.setState({ hovering: false })
 
     render() {
-        const { clusterTypes } = this.props;
+        const { clusterType, onSelect } = this.props;
         return (
-            <Form horizontal onSubmit={this.handleSubmit}>
-                <Modal.Body>
-                    <Table striped hover className="table-selection">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Name</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortBy(Object.values(clusterTypes), ['name']).map(t => {
-                                const selected = this.state.selected === t.name;
-                                return (
-                                    <tr
-                                      key={t.name}
-                                      className={selected ? 'success' : undefined}
-                                      onClick={() => this.setSelected(t.name)}>
-                                        <td>
-                                            <input
-                                              id={`radio-${t.name}`}
-                                              type="radio"
-                                              name="clusterType"
-                                              value={t.name}
-                                              checked={selected}
-                                              onChange={this.handleChange} />
-                                        </td>
-                                        <td><label htmlFor={`radio-${t.name}`}>{t.label}</label></td>
-                                        <td>{t.description}</td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </Table>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button bsStyle="primary" type="submit" disabled={!this.state.selected}>
-                        <i className="fa fa-arrow-circle-right" />
-                        {'\u00A0'}
-                        Next
-                    </Button>
-                </Modal.Footer>
-            </Form>
+            <Col key={clusterType.name} md={4} sm={6}>
+                <Panel
+                  bsStyle={this.state.hovering ? 'primary' : undefined}
+                  onMouseEnter={this.handleMouseEnter}
+                  onMouseLeave={this.handleMouseLeave}
+                  onClick={() => onSelect(clusterType.name)}>
+                    <Panel.Heading>
+                        <Panel.Title componentClass="h3">{clusterType.label}</Panel.Title>
+                    </Panel.Heading>
+                    <Panel.Body>
+                        <Image src={clusterType.logo} responsive />
+                    </Panel.Body>
+                    <Panel.Footer>
+                        <ReactMarkdown source={clusterType.description} />
+                    </Panel.Footer>
+                </Panel>
+            </Col>
         );
     }
+}
+
+
+function ClusterTypeForm(props) {
+    const { clusterTypes, onSelect } = props;
+    return (
+        <Modal.Body className="cluster-type-select">
+            <Col md={12}>
+                {sortBy(Object.values(clusterTypes), ['name']).map((ct, i) => (
+                    <React.Fragment key={ct.name}>
+                        <ClusterTypePanel clusterType={ct} onSelect={onSelect} />
+                        {i % 2 === 1 && <Clearfix visibleSmBlock />}
+                        {i % 3 === 2 && <Clearfix visibleMdBlock visibleLgBlock />}
+                    </React.Fragment>
+                ))}
+            </Col>
+            <Clearfix />
+        </Modal.Body>
+    );
 }
 
 
@@ -117,8 +107,8 @@ class ClusterParametersForm extends React.Component {
                           type="text"
                           placeholder="Cluster name"
                           required
-                          pattern="[A-Za-z0-9\.\-]+"
-                          title="Must contain alphanumeric characters, dot (.) and dash (-) only."
+                          pattern="[A-Za-z0-9\-]+"
+                          title="Must contain alphanumeric characters and dash (-) only."
                           value={this.state.name}
                           onChange={this.handleNameChange} />
                     </Field>
@@ -192,6 +182,7 @@ export class CreateClusterButton extends React.Component {
                 <Modal
                   backdrop="static"
                   onHide={this.close}
+                  bsSize={!this.state.clusterType ? 'large' : undefined}
                   show={this.state.visible}>
                     <Modal.Header closeButton>
                         <Modal.Title>Create a new cluster</Modal.Title>
@@ -208,7 +199,7 @@ export class CreateClusterButton extends React.Component {
                         !this.state.clusterType ? (
                             <ClusterTypeForm
                               clusterTypes={clusterTypes.data}
-                              onSubmit={this.handleClusterTypeSelected} />
+                              onSelect={this.handleClusterTypeSelected} />
                         ) : (
                             <ClusterParametersForm
                               tenancy={this.props.tenancy}
