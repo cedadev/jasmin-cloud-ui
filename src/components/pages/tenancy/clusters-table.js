@@ -12,11 +12,13 @@ import {
     Form,
     FormControl,
     Tooltip,
-    OverlayTrigger
+    OverlayTrigger,
+    ProgressBar
 } from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
+import truncate from 'lodash/truncate';
 
 import moment from 'moment';
 
@@ -191,27 +193,41 @@ function ClusterStatus(props) {
         'DELETING': 'danger',
         'ERROR': 'danger'
     };
-    return (
-        <span className={`resource-status text-${statusStyleMap[props.status]}`}>
-            {props.status}
-        </span>
+    const statusTooltip = props.cluster.error_message && (
+        <Tooltip id={`cluster-error-${props.cluster.id}`}>
+            {props.cluster.error_message}
+        </Tooltip>
+    );
+    const className = `resource-status text-${statusStyleMap[props.cluster.status]}`;
+    return statusTooltip ? (
+        <OverlayTrigger placement="top" overlay={statusTooltip}>
+            <span className={className + ' tooltip-trigger'}>
+                <i className="fa fa-exclamation-circle"></i>
+                {'\u00A0'}
+                {props.cluster.status}
+            </span>
+        </OverlayTrigger>
+    ) : (
+        <span className={className}>{props.cluster.status}</span>
     );
 }
 
 
 function ClusterPatched(props) {
     const threshold = moment().subtract(2, 'weeks');
-    const at = moment(props.at);
+    const patched = moment(props.cluster.patched);
     const tooltip = (
-        <Tooltip id={`${props.name}-patched`}>This cluster has not been patched recently.</Tooltip>
+        <Tooltip id={`cluster-patched-${props.cluster.id}`}>
+            This cluster has not been patched recently.
+        </Tooltip>
     );
-    return at.isAfter(threshold) ?
-        at.fromNow() :
+    return patched.isAfter(threshold) ?
+        patched.fromNow() :
         <OverlayTrigger placement="top" overlay={tooltip}>
-            <strong className="text-danger">
+            <strong className="text-danger tooltip-trigger">
                 <i className="fa fa-exclamation-circle"></i>
                 {'\u00A0'}
-                {at.fromNow()}
+                {patched.fromNow()}
             </strong>
         </OverlayTrigger>;
 }
@@ -259,10 +275,14 @@ function ClusterRow(props) {
         <tr className={highlightClass || undefined}>
             <td>{cluster.name}</td>
             <td>{get(clusterTypes, [cluster.cluster_type, 'label'], '-')}</td>
-            <td><ClusterStatus status={cluster.status} /></td>
+            <td><ClusterStatus cluster={cluster} /></td>
+            <td>{cluster.task ?
+                <ProgressBar active striped label={truncate(cluster.task)} now={100} /> :
+                '-'
+            }</td>
             <td>{moment(cluster.created).fromNow()}</td>
             <td>{moment(cluster.updated).fromNow()}</td>
-            <td><ClusterPatched at={cluster.patched} /></td>
+            <td><ClusterPatched cluster={cluster} /></td>
             <td className="resource-actions">
                 <ClusterActionsDropdown
                   disabled={!!highlightClass}
@@ -305,6 +325,7 @@ export class ClustersTable extends React.Component {
                         <th>Name</th>
                         <th>Cluster Type</th>
                         <th>Status</th>
+                        <th>Task</th>
                         <th>Created</th>
                         <th>Updated</th>
                         <th>Patched</th>

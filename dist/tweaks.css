@@ -186,9 +186,11 @@ body.resource-page #react-root {
 .resource-status {
     font-weight: bold;
 }
-.resource-status .tooltip-trigger {
-    color: inherit;
+.tooltip-trigger {
     cursor: help;
+}
+a.tooltip-trigger {
+    color: inherit;
 }
 /* The following two rules ensure the actions column is always the same size
    however wide the table is */

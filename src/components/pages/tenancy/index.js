@@ -59,7 +59,15 @@ export class TenancyPage extends React.Component {
                         <LinkContainer
                           to={`/tenancies/${tenancy.id}/clusters`}
                           disabled={!get(tenancy, 'clusters.enabled', false)}>
-                            <NavItem>Clusters</NavItem>
+                            <NavItem>
+                                Clusters
+                                {get(tenancy, 'clusters.fetching', false) && (
+                                    <>
+                                        {'\u00A0'}
+                                        <i className="fa fa-spinner fa-pulse" />
+                                    </>
+                                )}
+                            </NavItem>
                         </LinkContainer>
                     </Nav>
                     {React.Children.map(
