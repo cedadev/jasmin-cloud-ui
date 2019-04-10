@@ -43,6 +43,8 @@ export class TenancyPage extends React.Component {
                 clusterType: bindArgsToActions(tenancyActions.clusterType, tenancy.id),
                 cluster: bindArgsToActions(tenancyActions.cluster, tenancy.id)
             };
+            const clustersEnabled = get(tenancy, 'clusters.enabled', false);
+            const clustersFetching = get(tenancy, 'clusters.fetching', false);
             return (
                 <div>
                     <PageHeader>{tenancy.name}</PageHeader>
@@ -58,10 +60,10 @@ export class TenancyPage extends React.Component {
                         </LinkContainer>
                         <LinkContainer
                           to={`/tenancies/${tenancy.id}/clusters`}
-                          disabled={!get(tenancy, 'clusters.enabled', false)}>
+                          disabled={!clustersEnabled}>
                             <NavItem>
                                 Clusters
-                                {get(tenancy, 'clusters.fetching', false) && (
+                                {!clustersEnabled && clustersFetching && (
                                     <>
                                         {'\u00A0'}
                                         <i className="fa fa-spinner fa-pulse" />
