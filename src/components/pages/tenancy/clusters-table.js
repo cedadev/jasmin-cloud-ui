@@ -267,7 +267,7 @@ function ClusterRow(props) {
     const { clusterTypes: { data: clusterTypes } } = tenancy;
     const highlightClass = (cluster.status === 'CONFIGURING') ?
         'info' :
-        (cluster.updating ?
+        ((!!cluster.updating || !!cluster.deleting) ?
             'warning' :
             (cluster.status == 'DELETING' && 'danger')
         );

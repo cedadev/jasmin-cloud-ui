@@ -292,3 +292,7 @@ a.size-details {
     margin: 0 auto;
     max-height: 80px;
 }
+
+input + input {
+    margin-top: 5px;
+}

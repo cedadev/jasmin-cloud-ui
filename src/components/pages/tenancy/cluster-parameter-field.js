@@ -19,16 +19,59 @@ import {
 import { Field, RichSelect } from '../../utils';
 
 
-// FormControl sends through type=undefined, so remove it from props
-const TextControl = ({ tenancy: _, type, secret, ...props }) => (
-    <FormControl type={secret ? "password" : "text"} {...props} />
+class FormControlWithCustomValidity extends React.Component {
+    constructor(props) {
+        super(props)
+        this.inputRef = null;
+    }
+
+    setCustomValidity = () => (
+        this.inputRef &&
+            this.inputRef.setCustomValidity(this.props.customValidity || '')
+    )
+    componentDidMount = () => this.setCustomValidity()
+    componentDidUpdate = () => this.setCustomValidity()
+
+    render() {
+        const { customValidity: _, ...props } = this.props;
+        return <FormControl {...props} inputRef={ref => { this.inputRef = ref; }} />;
+    }
+}
+
+class TextControl extends React.Component {
+    state = { confirmation: '' }
+
+    render() {
+        const { tenancy: _, secret, confirm, ...props } = this.props;
+        const inputType = secret ? "password" : "text";
+        const customValidity = (
+            props.value !== this.state.confirmation ?
+                'Confirmation does not match.' :
+                ''
+        );
+        return (
+            <>
+                <FormControl {...props} type={inputType} />
+                {confirm && (
+                    <FormControlWithCustomValidity
+                      {...props}
+                      id={`${props.id}-confirm`}
+                      placeholder={`Confirm ${props.placeholder}`}
+                      type={inputType}
+                      value={this.state.confirmation}
+                      onChange={(e) => this.setState({ confirmation: e.target.value })}
+                      customValidity={customValidity} />
+                )}
+            </>
+        );
+    }
+}
+
+const NumberControl = ({ tenancy: _, ...props }) => (
+    <FormControl {...props} type="number" />
 );
 
-const NumberControl = ({ tenancy: _, type, ...props }) => (
-    <FormControl type="number" {...props} />
-);
-
-const IntegerControl = ({ tenancy: _, type, ...props }) => (
+const IntegerControl = ({ tenancy: _, ...props }) => (
     <NumberControl step="1" {...props} />
 );
 
@@ -100,15 +143,16 @@ export const ClusterParameterField = (props) => {
     const Control = get(kindToControlMap, parameter.kind, TextControl);
     return (
         <Field
-          name={parameter.name}
           label={parameter.label}
           helpText={<ReactMarkdown source={parameter.description} />}>
             <Control
+              id={parameter.name}
               tenancy={tenancy}
               required={parameter.required}
               value={value}
               onChange={(e) => onChange(e.target.value)}
               disabled={parameter.immutable && !isCreate}
+              placeholder={parameter.label}
               {...parameter.options} />
         </Field>
     );
