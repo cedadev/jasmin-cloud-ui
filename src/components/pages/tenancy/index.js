@@ -43,8 +43,9 @@ export class TenancyPage extends React.Component {
                 clusterType: bindArgsToActions(tenancyActions.clusterType, tenancy.id),
                 cluster: bindArgsToActions(tenancyActions.cluster, tenancy.id)
             };
+            // We want to show/hide the clusters tab depending on whether
+            // clusters are enabled for the tenancy
             const clustersEnabled = get(tenancy, 'clusters.enabled', false);
-            const clustersFetching = get(tenancy, 'clusters.fetching', false);
             return (
                 <div>
                     <PageHeader>{tenancy.name}</PageHeader>
@@ -59,17 +60,9 @@ export class TenancyPage extends React.Component {
                             <NavItem>Volumes</NavItem>
                         </LinkContainer>
                         <LinkContainer
-                          to={`/tenancies/${tenancy.id}/clusters`}
-                          disabled={!clustersEnabled}>
-                            <NavItem>
-                                Clusters
-                                {!clustersEnabled && clustersFetching && (
-                                    <>
-                                        {'\u00A0'}
-                                        <i className="fa fa-spinner fa-pulse" />
-                                    </>
-                                )}
-                            </NavItem>
+                          disabled={!clustersEnabled}
+                          to={`/tenancies/${tenancy.id}/clusters`}>
+                            <NavItem>Clusters</NavItem>
                         </LinkContainer>
                     </Nav>
                     {React.Children.map(

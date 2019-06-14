@@ -3,13 +3,13 @@
  */
 
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 
 import get from 'lodash/get';
 
 import { ResourcePanel } from './resource-utils';
 import { ClustersTable } from './clusters-table';
 import { CreateClusterButton } from './create-cluster-modal';
+import { Loading } from '../../utils';
 
 
 const Clusters = ({ resourceData, resourceActions, ...props }) => (
@@ -21,27 +21,42 @@ const Clusters = ({ resourceData, resourceActions, ...props }) => (
 
 
 export class TenancyClustersPanel extends React.Component {
-    setPageTitle(props) {
-        document.title = `Clusters | ${props.tenancy.name} | JASMIN Cloud Portal`;
+    setPageTitle() {
+        document.title = `Clusters | ${this.props.tenancy.name} | JASMIN Cloud Portal`;
     }
 
-    componentDidMount = () => this.setPageTitle(this.props)
-    componentDidUpdate = (props) => this.setPageTitle(props)
+    componentDidMount = () => this.setPageTitle()
+    componentDidUpdate = () => this.setPageTitle()
 
     render() {
         const { tenancy, tenancyActions } = this.props;
-        if( !get(tenancy.clusters, 'enabled', true) ) {
-            return <Redirect to={`/tenancies/${tenancy.id}`} />;
+        const enabled = get(tenancy.clusters, 'enabled', false);
+        const fetching = get(tenancy.clusters, 'fetching', false);
+        if( enabled ) {
+            return (
+                <ResourcePanel
+                  resource={tenancy.clusters}
+                  resourceActions={tenancyActions.cluster}
+                  resourceName="clusters"
+                  createButtonComponent={CreateClusterButton}
+                  createButtonExtraProps={({ tenancy })}>
+                    <Clusters tenancy={tenancy} />
+                </ResourcePanel>
+            );
         }
-        return (
-            <ResourcePanel
-              resource={tenancy.clusters}
-              resourceActions={tenancyActions.cluster}
-              resourceName="clusters"
-              createButtonComponent={CreateClusterButton}
-              createButtonExtraProps={({ tenancy })}>
-                <Clusters tenancy={tenancy} />
-            </ResourcePanel>
-        );
+        else if( fetching ) {
+            return <Loading message={`Loading clusters...`} />;
+        }
+        else {
+            return (
+                <div
+                  role="notification"
+                  className="notification notification-inline notification-danger">
+                    <div className="notification-content">
+                        Clusters are not enabled for this tenancy
+                    </div>
+                </div>
+            );
+        }
     }
 }

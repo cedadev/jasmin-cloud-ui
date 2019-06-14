@@ -21,12 +21,12 @@ const Machines = (props) => (
 
 
 export class TenancyMachinesPanel extends React.Component {
-    setPageTitle(props) {
-        document.title = `Machines | ${props.tenancy.name} | JASMIN Cloud Portal`;
+    setPageTitle() {
+        document.title = `Machines | ${this.props.tenancy.name} | JASMIN Cloud Portal`;
     }
 
-    componentDidMount = () => this.setPageTitle(this.props)
-    componentDidUpdate = (props) => this.setPageTitle(props)
+    componentDidMount = () => this.setPageTitle()
+    componentDidUpdate = () => this.setPageTitle()
 
     render() {
         const {
