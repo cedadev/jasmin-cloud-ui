@@ -296,3 +296,8 @@ a.size-details {
 input + input {
     margin-top: 5px;
 }
+
+.form-group.required .control-label:after {
+    content: "*";
+    color: red;
+}

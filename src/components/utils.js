@@ -82,11 +82,19 @@ export function Form(props) {
  * @return {ReactElement} The react element to render.
  */
 export function Field(props) {
-    const { name, children, label = null, helpText = null, errors = [] } = props;
+    const {
+        name,
+        children,
+        label = null,
+        required,
+        helpText = null,
+        errors = []
+    } = props;
     return (
         <FormGroup
-            controlId={name}
-            validationState={errors.length > 0 ? 'error' : null}>
+          controlId={name}
+          className={required && 'required'}
+          validationState={errors.length > 0 ? 'error' : null}>
             {label && <ControlLabel>{label}</ControlLabel>}
             <ControlContainer>
                 {children}

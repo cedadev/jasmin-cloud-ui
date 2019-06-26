@@ -144,6 +144,7 @@ export const ClusterParameterField = (props) => {
     return (
         <Field
           label={parameter.label}
+          required={parameter.required}
           helpText={<ReactMarkdown source={parameter.description} />}>
             <Control
               id={parameter.name}

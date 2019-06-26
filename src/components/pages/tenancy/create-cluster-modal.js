@@ -102,7 +102,7 @@ class ClusterParametersForm extends React.Component {
                     <Field name="clusterType" label="Cluster Type">
                         <FormControl.Static>{label}</FormControl.Static>
                     </Field>
-                    <Field name="name" label="Cluster name">
+                    <Field name="name" label="Cluster name" required>
                         <FormControl
                           type="text"
                           placeholder="Cluster name"
