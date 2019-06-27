@@ -147,8 +147,9 @@ export function createReducer(actions, id, transform) {
                         ...state,
                         data: Object.assign(
                             {},
+                            // Compare IDs as strings to avoid any mismatch between int/string
                             ...Object.entries(state.data)
-                                .filter(([id, _]) => id !== action.request.resourceId)
+                                .filter(([id, _]) => id.toString() !== action.request.resourceId.toString())
                                 .map(([id, resource]) => ({ [id]: resource }))
                         )
                     };
