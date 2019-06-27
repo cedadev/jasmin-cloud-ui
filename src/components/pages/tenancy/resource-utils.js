@@ -4,7 +4,7 @@
 
 import React from 'react';
 
-import { Row, Col, ButtonGroup, Button, FormControl } from 'react-bootstrap';
+import { Row, Col, ButtonGroup, Button, FormControl, InputGroup } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
@@ -78,6 +78,7 @@ export const ResourcePanel = (props) => {
 const ResourceSelectControl = (props) => {
     const {
         resource: { fetching, data },
+        resourceActions: _,
         resourceName,
         resourceNamePlural = `${resourceName}s`,
         resourceToOption = (r) => (<option key={r.id} value={r.id}>{r.name}</option>),
@@ -136,17 +137,34 @@ export const SizeSelectControl = (props) => (
         {...props} />
 );
 
-export const ExternalIpSelectControl = ({ value, ...props }) => (
-    <ResourceSelectControl
-        resourceName="external ip"
-        resourceToOption={(ip) => (
-            <option key={ip.external_ip} value={ip.external_ip}>{ip.external_ip}</option>
-        )}
-        sortResources={(ips) => sortBy(ips, ['external_ip'])}
-        // The currently selected IP should be permitted, regardless of state
-        resourceFilter={(ip) => (ip.external_ip === value) || (!ip.updating && !ip.machine)}
-        value={value}
-        {...props} />
+export const ExternalIpSelectControl = ({ value, resource, resourceActions, ...props }) => (
+    <InputGroup>
+        <ResourceSelectControl
+            resource={resource}
+            resourceActions={resourceActions}
+            resourceName="external ip"
+            resourceToOption={(ip) => (
+                <option key={ip.external_ip} value={ip.external_ip}>{ip.external_ip}</option>
+            )}
+            sortResources={(ips) => sortBy(ips, ['external_ip'])}
+            // The currently selected IP should be permitted, regardless of state
+            resourceFilter={(ip) => (ip.external_ip === value) || (!ip.updating && !ip.machine)}
+            value={value}
+            {...props} />
+        <InputGroup.Button>
+            <Button
+              bsStyle="success"
+              disabled={props.disabled || resource.creating}
+              onClick={() => resourceActions.create()}
+              title="Allocate new IP">
+                {resource.creating ? (
+                    <i className="fa fa-fw fa-spinner fa-pulse" />
+                ) : (
+                    <i className="fa fa-fw fa-plus" />
+                )}
+            </Button>
+        </InputGroup.Button>
+    </InputGroup>
 );
 
 export const VolumeSelectControl = (props) => (

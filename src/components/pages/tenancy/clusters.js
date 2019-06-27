@@ -39,8 +39,8 @@ export class TenancyClustersPanel extends React.Component {
                   resourceActions={tenancyActions.cluster}
                   resourceName="clusters"
                   createButtonComponent={CreateClusterButton}
-                  createButtonExtraProps={({ tenancy })}>
-                    <Clusters tenancy={tenancy} />
+                  createButtonExtraProps={({ tenancy, tenancyActions })}>
+                    <Clusters tenancy={tenancy} tenancyActions={tenancyActions} />
                 </ResourcePanel>
             );
         }

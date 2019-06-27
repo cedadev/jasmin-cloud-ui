@@ -97,6 +97,7 @@ class UpdateClusterParametersMenuItem extends React.Component {
                                 <ClusterParameterField
                                   key={p.name}
                                   tenancy={this.props.tenancy}
+                                  tenancyActions={this.props.tenancyActions}
                                   isCreate={false}
                                   parameter={p}
                                   value={this.state.parameterValues[p.name] || ''}
@@ -254,6 +255,7 @@ function ClusterActionsDropdown(props) {
             <UpdateClusterParametersMenuItem
               cluster={props.cluster}
               tenancy={props.tenancy}
+              tenancyActions={props.tenancyActions}
               onSubmit={props.clusterActions.update} />
             <ConfirmDeleteMenuItem
               name={props.cluster.name}
@@ -263,7 +265,7 @@ function ClusterActionsDropdown(props) {
 }
 
 function ClusterRow(props) {
-    const { cluster, tenancy } = props;
+    const { cluster, tenancy, tenancyActions } = props;
     const { clusterTypes: { data: clusterTypes } } = tenancy;
     const highlightClass = (cluster.status === 'CONFIGURING') ?
         'info' :
@@ -288,6 +290,7 @@ function ClusterRow(props) {
                   disabled={!!highlightClass}
                   cluster={cluster}
                   tenancy={tenancy}
+                  tenancyActions={tenancyActions}
                   clusterActions={props.clusterActions} />
             </td>
         </tr>
@@ -338,6 +341,7 @@ export class ClustersTable extends React.Component {
                           key={cluster.id}
                           cluster={cluster}
                           tenancy={this.props.tenancy}
+                          tenancyActions={this.props.tenancyActions}
                           clusterActions={bindArgsToActions(this.props.clusterActions, cluster.id)} />
                     )}
                 </tbody>

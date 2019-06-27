@@ -116,6 +116,7 @@ class ClusterParametersForm extends React.Component {
                         <ClusterParameterField
                           key={p.name}
                           tenancy={this.props.tenancy}
+                          tenancyActions={this.props.tenancyActions}
                           isCreate={true}
                           parameter={p}
                           value={this.state.parameterValues[p.name] || ''}
@@ -203,6 +204,7 @@ export class CreateClusterButton extends React.Component {
                         ) : (
                             <ClusterParametersForm
                               tenancy={this.props.tenancy}
+                              tenancyActions={this.props.tenancyActions}
                               clusterType={clusterTypes.data[this.state.clusterType]}
                               goBack={() => this.setState({ clusterType: '' })}
                               onSubmit={this.handleClusterParamsSubmitted} />

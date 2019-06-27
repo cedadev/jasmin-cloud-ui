@@ -42,7 +42,13 @@ class TextControl extends React.Component {
     state = { confirmation: '' }
 
     render() {
-        const { tenancy: _, secret, confirm, ...props } = this.props;
+        const {
+            tenancy: _,
+            tenancyActions: __,
+            secret,
+            confirm,
+            ...props
+        } = this.props;
         const inputType = secret ? "password" : "text";
         const customValidity = (
             props.value !== this.state.confirmation ?
@@ -67,22 +73,22 @@ class TextControl extends React.Component {
     }
 }
 
-const NumberControl = ({ tenancy: _, ...props }) => (
+const NumberControl = ({ tenancy: _, tenancyActions: __, ...props }) => (
     <FormControl {...props} type="number" />
 );
 
-const IntegerControl = ({ tenancy: _, ...props }) => (
+const IntegerControl = ({ tenancy: _, tenancyActions: __, ...props }) => (
     <NumberControl step="1" {...props} />
 );
 
-const ChoiceControl = ({ tenancy: _, choices, ...props }) => (
+const ChoiceControl = ({ tenancy: _, tenancyActions: __, choices, ...props }) => (
     <FormControl componentClass={RichSelect} {...props}>
         <option value="">Select one...</option>
         {choices.map(c => <option key={c}>{c}</option>)}
     </FormControl>
 );
 
-const CloudSizeControl = ({ tenancy, min_cpus, min_ram, ...props }) => {
+const CloudSizeControl = ({ tenancy, tenancyActions: __, min_cpus, min_ram, ...props }) => {
     const filterSizes = (size) => {
         if( !!min_cpus && size.cpus < min_cpus ) return false;
         if( !!min_ram && size.ram < min_ram ) return false;
@@ -96,22 +102,25 @@ const CloudSizeControl = ({ tenancy, min_cpus, min_ram, ...props }) => {
     );
 };
 
-const CloudMachineControl = ({ tenancy, ...props }) => (
+const CloudMachineControl = ({ tenancy, tenancyActions: __, ...props }) => (
     <MachineSelectControl resource={tenancy.machines} {...props} />
 );
 
-const CloudIpControl = ({ tenancy, ...props }) => (
-    <ExternalIpSelectControl resource={tenancy.externalIps} {...props} />
+const CloudIpControl = ({ tenancy, tenancyActions, ...props }) => (
+    <ExternalIpSelectControl
+      resource={tenancy.externalIps}
+      resourceActions={tenancyActions.externalIp}
+      {...props} />
 );
 
-const CloudVolumeControl = ({ tenancy, min_size, ...props }) => (
+const CloudVolumeControl = ({ tenancy, tenancyActions: __, min_size, ...props }) => (
     <VolumeSelectControl
       resource={tenancy.volumes}
       resourceFilter={(v) => (!min_size || v.size >= min_size)}
       {...props} />
 );
 
-const CloudClusterControl = ({ tenancy, tag, value, ...props }) => {
+const CloudClusterControl = ({ tenancy, tenancyActions: __, tag, value, ...props }) => {
     const hasTag = (c) => !tag || c.tags.includes(tag);
     const isReady = (c) => (value === c.name) || (c.status === 'READY');
     return (
@@ -139,7 +148,7 @@ const kindToControlMap = {
 
 
 export const ClusterParameterField = (props) => {
-    const { tenancy, parameter, value, onChange, isCreate } = props;
+    const { tenancy, tenancyActions, parameter, value, onChange, isCreate } = props;
     const Control = get(kindToControlMap, parameter.kind, TextControl);
     return (
         <Field
@@ -149,6 +158,7 @@ export const ClusterParameterField = (props) => {
             <Control
               id={parameter.name}
               tenancy={tenancy}
+              tenancyActions={tenancyActions}
               required={parameter.required}
               value={value}
               onChange={(e) => onChange(e.target.value)}

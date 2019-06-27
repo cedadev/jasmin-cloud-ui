@@ -60,23 +60,13 @@ export class AttachExternalIpMenuItem extends React.Component {
                             <Field name="externalIp" label="External IP">
                                 <ExternalIpSelectControl
                                   resource={externalIps}
+                                  resourceActions={externalIpActions}
                                   required
                                   value={this.state.externalIp}
                                   onChange={this.handleChange} />
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button
-                              bsStyle="success"
-                              onClick={() => externalIpActions.create()}>
-                                {externalIps.creating ? (
-                                    <i className="fa fa-spinner fa-pulse" />
-                                ) : (
-                                    <i className="fa fa-plus" />
-                                )}
-                                {'\u00A0'}
-                                {externalIps.creating ? 'Allocating new IP...' : 'Allocate new IP'}
-                            </Button>
                             <Button
                               bsStyle="primary"
                               type="submit"
