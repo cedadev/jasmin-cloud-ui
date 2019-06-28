@@ -59,11 +59,13 @@ export class TenancyPage extends React.Component {
                         <LinkContainer to={`/tenancies/${tenancy.id}/volumes`}>
                             <NavItem>Volumes</NavItem>
                         </LinkContainer>
-                        <LinkContainer
-                          disabled={!clustersEnabled}
-                          to={`/tenancies/${tenancy.id}/clusters`}>
-                            <NavItem>Clusters</NavItem>
-                        </LinkContainer>
+                        {clustersEnabled && (
+                            <LinkContainer
+                              disabled={!clustersEnabled}
+                              to={`/tenancies/${tenancy.id}/clusters`}>
+                                <NavItem>Clusters</NavItem>
+                            </LinkContainer>
+                        )}
                     </Nav>
                     {React.Children.map(
                         // Pass the tenancy data to the children
