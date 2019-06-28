@@ -170,7 +170,12 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <MenuItem className="danger" onSelect={this.open}>Delete cluster</MenuItem>
+                <MenuItem
+                  className="danger"
+                  disabled={this.props.disabled}
+                  onSelect={this.open}>
+                    Delete cluster
+                </MenuItem>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -259,6 +264,7 @@ function ClusterActionsDropdown(props) {
               onSubmit={props.clusterActions.update} />
             <ConfirmDeleteMenuItem
               name={props.cluster.name}
+              disabled={props.cluster.linked}
               onConfirm={props.clusterActions.delete} />
         </DropdownButton>
     );
@@ -316,8 +322,31 @@ export class ClustersTable extends React.Component {
     }
 
     render() {
-        // Sort the clusters by name to ensure a consistent rendering
-        const clusters = sortBy(Object.values(this.props.clusters), 'name');
+        // Calculate which clusters have dependencies
+        // First, create a map of all the parameters that link to another
+        // cluster, indexed by cluster type
+        const clusterTypes = get(this.props.tenancy, ['clusterTypes', 'data'], {});
+        const clusterParameters = Object.assign(
+            {},
+            ...Object.values(clusterTypes).map(ct => ({
+                [ct.name]: ct.parameters
+                    .filter(p => p.kind === "cloud.cluster")
+                    .map(p => p.name)
+            }))
+        );
+        // Then extract the values of those parameters from the clusters
+        const linkedClusters = Object.values(this.props.clusters)
+            .map(c =>
+                clusterParameters[c.cluster_type].map(p => c.parameter_values[p])
+            )
+            .flat();
+        // Attach a linked property to each cluster and sort them by name to
+        // ensure a consistent rendering
+        const clusters = sortBy(
+            Object.values(this.props.clusters)
+                .map(c => ({ ...c, linked: linkedClusters.includes(c.name) })),
+            'name'
+        );
         return (
             <Table striped hover responsive>
                 <caption>
