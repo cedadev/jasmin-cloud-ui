@@ -289,8 +289,8 @@ function ClusterRow(props) {
                 '-'
             }</td>
             <td>{moment(cluster.created).fromNow()}</td>
-            <td>{moment(cluster.updated).fromNow()}</td>
-            <td><ClusterPatched cluster={cluster} /></td>
+            <td>{cluster.updated ? moment(cluster.updated).fromNow() : '-'}</td>
+            <td>{cluster.patched ? <ClusterPatched cluster={cluster} /> : '-'}</td>
             <td className="resource-actions">
                 <ClusterActionsDropdown
                   disabled={!!highlightClass}
@@ -325,7 +325,7 @@ export class ClustersTable extends React.Component {
         // Calculate which clusters have dependencies
         // First, create a map of all the parameters that link to another
         // cluster, indexed by cluster type
-        const clusterTypes = get(this.props.tenancy, ['clusterTypes', 'data'], {});
+        const clusterTypes = get(this.props.tenancy, ['clusterTypes', 'data']) || {};
         const clusterParameters = Object.assign(
             {},
             ...Object.values(clusterTypes).map(ct => ({
@@ -336,6 +336,7 @@ export class ClustersTable extends React.Component {
         );
         // Then extract the values of those parameters from the clusters
         const linkedClusters = Object.values(this.props.clusters)
+            .filter(c => clusterParameters.hasOwnProperty(c.cluster_type))
             .map(c =>
                 clusterParameters[c.cluster_type].map(p => c.parameter_values[p])
             )

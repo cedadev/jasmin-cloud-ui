@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { FormControl } from 'react-bootstrap';
+import { FormControl, Checkbox } from 'react-bootstrap';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -147,7 +147,25 @@ const kindToControlMap = {
 };
 
 
-export const ClusterParameterField = (props) => {
+const BooleanParameterField = (props) => {
+    const { parameter, value, onChange, isCreate } = props;
+    return (
+        <Field
+          label={parameter.label}
+          helpText={<ReactMarkdown source={parameter.description} />}>
+            <Checkbox
+              id={parameter.name}
+              checked={value}
+              onChange={(e) => onChange(e.target.checked)}
+              disabled={parameter.immutable && !isCreate}>
+                {parameter.options.checkboxLabel || parameter.label}
+            </Checkbox>
+        </Field>
+    );
+};
+
+
+const DefaultParameterField = (props) => {
     const { tenancy, tenancyActions, parameter, value, onChange, isCreate } = props;
     const Control = get(kindToControlMap, parameter.kind, TextControl);
     return (
@@ -167,4 +185,11 @@ export const ClusterParameterField = (props) => {
               {...parameter.options} />
         </Field>
     );
+};
+
+
+export const ClusterParameterField = (props) => {
+    return props.parameter.kind == "boolean" ?
+        <BooleanParameterField {...props} /> :
+        <DefaultParameterField {...props} />;
 };
