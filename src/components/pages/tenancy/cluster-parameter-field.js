@@ -88,10 +88,11 @@ const ChoiceControl = ({ tenancy: _, tenancyActions: __, choices, ...props }) =>
     </FormControl>
 );
 
-const CloudSizeControl = ({ tenancy, tenancyActions: __, min_cpus, min_ram, ...props }) => {
+const CloudSizeControl = ({ tenancy, tenancyActions: __, min_cpus, min_ram, min_disk, ...props }) => {
     const filterSizes = (size) => {
         if( !!min_cpus && size.cpus < min_cpus ) return false;
         if( !!min_ram && size.ram < min_ram ) return false;
+        if( !!min_disk && size.disk < min_disk ) return false;
         return true;
     };
     return (
