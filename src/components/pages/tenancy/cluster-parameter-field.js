@@ -41,6 +41,8 @@ class FormControlWithCustomValidity extends React.Component {
 class TextControl extends React.Component {
     state = { confirmation: '' }
 
+    componentDidMount = () => this.setState({ confirmation: this.props.value })
+
     render() {
         const {
             tenancy: _,
