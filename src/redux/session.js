@@ -204,7 +204,6 @@ function apiRequestEpic(action$) {
                         request: action
                     })),
                     catchError(error => {
-                        console.log(error)
                         // Transform AjaxErrors into ApiErrors by inspecting the response for details
                         // If there is no response, check to see if it is because we are offline
                         const response = error.xhr.response;
