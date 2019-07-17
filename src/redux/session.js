@@ -2,16 +2,11 @@
  * Action creators and reducers for the User section of the state.
  */
 
-import { Observable } from 'rxjs/Observable';
-import { ajax } from 'rxjs/observable/dom/ajax';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/merge';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/catch';
+import { ajax } from 'rxjs/ajax';
+import { of } from 'rxjs';
+import { merge, map, filter, mergeMap, delay, catchError } from 'rxjs/operators';
 
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 
 import Cookies from 'js-cookie';
 
@@ -124,10 +119,11 @@ export function reducer(state = initialState, action) {
  * session is successfully initialised or authenticated.
  */
 function sessionStartedEpic(action$) {
-    return action$
-        .ofType(actions.INITIALISATION_SUCCEEDED)
-        .merge(action$.ofType(actions.AUTHENTICATION_SUCCEEDED))
-        .map(action => ({ type: actions.STARTED }));
+    return action$.pipe(
+        ofType(actions.INITIALISATION_SUCCEEDED),
+        merge(action$.pipe(ofType(actions.AUTHENTICATION_SUCCEEDED))),
+        map(_ => ({ type: actions.STARTED }))
+    );
 }
 
 /**
@@ -135,26 +131,42 @@ function sessionStartedEpic(action$) {
  * a session is terminated, either on purpose or due to an error.
  */
 function sessionTerminatedEpic(action$) {
-    return action$
-        .ofType(actions.SIGN_OUT_SUCCEEDED)
-        .merge(action$.ofType(actions.INITIALISATION_FAILED))
-        .merge(action$.ofType(actions.AUTHENTICATION_FAILED))
-        .map(action => ({ type: actions.TERMINATED }));
+    return action$.pipe(
+        ofType(actions.SIGN_OUT_SUCCEEDED),
+        merge(action$.pipe(ofType(actions.INITIALISATION_FAILED))),
+        merge(action$.pipe(ofType(actions.AUTHENTICATION_FAILED))),
+        map(_ => ({ type: actions.TERMINATED }))
+    );
 }
 
 /**
  * redux-observable epic to dispatch an AUTHENTICATION_FAILED action whenever an
  * API request fails with a 401 or 403.
  */
-function apiAuthenticationErrorEpic(action$, store) {
-    return action$
-        .filter(action => !!action.error)
-        .filter(action => action.type !== actions.INITIALISATION_FAILED)
-        .filter(action => action.type !== actions.AUTHENTICATION_FAILED)
-        .filter(action =>
+function apiAuthenticationErrorEpic(action$) {
+    return action$.pipe(
+        filter(action => !!action.error),
+        filter(action => action.type !== actions.INITIALISATION_FAILED),
+        filter(action => action.type !== actions.AUTHENTICATION_FAILED),
+        filter(action =>
             action.payload.status === 401 || action.payload.status === 403
-        )
-        .map(action => ({ ...action, type: actions.AUTHENTICATION_FAILED }));
+        ),
+        map(action => ({ ...action, type: actions.AUTHENTICATION_FAILED }))
+    );
+}
+
+
+/**
+ * redux-observable epic to look for 503 temporarily unavailable and retry
+ */
+function retryTemporarilyUnavailableEpic(action$) {
+    return action$.pipe(
+        filter(action => !!action.error),
+        filter(action => action.payload.status === 503),
+        // Wait 10s and try again
+        delay(10000),
+        map(action => action.request)
+    );
 }
 
 
@@ -175,11 +187,11 @@ export class ApiError extends Error {
  * If the request fails, it dispatches the specified failure action with an ``ApiError``
  * as the payload.
  */
-function apiRequestEpic(action$, store) {
+function apiRequestEpic(action$) {
     // Listen for actions with the apiRequest flag
-    return action$
-        .filter(action => action.apiRequest)
-        .mergeMap(
+    return action$.pipe(
+        filter(action => action.apiRequest),
+        mergeMap(
             action => {
                 // The action then has an expected structure
                 const { options, successAction, failureAction } = action;
@@ -193,41 +205,48 @@ function apiRequestEpic(action$, store) {
                 }
                 // Make the API request
                 // If the session is terminated, discard any active requests
-                return ajax({ ...options,
-                              withCredentials: true, // Include cookies with the request
-                              headers: headers,
-                              responseType: 'json' /* Ask for JSON please! */ })
-                    .map(response => ({
+                const request = {
+                    ...options,
+                    withCredentials: true, // Include cookies with the request
+                    headers: headers,
+                    responseType: 'json' /* Ask for JSON please! */
+                };
+                return ajax(request).pipe(
+                    map(response => ({
                         type: successAction,
                         payload: response.response,
                         request: action
-                    }))
-                    .catch(error => {
+                    })),
+                    catchError(error => {
                         // Transform AjaxErrors into ApiErrors by inspecting the response for details
+                        // If there is no response, check to see if it is because we are offline
                         const response = error.xhr.response;
-                        const apiError = response === null ?
-                            new ApiError(
-                                'Error communicating with API server.', error.status
+                        const apiError = response === null ? (
+                                navigator.onLine ?
+                                    new ApiError('Error communicating with API server.', error.status) :
+                                    new ApiError('No internet connection.', 503)
                             ) : (
                                 response.detail ?
                                     new ApiError(response.detail, error.status):
                                     new ApiError(JSON.stringify(response), error.status)
                             );
-                        return Observable.of({
+                        return of({
                             type: failureAction,
                             error: true,
                             silent: !!action.failSilently,
                             payload: apiError,
                             request: action
                         });
-                    });
+                    })
+                );
             },
             // Allow at most 2 concurrent requests
             // This means one long-running request, like a large list fetch,
             // won't block other small requests, but our requests are reasonably
             // rate limited
             2
-        );
+        )
+    );
 }
 
 
@@ -235,5 +254,6 @@ export const epic = combineEpics(
     apiRequestEpic,
     sessionStartedEpic,
     sessionTerminatedEpic,
-    apiAuthenticationErrorEpic
+    apiAuthenticationErrorEpic,
+    retryTemporarilyUnavailableEpic
 );

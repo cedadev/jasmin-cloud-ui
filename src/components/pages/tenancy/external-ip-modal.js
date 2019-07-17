@@ -3,12 +3,12 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
-import { Loading, Form, Field, RichSelect } from '../../utils';
+import { Form, Field, RichSelect } from '../../utils';
+import { ExternalIpSelectControl } from './resource-utils';
 
 
 export class AttachExternalIpMenuItem extends React.Component {
@@ -34,81 +34,43 @@ export class AttachExternalIpMenuItem extends React.Component {
     render() {
         const {
             machine,
-            machineExternalIp,
-            externalIps: { creating, fetching, data: externalIps },
-            externalIpActions
+            externalIps,
+            externalIpActions,
+            disabled
         } = this.props;
-        const availableIps = Object.values(externalIps || {})
-            .filter(ip => !ip.updating && !ip.machine)
-            .map(ip => ip.external_ip);
+        const availableIps = Object.values(externalIps.data || {})
+            .filter(ip => !ip.updating && !ip.machine);
         return (
-            <MenuItem
-              onSelect={this.open}
-              disabled={!!machineExternalIp || !machine.nat_allowed}>
-                Attach external IP
+            <>
+                <MenuItem onSelect={this.open} disabled={disabled}>
+                    Attach external IP
+                </MenuItem>
                 <Modal
                   backdrop="static"
-                  onHide={!!creating ? undefined : this.close}
+                  onHide={!externalIps.creating ? this.close : undefined}
                   show={this.state.visible}>
                     <Modal.Header closeButton>
                         <Modal.Title>Attach external IP to {machine.name}</Modal.Title>
                     </Modal.Header>
                     <Form
                       horizontal
-                      disabled={!!creating}
+                      disabled={!!externalIps.creating}
                       onSubmit={this.handleSubmit}>
                         <Modal.Body>
                             <Field name="externalIp" label="External IP">
-                                { externalIps ? (
-                                    <FormControl
-                                      componentClass={RichSelect}
-                                      disabled={isEmpty(availableIps)}
-                                      required
-                                      value={this.state.externalIp}
-                                      onChange={this.handleChange}>
-                                        {isEmpty(availableIps) ? (
-                                            <option value="">No external IPs available</option>
-                                        ) : (
-                                            <option value="">Select an external IP...</option>
-                                        )}
-                                        {availableIps.map(ip =>
-                                            <option key={ip} value={ip}>{ip}</option>
-                                        )}
-                                    </FormControl>
-                                ) : (
-                                    fetching ? (
-                                        <FormControl.Static>
-                                            <i className="fa fa-spinner fa-pulse" />
-                                            {'\u00A0'}
-                                            Loading external IPs...
-                                        </FormControl.Static>
-                                    ) : (
-                                        <FormControl.Static className="text-danger">
-                                            <i className="fa fa-exclamation-triangle" />
-                                            {'\u00A0'}
-                                            Failed to load external IPs
-                                        </FormControl.Static>
-                                    )
-                                ) }
+                                <ExternalIpSelectControl
+                                  resource={externalIps}
+                                  resourceActions={externalIpActions}
+                                  required
+                                  value={this.state.externalIp}
+                                  onChange={this.handleChange} />
                             </Field>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button
-                              bsStyle="success"
-                              disabled={!!creating}
-                              onClick={() => externalIpActions.create()}>
-                                {creating ? (
-                                    <i className="fa fa-spinner fa-pulse" />
-                                ) : (
-                                    <i className="fa fa-plus" />
-                                )}
-                                {'\u00A0'}
-                                {creating ? 'Allocating new IP...' : 'Allocate new IP'}
-                            </Button>
-                            <Button
                               bsStyle="primary"
                               type="submit"
-                              disabled={!!creating}>
+                              disabled={isEmpty(availableIps)}>
                                 <i className="fa fa-check" />
                                 {'\u00A0'}
                                 Attach IP
@@ -116,7 +78,7 @@ export class AttachExternalIpMenuItem extends React.Component {
                         </Modal.Footer>
                     </Form>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }

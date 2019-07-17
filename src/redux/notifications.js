@@ -2,8 +2,7 @@
  * This module manages the Redux state for the messaging subsystem.
  */
 
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
+import { filter, map } from 'rxjs/operators';
 
 
 export const actions = {
@@ -61,8 +60,9 @@ export function reducer(state = [], action) {
  * except those that are explicitly silenced.
  */
 export function epic(action$) {
-    return action$
-        .filter(action => !!action.error)
-        .filter(action => !action.silent)
-        .map(action => actionCreators.error(action.payload.message));
+    return action$.pipe(
+        filter(action => !!action.error),
+        filter(action => !action.silent),
+        map(action => actionCreators.error(action.payload.message))
+    );
 }

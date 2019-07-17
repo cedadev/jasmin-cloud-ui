@@ -8,7 +8,7 @@ import {
     DropdownButton, MenuItem
 } from 'react-bootstrap';
 
-import moment from 'moment';
+import sortBy from 'lodash/sortBy';
 
 import { bindArgsToActions } from '../../utils';
 
@@ -31,11 +31,13 @@ class ConfirmDeleteMenuItem extends React.Component {
 
     render() {
         return (
-            <MenuItem
-              className="danger"
-              disabled={this.props.disabled}
-              onSelect={this.open}>
-                Delete volume
+            <>
+                <MenuItem
+                  className="danger"
+                  disabled={this.props.disabled}
+                  onSelect={this.open}>
+                    Delete volume
+                </MenuItem>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -46,7 +48,7 @@ class ConfirmDeleteMenuItem extends React.Component {
                         <Button bsStyle="danger" onClick={this.onConfirm}>Delete volume</Button>
                     </Modal.Footer>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }
@@ -63,7 +65,7 @@ function VolumeStatus(props) {
         'OTHER': 'warning'
     };
     return (
-        <span className={`volume-status text-${statusStyleMap[props.status]}`}>
+        <span className={`resource-status text-${statusStyleMap[props.status]}`}>
             {props.status}
         </span>
     );
@@ -115,7 +117,7 @@ function VolumeRow(props) {
     // Try and find the attached machine
     const attachedTo = (props.machines.data || {})[(volume.machine || {}).id];
     return (
-        <tr className={highlightClass}>
+        <tr className={highlightClass || undefined}>
             <td>{volume.name}</td>
             <td><VolumeStatus status={volume.status} /></td>
             <td>{volume.size} GB</td>
@@ -126,7 +128,7 @@ function VolumeRow(props) {
                     '-'
                 )}
             </td>
-            <td className="volume-actions">
+            <td className="resource-actions">
                 <VolumeActionsDropdown
                   disabled={!!highlightClass}
                   volume={volume}
@@ -147,17 +149,16 @@ export class VolumesTable extends React.Component {
         // When this component mounts, we add a body class so that we can add a
         // negative margin to pull the footer back up
         // When it unmounts, we remove it again
-        document.body.classList.add('volumes-page');
+        document.body.classList.add('resource-page');
     }
 
     componentWillUnmount() {
-        document.body.classList.remove('volumes-page')
+        document.body.classList.remove('resource-page')
     }
 
     render() {
         // Sort the volumes by name to ensure a consistent rendering
-        const volumes = Object.values(this.props.volumes)
-            .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+        const volumes = sortBy(Object.values(this.props.volumes), ['name']);
         return (
             <Table striped hover responsive>
                 <caption>

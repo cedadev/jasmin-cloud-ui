@@ -3,9 +3,8 @@
  */
 
 import React from 'react';
-import { Redirect } from 'react-router-dom';
 import {
-    Alert, FormGroup, ControlLabel, HelpBlock, Modal, Form as BSForm
+    FormGroup, ControlLabel, HelpBlock, Form as BSForm
 } from 'react-bootstrap';
 
 import $ from 'jquery';
@@ -83,11 +82,19 @@ export function Form(props) {
  * @return {ReactElement} The react element to render.
  */
 export function Field(props) {
-    const { name, children, label = null, helpText = null, errors = [] } = props;
+    const {
+        name,
+        children,
+        label = null,
+        required,
+        helpText = null,
+        errors = []
+    } = props;
     return (
         <FormGroup
-            controlId={name}
-            validationState={errors.length > 0 ? 'error' : null}>
+          controlId={name}
+          className={required && 'required'}
+          validationState={errors.length > 0 ? 'error' : null}>
             {label && <ControlLabel>{label}</ControlLabel>}
             <ControlContainer>
                 {children}
@@ -118,61 +125,55 @@ export function ControlContainer(props) {
 /**
  * React component for a rich select
  *
- * Utilises bootstrap-select under the hood (https://silviomoreto.github.io/bootstrap-select/)
+ * Utilises bootstrap-select under the hood (https://developer.snapappointments.com/bootstrap-select/)
  */
 export class RichSelect extends React.Component {
     constructor(props) {
         super(props)
         this.state = { open: false };
+        this.selectInput = React.createRef();
+    }
+
+    componentDidMount() {
+        var select = $(this.selectInput.current);
+        select.selectpicker();
+
+        // Attach event handlers
+        const button = select.siblings('button');
+        $('html').click(() => this.setState({ open: false }));
+        // If another bootstrap-select receives focus, close
+        $('body').on('focus', '.bootstrap-select .btn', (e) => {
+            if( $(e.target).is(button) ) return;
+            this.setState({ open: false });
+        });
+        button.click((e) => {
+            e.stopPropagation();
+            this.setState({ open: !this.state.open && !this.props.disabled });
+        });
+        select.siblings('.dropdown-menu').find('li a').click(() => {
+            if (this.props.multiple) return;
+            this.setState({ open: false });
+        });
     }
 
     componentDidUpdate() {
-        var select = $(this.selectInput)
+        var select = $(this.selectInput.current)
         select.selectpicker('refresh');
         select.parent().toggleClass('open', this.state.open);
     }
 
     componentWillUnmount() {
-        var select = $(this.selectInput).find('select');
-        // Find the other control components
-        var button = select.siblings('button');
-        var items = select.siblings('.dropdown-menu').find('li a');
-
+        const select = $(this.selectInput.current);
+        // Detach the event handlers
         $('html').off('click');
-        button.off('click');
-        items.off('click');
-    }
-
-    componentDidMount() {
-        var self = this;
-        // First, make the select a custom select
-        var select = $(this.selectInput);
-        select.selectpicker();
-        // Find the other control components
-        var button = select.siblings('button');
-        var items = select.siblings('.dropdown-menu').find('li a');
-
-        $('html').click(function () {
-            self.setState({ open: false });
-        });
-        // If another bootstrap-select receives focus, close
-        $('body').on('focus', '.bootstrap-select .btn', function(e) {
-            if( $(e.target).is(button) ) return;
-            self.setState({ open: false });
-        });
-        button.click(function (e) {
-            e.stopPropagation();
-            self.setState({ open: !self.state.open });
-        });
-        items.click(function () {
-            if (self.props.multiple) return;
-            self.setState({ open: false });
-        });
+        $('body').off('focus', '.bootstrap-select .btn');
+        select.siblings('button').off('click');
+        select.siblings('.dropdown-menu').find('li a').off('click');
     }
 
     render() {
         return (
-            <select ref={(s) => { this.selectInput = s; }} {...this.props}>{this.props.children}</select>
+            <select ref={this.selectInput} {...this.props}>{this.props.children}</select>
         );
     }
 }

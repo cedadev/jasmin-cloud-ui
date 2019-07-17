@@ -13,8 +13,8 @@
     padding-left: 15px;
 }
 @media (min-width: 768px) {
-    .form-horizontal .control-label { width: 25%; float: left; }
-    .form-horizontal .control-container { margin-left: 25%; width: 75%; float: left; }
+    .form-horizontal .control-label { width: 30%; float: left; }
+    .form-horizontal .control-container { margin-left: 30%; width: 70%; float: left; }
     /* When the control-container follows a control-label, remove the margin */
     .form-horizontal .control-label + .control-container { margin-left: 0; }
 }
@@ -180,22 +180,24 @@ caption {
     color: #777;
 }
 
-body.machines-page #react-root, body.volumes-page #react-root {
+body.resource-page #react-root {
     margin-bottom: -160px;
 }
-.machine-status, .volume-status {
+.resource-status {
     font-weight: bold;
 }
-.machine-status .tooltip-trigger {
-    color: inherit;
+.tooltip-trigger {
     cursor: help;
+}
+a.tooltip-trigger {
+    color: inherit;
 }
 /* The following two rules ensure the actions column is always the same size
    however wide the table is */
-.machine-actions, .volume-actions {
+.resource-actions {
     width: 1%;
 }
-.machine-actions .btn-group, .volume-actions .btn-group {
+.resource-actions .btn-group {
     width: 100px;
 }
 
@@ -271,4 +273,31 @@ a.size-details {
 
 .bootstrap-select.btn-group .dropdown-menu li small {
     padding-left: 1em;
+}
+
+.modal .steps {
+    margin: unset;
+    border-top: unset;
+    border-bottom-color: #e5e5e5;
+}
+
+.nav li.disabled {
+    cursor: not-allowed;
+}
+
+.cluster-type-select .panel {
+    cursor: pointer;
+}
+.cluster-type-select .img-responsive {
+    margin: 0 auto;
+    max-height: 80px;
+}
+
+input + input {
+    margin-top: 5px;
+}
+
+.form-group.required .control-label:after {
+    content: "*";
+    color: red;
 }

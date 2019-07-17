@@ -3,19 +3,13 @@
  * tenancy resources.
  */
 
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/takeUntil';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/merge';
+import { of } from 'rxjs';
+import { filter, map, merge, mergeMap, delay, takeUntil } from 'rxjs/operators';
 
-
-import { combineEpics } from 'redux-observable';
+import { combineEpics, ofType } from 'redux-observable';
 
 import { actions as sessionActions } from '../session';
+import { actions as tenancyActions } from './index';
 
 
 export function createActions(resourceName) {
@@ -153,8 +147,9 @@ export function createReducer(actions, id, transform) {
                         ...state,
                         data: Object.assign(
                             {},
+                            // Compare IDs as strings to avoid any mismatch between int/string
                             ...Object.entries(state.data)
-                                .filter(([id, _]) => id !== action.request.resourceId)
+                                .filter(([id, _]) => id.toString() !== action.request.resourceId.toString())
                                 .map(([id, resource]) => ({ [id]: resource }))
                         )
                     };
@@ -270,75 +265,90 @@ export function createReducer(actions, id, transform) {
 
 export function createEpic(actions, actionCreators, isActive, id) {
     return combineEpics(
-        // Whenever the resource list is fetched successfully, wait 2 mins before
-        // fetching them again
-        action$ => action$
-            .ofType(actions.FETCH_LIST_SUCCEEDED)
-            .mergeMap(action => {
+        // Whenever a resource list is fetched successfully, wait 2 min before fetching it again
+        action$ => action$.pipe(
+            ofType(actions.FETCH_LIST_SUCCEEDED),
+            mergeMap(action => {
                 const tenancyId = action.request.tenancyId;
                 // Cancel the timer if:
                 //   * A separate fetch is requested before the timer expires
                 //   * The session is terminated before the timer expires
-                return Observable
-                    .of(actionCreators.fetchList(tenancyId))
-                    .delay(2 * 60 * 1000)
-                    .takeUntil(action$
-                        .ofType(actions.FETCH_LIST)
-                        .filter(action => action.tenancyId === tenancyId)
-                    )
-                    .takeUntil(action$.ofType(sessionActions.TERMINATED));
-            }),
-        // Whenever the resource list is fetched, trigger an individual fetch for any
+                //   * A switch takes place to a different tenancy before the timer expires
+                return of(actionCreators.fetchList(tenancyId)).pipe(
+                    delay(120000),
+                    takeUntil(action$.pipe(
+                        ofType(actions.FETCH_LIST),
+                        filter(action => action.tenancyId === tenancyId)
+                    )),
+                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED))),
+                    takeUntil(action$.pipe(
+                        ofType(tenancyActions.SWITCH),
+                        filter(action => action.tenancyId !== tenancyId)
+                    ))
+                );
+            })
+        ),
+        // Whenever a resource list is fetched, trigger an individual fetch for any
         // 'active' resources, as determined by the given predicate
-        action$ => action$
-            .ofType(actions.FETCH_LIST_SUCCEEDED)
-            .mergeMap(action => Observable.of(
+        action$ => action$.pipe(
+            ofType(actions.FETCH_LIST_SUCCEEDED),
+            mergeMap(action => of(
                 ...action.payload
                     .filter(isActive)
                     .map(resource =>
                         actionCreators.fetchOne(action.request.tenancyId, id(resource))
                     )
-            )),
-        // When a fetched, created or updated resource is active, wait 1s and
+            ))
+        ),
+        // When a resource is fetched, created or updated and is active, wait 5s and
         // fetch it again
-        action$ => action$
-            .ofType(actions.FETCH_ONE_SUCCEEDED)
-            .merge(action$.ofType(actions.CREATE_SUCCEEDED))
-            .merge(action$.ofType(actions.UPDATE_SUCCEEDED))
-            .filter(action => isActive(action.payload))
-            .mergeMap(action => {
+        action$ => action$.pipe(
+            ofType(actions.FETCH_ONE_SUCCEEDED),
+            merge(action$.pipe(ofType(actions.CREATE_SUCCEEDED))),
+            merge(action$.pipe(ofType(actions.UPDATE_SUCCEEDED))),
+            filter(action => isActive(action.payload)),
+            mergeMap(action => {
                 const tenancyId = action.request.tenancyId;
                 const resourceId = id(action.payload);
                 // Cancel the timer if:
                 //   * A fetch for the same resource is requested before the
                 //     timer expires
                 //   * The session is terminated while we are waiting
-                return Observable
-                    .of(actionCreators.fetchOne(tenancyId, resourceId))
-                    .delay(1000)
-                    .takeUntil(
-                        action$.ofType(actions.FETCH_ONE)
-                            .filter(action => action.tenancyId === tenancyId)
-                            .filter(action => action.resourceId === resourceId)
-                    )
-                    .takeUntil(action$.ofType(sessionActions.TERMINATED));
-            }),
+                //   * A switch takes place to a different tenancy before the timer expires
+                return of(actionCreators.fetchOne(tenancyId, resourceId)).pipe(
+                    delay(5000),
+                    takeUntil(
+                        action$.pipe(
+                            ofType(actions.FETCH_ONE),
+                            filter(action => action.tenancyId === tenancyId),
+                            filter(action => action.resourceId === resourceId)
+                        )
+                    ),
+                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED))),
+                    takeUntil(action$.pipe(
+                        ofType(tenancyActions.SWITCH),
+                        filter(action => action.tenancyId !== tenancyId)
+                    ))
+                );
+            })
+        ),
         // When a resource is deleted but returns a payload, trigger a fetch of
         // the resource as it might be doing something interesting
         // When it disappears, the reducer will remove it
-        action$ => action$
-            .ofType(actions.DELETE_SUCCEEDED)
-            .filter(action => !!action.payload)
-            .map(action =>
+        action$ => action$.pipe(
+            ofType(actions.DELETE_SUCCEEDED),
+            filter(action => !!action.payload),
+            map(action =>
                 actionCreators.fetchOne(action.request.tenancyId, id(action.payload))
             )
+        )
     );
 }
 
 
 export function createTenancyResource(resourceName, options = {}) {
     const {
-        isActive = resource => false,
+        isActive = _ => false,
         id = resource => resource.id,
         transform = resource => resource
     } = options;

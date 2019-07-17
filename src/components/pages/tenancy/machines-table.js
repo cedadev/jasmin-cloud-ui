@@ -10,6 +10,8 @@ import {
 
 import moment from 'moment';
 
+import sortBy from 'lodash/sortBy';
+
 import { bindArgsToActions } from '../../utils';
 
 import { AttachExternalIpMenuItem } from './external-ip-modal';
@@ -31,8 +33,10 @@ class ConfirmDeleteMenuItem extends React.Component {
 
     render() {
         return (
-            <MenuItem className="danger" onSelect={this.open}>
-                Delete machine
+            <>
+                <MenuItem className="danger" onSelect={this.open}>
+                    Delete machine
+                </MenuItem>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -43,7 +47,7 @@ class ConfirmDeleteMenuItem extends React.Component {
                         <Button bsStyle="danger" onClick={this.onConfirm}>Delete machine</Button>
                     </Modal.Footer>
                 </Modal>
-            </MenuItem>
+            </>
         );
     }
 }
@@ -95,7 +99,7 @@ function MachineStatus(props) {
         </Tooltip>
     );
     return (
-        <span className={`machine-status text-${statusStyleMap[props.machine.status.type]}`}>
+        <span className={`resource-status text-${statusStyleMap[props.machine.status.type]}`}>
             {props.machine.status.name}
             {statusTooltip && (
                 <OverlayTrigger placement="top" overlay={statusTooltip}>
@@ -129,9 +133,9 @@ function MachineActionsDropdown(props) {
           disabled={props.disabled}>
             <AttachExternalIpMenuItem
               machine={props.machine}
-              machineExternalIp={props.machineExternalIp}
               externalIps={props.externalIps}
-              externalIpActions={props.externalIpActions} />
+              externalIpActions={props.externalIpActions}
+              disabled={!!props.machineExternalIp || !props.machine.nat_allowed} />
             <MenuItem
               onSelect={() => props.externalIpActions.update(
                   props.machineExternalIp,
@@ -179,7 +183,7 @@ function MachineRow(props) {
             ) && 'warning')
         );
     return (
-        <tr className={highlightClass}>
+        <tr className={highlightClass || undefined}>
             <td>{machine.name}</td>
             <td>{(machine.image || {}).name || '-'}</td>
             <td>{machine.size ? <MachineSize machine={machine} size={machine.size} /> : '-'}</td>
@@ -192,7 +196,7 @@ function MachineRow(props) {
             <td>{machine.internal_ip || '-'}</td>
             <td>{(externalIp || {}).external_ip || '-'}</td>
             <td>{moment(machine.created).fromNow()}</td>
-            <td className="machine-actions">
+            <td className="resource-actions">
                 <MachineActionsDropdown
                   disabled={!!highlightClass}
                   machine={machine}
@@ -216,17 +220,16 @@ export class MachinesTable extends React.Component {
         // When this component mounts, we add a body class so that we can add a
         // negative margin to pull the footer back up
         // When it unmounts, we remove it again
-        document.body.classList.add('machines-page');
+        document.body.classList.add('resource-page');
     }
 
     componentWillUnmount() {
-        document.body.classList.remove('machines-page')
+        document.body.classList.remove('resource-page')
     }
 
     render() {
         // Sort the machines by name to ensure a consistent rendering
-        const machines = Object.values(this.props.machines)
-            .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+        const machines = sortBy(Object.values(this.props.machines), ['name']);
         return (
             <Table striped hover responsive>
                 <caption>

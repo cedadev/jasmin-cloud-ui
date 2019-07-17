@@ -8,12 +8,13 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { store } from './redux';
+import get from 'lodash/get';
+import sortBy from 'lodash/get';
+
 import { actionCreators as sessionActions } from './redux/session';
 import { actionCreators as tenancyActions } from './redux/tenancies';
 import { actionCreators as notificationActions } from './redux/notifications';
 
-import { Loading } from './components/utils';
 import { Navigation } from './components/navigation';
 import { CookielawBanner } from './components/cookielaw';
 import { Notifications } from './components/notifications';
@@ -24,6 +25,7 @@ import { TenancyPage } from './components/pages/tenancy';
 import { TenancyOverviewPanel } from './components/pages/tenancy/overview';
 import { TenancyMachinesPanel } from './components/pages/tenancy/machines';
 import { TenancyVolumesPanel } from './components/pages/tenancy/volumes';
+import { TenancyClustersPanel } from './components/pages/tenancy/clusters';
 
 
 /**
@@ -40,12 +42,14 @@ const ConnectedNav = connect(
     }, dispatch)
 )(Navigation);
 
+
 const ConnectedNotifications = connect(
     (state) => ({ notifications: state.notifications }),
     (dispatch) => ({
         notificationActions: bindActionCreators(notificationActions, dispatch)
     })
 )(Notifications);
+
 
 const ConnectedLoginPage = connect(
     (state) => state.session,
@@ -54,26 +58,29 @@ const ConnectedLoginPage = connect(
     }, dispatch)
 )(LoginPage);
 
+
 const ConnectedDashboard = connect(
     (state) => ({ tenancies: state.tenancies }),
 )(Dashboard);
 
+
 const ConnectedTenancyPage = connect(
-    (state, props) => ({
-        tenancies: state.tenancies,
-        tenancyId: props.match.params.id
-    }),
+    (state) => ({ tenancies: state.tenancies }),
     (dispatch) => ({
         tenancyActions: {
+            switchTo: (tenancyId) => dispatch(tenancyActions.switchTo(tenancyId)),
             quota: bindActionCreators(tenancyActions.quota, dispatch),
             image: bindActionCreators(tenancyActions.image, dispatch),
             size: bindActionCreators(tenancyActions.size, dispatch),
             externalIp: bindActionCreators(tenancyActions.externalIp, dispatch),
             volume: bindActionCreators(tenancyActions.volume, dispatch),
-            machine: bindActionCreators(tenancyActions.machine, dispatch)
+            machine: bindActionCreators(tenancyActions.machine, dispatch),
+            clusterType: bindActionCreators(tenancyActions.clusterType, dispatch),
+            cluster: bindActionCreators(tenancyActions.cluster, dispatch)
         }
     })
 )(TenancyPage);
+
 
 const NotFound = connect(
     undefined,
@@ -86,46 +93,27 @@ const NotFound = connect(
 });
 
 
-
-/**
- * react-router does not seem to play nice when Routes are inside connected
- * components
- * Instead, we bind directly to the redux store for our protected routes
- */
-class ProtectedRoute extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = store.getState().session;
-    }
-
-    componentDidMount() {
-        this.unsubcribe = store.subscribe(() =>
-            this.setState(store.getState().session)
-        );
-    }
-
-    componentWillUnmount() {
-        this.unsubcribe()
-    }
-
-    render() {
-        const { component: Component, ...rest } = this.props;
-        const { username, initialising, authenticating } = this.state;
-        return (
-            <Route {...rest} render={props => (
-                username ? (
+const ProtectedRoute = connect(
+    (state) => ({ session: state.session })
+)(({ component: Component, session, ...rest }) => {
+    return (
+        <Route
+            {...rest}
+            render={props =>
+                session.username ? (
                     <Component {...props} />
                 ) : (
-                    (initialising || authenticating) ? (
+                    (session.initialising || session.authenticating) ? (
                         <div></div>
                     ) : (
                         <Redirect to="/login" />
                     )
                 )
-            )}/>
-        );
-    }
-}
+            }
+        />
+    );
+});
+
 
 const TenancyOverviewPage = props => (
     <ConnectedTenancyPage {...props}><TenancyOverviewPanel /></ConnectedTenancyPage>
@@ -135,6 +123,9 @@ const TenancyMachinesPage = props => (
 );
 const TenancyVolumesPage = props => (
     <ConnectedTenancyPage {...props}><TenancyVolumesPanel /></ConnectedTenancyPage>
+);
+const TenancyClustersPage = props => (
+    <ConnectedTenancyPage {...props}><TenancyClustersPanel /></ConnectedTenancyPage>
 );
 
 
@@ -152,6 +143,7 @@ export class Application extends React.Component {
                     <ProtectedRoute exact path="/tenancies/:id" component={TenancyOverviewPage} />
                     <ProtectedRoute exact path="/tenancies/:id/machines" component={TenancyMachinesPage} />
                     <ProtectedRoute exact path="/tenancies/:id/volumes" component={TenancyVolumesPage} />
+                    <ProtectedRoute exact path="/tenancies/:id/clusters" component={TenancyClustersPage} />
                     <Route component={NotFound} />
                 </Switch>
             </Grid>

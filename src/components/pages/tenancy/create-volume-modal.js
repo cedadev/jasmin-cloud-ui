@@ -27,18 +27,20 @@ export class CreateVolumeButton extends React.Component {
 
     render() {
         return (
-            <Button
-              bsStyle="success"
-              disabled={this.props.creating}
-              onClick={this.open}
-              title="Create a new volume">
-                { this.props.creating ? (
-                    <i className="fa fa-spinner fa-pulse" />
-                ) : (
-                    <i className="fa fa-database"></i>
-                )}
-                {'\u00A0\u00A0'}
-                { this.props.creating ? 'Creating volume...' : 'New volume' }
+            <>
+                <Button
+                  bsStyle="success"
+                  disabled={this.props.creating}
+                  onClick={this.open}
+                  title="Create a new volume">
+                    {this.props.creating ? (
+                        <i className="fa fa-spinner fa-pulse" />
+                    ) : (
+                        <i className="fa fa-database"></i>
+                    )}
+                    {'\u00A0\u00A0'}
+                    { this.props.creating ? 'Creating volume...' : 'New volume' }
+                </Button>
                 <Modal
                   backdrop="static"
                   onHide={this.close}
@@ -80,7 +82,7 @@ export class CreateVolumeButton extends React.Component {
                         </Modal.Footer>
                     </Form>
                 </Modal>
-            </Button>
+            </>
         );
     }
 }

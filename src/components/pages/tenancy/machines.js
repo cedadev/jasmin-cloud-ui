@@ -3,75 +3,49 @@
  */
 
 import React from 'react';
-import { Row, Col, ButtonGroup, Button } from 'react-bootstrap';
-import { Redirect } from 'react-router';
 
-import { Loading } from '../../utils';
-
+import { ResourcePanel } from './resource-utils';
 import { CreateMachineButton } from './create-machine-modal';
 import { MachinesTable } from './machines-table';
 
 
+const Machines = (props) => (
+    <MachinesTable
+      machines={props.resourceData}
+      images={props.images}
+      sizes={props.sizes}
+      externalIps={props.externalIps}
+      machineActions={props.resourceActions}
+      externalIpActions={props.externalIpActions} />
+);
+
+
 export class TenancyMachinesPanel extends React.Component {
-    setPageTitle(props) {
-        document.title = `Machines | ${props.tenancy.name} | JASMIN Cloud Portal`;
+    setPageTitle() {
+        document.title = `Machines | ${this.props.tenancy.name} | JASMIN Cloud Portal`;
     }
 
-    componentDidMount = () => this.setPageTitle(this.props)
-    componentWillUpdate = (props) => this.setPageTitle(props)
+    componentDidMount = () => this.setPageTitle()
+    componentDidUpdate = () => this.setPageTitle()
 
     render() {
-        const { fetching, data: machines, creating = false } = this.props.tenancy.machines;
+        const {
+            tenancy: { machines, images, sizes, externalIps },
+            tenancyActions
+        } = this.props;
         return (
-            machines ? (
-                <div>
-                    <Row>
-                        <Col md={12}>
-                            <ButtonGroup className="pull-right">
-                                <CreateMachineButton
-                                  creating={creating}
-                                  images={this.props.tenancy.images}
-                                  sizes={this.props.tenancy.sizes}
-                                  create={this.props.tenancyActions.machine.create} />
-                                <Button
-                                  bsStyle="info"
-                                  disabled={fetching}
-                                  onClick={() => this.props.tenancyActions.machine.fetchList()}
-                                  title="Refresh machine list">
-                                    <i className={`fa fa-refresh ${fetching ? 'fa-spin' : ''}`}></i>
-                                    {'\u00A0'}
-                                    Refresh
-                                </Button>
-                            </ButtonGroup>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col md={12}>
-                            <MachinesTable
-                              machines={machines}
-                              images={this.props.tenancy.images.data || {}}
-                              sizes={this.props.tenancy.sizes.data || {}}
-                              externalIps={this.props.tenancy.externalIps}
-                              machineActions={this.props.tenancyActions.machine}
-                              externalIpActions={this.props.tenancyActions.externalIp} />
-                        </Col>
-                    </Row>
-                </div>
-            ) : (
-                <Row>
-                    <Col md={6} mdOffset={3}>
-                        {fetching ? (
-                            <Loading message="Loading machines..."/>
-                        ) : (
-                            <div
-                              role="notification"
-                              className="notification notification-inline notification-danger">
-                                <div className="notification-content">Unable to load machines</div>
-                            </div>
-                        )}
-                    </Col>
-                </Row>
-            )
+            <ResourcePanel
+              resource={machines}
+              resourceActions={tenancyActions.machine}
+              resourceName="machines"
+              createButtonComponent={CreateMachineButton}
+              createButtonExtraProps={({ images, sizes })}>
+                <Machines
+                  images={images}
+                  sizes={sizes}
+                  externalIps={externalIps}
+                  externalIpActions={tenancyActions.externalIp} />
+            </ResourcePanel>
         );
     }
 }

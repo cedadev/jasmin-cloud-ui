@@ -30,11 +30,14 @@ const rootReducer = combineReducers({
 
 const rootEpic = combineEpics(sessionEpic, notificationEpic, tenanciesEpic);
 
+const epicMiddleware = createEpicMiddleware();
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 export const store = createStore(
     rootReducer,
-    composeEnhancers(applyMiddleware(createEpicMiddleware(rootEpic)))
+    composeEnhancers(applyMiddleware(epicMiddleware))
 );
+
+epicMiddleware.run(rootEpic);
 
 // Initialise the session
 store.dispatch(sessionActionCreators.initialise());

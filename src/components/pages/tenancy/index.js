@@ -4,59 +4,87 @@
 
 import React from 'react';
 import { PageHeader, Nav, NavItem } from 'react-bootstrap';
-import { Redirect } from 'react-router';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Redirect } from 'react-router-dom';
+
+import get from 'lodash/get';
 
 import { Loading, bindArgsToActions } from '../../utils';
 
 
-export function TenancyPage(props) {
-    const {
-        tenancyId,
-        tenancies: { fetching, data: tenancies },
-        tenancyActions
-    } = props;
-    // Extract the tenancy data for the given ID
-    const tenancy = (tenancies || {})[tenancyId];
-    if( tenancy ) {
-        // Bind the tenancyActions to the tenancyId
-        const boundTenancyActions = {
-            quota: bindArgsToActions(tenancyActions.quota, tenancyId),
-            image: bindArgsToActions(tenancyActions.image, tenancyId),
-            size: bindArgsToActions(tenancyActions.size, tenancyId),
-            externalIp: bindArgsToActions(tenancyActions.externalIp, tenancyId),
-            volume: bindArgsToActions(tenancyActions.volume, tenancyId),
-            machine: bindArgsToActions(tenancyActions.machine, tenancyId)
-        };
-        return (
-            <div>
-                <PageHeader>{tenancy.name}</PageHeader>
-                <Nav bsStyle="tabs" activeHref={props.match.url}>
-                    <LinkContainer exact to={`/tenancies/${tenancyId}`}>
-                        <NavItem>Overview</NavItem>
-                    </LinkContainer>
-                    <LinkContainer to={`/tenancies/${tenancyId}/machines`}>
-                        <NavItem>Machines</NavItem>
-                    </LinkContainer>
-                    <LinkContainer to={`/tenancies/${tenancyId}/volumes`}>
-                        <NavItem>Volumes</NavItem>
-                    </LinkContainer>
-                </Nav>
-                {React.Children.map(
-                    // Pass the tenancy data to the children
-                    props.children,
-                    child => React.cloneElement(child, {
-                        tenancy,
-                        tenancyActions: boundTenancyActions
-                    })
-                )}
-            </div>
-        );
+export class TenancyPage extends React.Component {
+    // On initial mount or update, trigger a tenancy switch if required
+    switchTenancy = () => {
+        // If still fetching tenancy data, do nothing
+        if( this.props.tenancies.fetching ) return;
+        // Check the id in the match against the current tenancy
+        const matchedId = this.props.match.params.id;
+        const currentId = get(this.props.tenancies, 'current.id');
+        if( matchedId !== currentId )
+            this.props.tenancyActions.switchTo(matchedId);
     }
-    else if( fetching ) {
-        return <Loading message="Loading tenancy details..." />;
-    }
-    else {
-        return <Redirect to="/dashboard" />;
+    componentDidMount = () => this.switchTenancy()
+    componentDidUpdate = () => this.switchTenancy()
+
+    render() {
+        const {
+            tenancies: { fetching, data: tenancies, current: tenancy },
+            tenancyActions
+        } = this.props;
+        if( get(tenancy, 'id') && get(tenancy, 'name') ) {
+            // If the tenancy id and name are set, then render
+            const boundTenancyActions = {
+                quota: bindArgsToActions(tenancyActions.quota, tenancy.id),
+                image: bindArgsToActions(tenancyActions.image, tenancy.id),
+                size: bindArgsToActions(tenancyActions.size, tenancy.id),
+                externalIp: bindArgsToActions(tenancyActions.externalIp, tenancy.id),
+                volume: bindArgsToActions(tenancyActions.volume, tenancy.id),
+                machine: bindArgsToActions(tenancyActions.machine, tenancy.id),
+                clusterType: bindArgsToActions(tenancyActions.clusterType, tenancy.id),
+                cluster: bindArgsToActions(tenancyActions.cluster, tenancy.id)
+            };
+            // We want to show/hide the clusters tab depending on whether
+            // clusters are enabled for the tenancy
+            const clustersEnabled = get(tenancy, 'clusters.enabled', false);
+            return (
+                <div>
+                    <PageHeader>{tenancy.name}</PageHeader>
+                    <Nav bsStyle="tabs" activeHref={this.props.match.url}>
+                        <LinkContainer exact to={`/tenancies/${tenancy.id}`}>
+                            <NavItem>Overview</NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={`/tenancies/${tenancy.id}/machines`}>
+                            <NavItem>Machines</NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={`/tenancies/${tenancy.id}/volumes`}>
+                            <NavItem>Volumes</NavItem>
+                        </LinkContainer>
+                        {clustersEnabled && (
+                            <LinkContainer
+                              disabled={!clustersEnabled}
+                              to={`/tenancies/${tenancy.id}/clusters`}>
+                                <NavItem>Clusters</NavItem>
+                            </LinkContainer>
+                        )}
+                    </Nav>
+                    {React.Children.map(
+                        // Pass the tenancy data to the children
+                        this.props.children,
+                        child => React.cloneElement(child, {
+                            tenancy,
+                            tenancyActions: boundTenancyActions
+                        })
+                    )}
+                </div>
+            );
+        }
+        else if( fetching || (tenancies || {}).hasOwnProperty(this.props.match.params.id) ) {
+            // If fetching tenancies or the matched id is in the tenancy data, allow more time
+            return <Loading message="Loading tenancy details..." />;
+        }
+        else {
+            // Otherwise redirect
+            return <Redirect to="/dashboard" />;
+        }
     }
 }
