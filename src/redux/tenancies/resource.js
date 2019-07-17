@@ -265,7 +265,7 @@ export function createReducer(actions, id, transform) {
 
 export function createEpic(actions, actionCreators, isActive, id) {
     return combineEpics(
-        // Whenever a resource list is fetched successfully, wait 1 min before fetching it again
+        // Whenever a resource list is fetched successfully, wait 2 min before fetching it again
         action$ => action$.pipe(
             ofType(actions.FETCH_LIST_SUCCEEDED),
             mergeMap(action => {
@@ -275,7 +275,7 @@ export function createEpic(actions, actionCreators, isActive, id) {
                 //   * The session is terminated before the timer expires
                 //   * A switch takes place to a different tenancy before the timer expires
                 return of(actionCreators.fetchList(tenancyId)).pipe(
-                    delay(60 * 1000),
+                    delay(120000),
                     takeUntil(action$.pipe(
                         ofType(actions.FETCH_LIST),
                         filter(action => action.tenancyId === tenancyId)
@@ -300,7 +300,7 @@ export function createEpic(actions, actionCreators, isActive, id) {
                     )
             ))
         ),
-        // When a resource is fetched, created or updated and is active, wait 1s and
+        // When a resource is fetched, created or updated and is active, wait 5s and
         // fetch it again
         action$ => action$.pipe(
             ofType(actions.FETCH_ONE_SUCCEEDED),
@@ -316,7 +316,7 @@ export function createEpic(actions, actionCreators, isActive, id) {
                 //   * The session is terminated while we are waiting
                 //   * A switch takes place to a different tenancy before the timer expires
                 return of(actionCreators.fetchOne(tenancyId, resourceId)).pipe(
-                    delay(1000),
+                    delay(5000),
                     takeUntil(
                         action$.pipe(
                             ofType(actions.FETCH_ONE),

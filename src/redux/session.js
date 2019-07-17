@@ -4,7 +4,7 @@
 
 import { ajax } from 'rxjs/ajax';
 import { of } from 'rxjs';
-import { merge, map, filter, mergeMap, catchError } from 'rxjs/operators';
+import { merge, map, filter, mergeMap, delay, catchError } from 'rxjs/operators';
 
 import { combineEpics, ofType } from 'redux-observable';
 
@@ -156,6 +156,20 @@ function apiAuthenticationErrorEpic(action$) {
 }
 
 
+/**
+ * redux-observable epic to look for 503 temporarily unavailable and retry
+ */
+function retryTemporarilyUnavailableEpic(action$) {
+    return action$.pipe(
+        filter(action => !!action.error),
+        filter(action => action.payload.status === 503),
+        // Wait 10s and try again
+        delay(10000),
+        map(action => action.request)
+    );
+}
+
+
 export class ApiError extends Error {
     constructor(message, status) {
         super(message)
@@ -240,5 +254,6 @@ export const epic = combineEpics(
     apiRequestEpic,
     sessionStartedEpic,
     sessionTerminatedEpic,
-    apiAuthenticationErrorEpic
+    apiAuthenticationErrorEpic,
+    retryTemporarilyUnavailableEpic
 );
