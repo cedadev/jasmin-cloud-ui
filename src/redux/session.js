@@ -204,11 +204,14 @@ function apiRequestEpic(action$) {
                         request: action
                     })),
                     catchError(error => {
+                        console.log(error)
                         // Transform AjaxErrors into ApiErrors by inspecting the response for details
+                        // If there is no response, check to see if it is because we are offline
                         const response = error.xhr.response;
-                        const apiError = response === null ?
-                            new ApiError(
-                                'Error communicating with API server.', error.status
+                        const apiError = response === null ? (
+                                navigator.onLine ?
+                                    new ApiError('Error communicating with API server.', error.status) :
+                                    new ApiError('No internet connection.', 503)
                             ) : (
                                 response.detail ?
                                     new ApiError(response.detail, error.status):
