@@ -293,11 +293,25 @@ a.size-details {
     max-height: 80px;
 }
 
-input + input {
+input + input,
+input + button,
+.form-list-item + .form-list-item,
+.form-list-item + button {
     margin-top: 5px;
 }
 
 .form-group.required .control-label:after {
     content: "*";
     color: red;
+}
+
+.form-list-item {
+    display: flex;
+}
+.form-list-item-control {
+    flex: auto;
+    margin-right: 5px;
+}
+.form-list-item-remove {
+    flex: none;
 }
