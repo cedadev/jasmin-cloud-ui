@@ -134,7 +134,7 @@ class ListControl extends React.Component {
             tenancy,
             tenancyActions,
             min_length: minLength = 0,
-            max_length: maxLength = 5,
+            max_length: maxLength,
             item = {kind: "string", options: {}},
             id,
             value,
