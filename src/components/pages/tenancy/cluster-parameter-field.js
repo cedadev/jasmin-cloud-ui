@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { FormControl, Checkbox } from 'react-bootstrap';
+import { FormControl, Checkbox, Button, InputGroup } from 'react-bootstrap';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -59,7 +59,10 @@ class TextControl extends React.Component {
         );
         return (
             <>
-                <FormControl {...props} type={inputType} />
+                <FormControl
+                  {...props}
+                  type={inputType}
+                  onChange={(e) => this.props.onChange(e.target.value)} />
                 {confirm && (
                     <FormControlWithCustomValidity
                       {...props}
@@ -76,19 +79,105 @@ class TextControl extends React.Component {
 }
 
 const NumberControl = ({ tenancy: _, tenancyActions: __, ...props }) => (
-    <FormControl {...props} type="number" />
+    <FormControl
+      {...props}
+      type="number"
+      onChange={(e) => props.onChange(e.target.value)} />
 );
 
-const IntegerControl = ({ tenancy: _, tenancyActions: __, ...props }) => (
+const IntegerControl = (props) => (
     <NumberControl step="1" {...props} />
 );
 
 const ChoiceControl = ({ tenancy: _, tenancyActions: __, choices, ...props }) => (
-    <FormControl componentClass={RichSelect} {...props}>
+    <FormControl
+      componentClass={RichSelect}
+      {...props}
+      onChange={(e) => props.onChange(e.target.value)}>
         <option value="">Select one...</option>
         {choices.map(c => <option key={c}>{c}</option>)}
     </FormControl>
 );
+
+class ListControl extends React.Component {
+    // On first mount, pad the value to the minimum length if required
+    componentDidMount = () => {
+        const minLength = this.props.min_length || 0;
+        const values = this.props.value || [];
+        const padding = Array(Math.max(minLength - values.length, 0)).fill('');
+        this.props.onChange(values.concat(padding));
+    }
+
+    itemAdded = () => {
+        this.props.onChange([...this.props.value || [], ''])
+    }
+
+    itemChanged = (index) => (value) => {
+        const currentList = this.props.value || [];
+        this.props.onChange([
+            ...currentList.slice(0, index),
+            value,
+            ...currentList.slice(index + 1)
+        ]);
+    }
+
+    itemRemoved = (index) => () => {
+        const currentList = this.props.value || [];
+        this.props.onChange([
+            ...currentList.slice(0, index),
+            ...currentList.slice(index + 1)
+        ]);
+    }
+
+    render() {
+        const {
+            tenancy,
+            tenancyActions,
+            min_length: minLength = 0,
+            max_length: maxLength = 5,
+            item = {kind: "string", options: {}},
+            id,
+            value,
+            disabled
+        } = this.props;
+        // Select the item control based on the item kind
+        const ItemControl = get(kindToControlMap, item.kind, TextControl);
+        return (
+            <>
+                {(value || []).map((v, i) => (
+                    <div key={i} className="form-list-item">
+                        <div className="form-list-item-control">
+                            <ItemControl
+                              id={`${id}[${i}]`}
+                              tenancy={tenancy}
+                              tenancyActions={tenancyActions}
+                              required={true}
+                              value={v}
+                              onChange={this.itemChanged(i)}
+                              disabled={disabled}
+                              {...item.options} />
+                        </div>
+                        <Button
+                          title="Remove item"
+                          className="form-list-item-remove"
+                          disabled={disabled || (value.length <= minLength)}
+                          onClick={this.itemRemoved(i)}>
+                            <i className="fa fa-times" />
+                        </Button>
+                    </div>
+                ))}
+                <Button
+                  bsStyle="success"
+                  disabled={disabled || (maxLength && value.length >= maxLength)}
+                  onClick={this.itemAdded}>
+                    <i className="fa fa-fw fa-plus" />
+                    {'\u00A0'}
+                    Add another item
+                </Button>
+            </>
+        );
+    }
+}
 
 const CloudSizeControl = ({ tenancy, tenancyActions: __, min_cpus, min_ram, min_disk, ...props }) => {
     const filterSizes = (size) => {
@@ -101,26 +190,32 @@ const CloudSizeControl = ({ tenancy, tenancyActions: __, min_cpus, min_ram, min_
         <SizeSelectControl
           resource={tenancy.sizes}
           resourceFilter={filterSizes}
-          {...props} />
+          {...props}
+          onChange={(e) => props.onChange(e.target.value)} />
     );
 };
 
 const CloudMachineControl = ({ tenancy, tenancyActions: __, ...props }) => (
-    <MachineSelectControl resource={tenancy.machines} {...props} />
+    <MachineSelectControl
+      resource={tenancy.machines}
+      {...props}
+      onChange={(e) => props.onChange(e.target.value)} />
 );
 
 const CloudIpControl = ({ tenancy, tenancyActions, ...props }) => (
     <ExternalIpSelectControl
       resource={tenancy.externalIps}
       resourceActions={tenancyActions.externalIp}
-      {...props} />
+      {...props}
+      onChange={(e) => props.onChange(e.target.value)} />
 );
 
 const CloudVolumeControl = ({ tenancy, tenancyActions: __, min_size, ...props }) => (
     <VolumeSelectControl
       resource={tenancy.volumes}
       resourceFilter={(v) => (!min_size || v.size >= min_size)}
-      {...props} />
+      {...props}
+      onChange={(e) => props.onChange(e.target.value)} />
 );
 
 const CloudClusterControl = ({ tenancy, tenancyActions: __, tag, value, ...props }) => {
@@ -133,7 +228,8 @@ const CloudClusterControl = ({ tenancy, tenancyActions: __, tag, value, ...props
           // We work in names for clusters
           resourceToOption={(c) => <option key={c.name} value={c.name}>{c.name}</option>}
           value={value}
-          {...props} />
+          {...props}
+          onChange={(e) => props.onChange(e.target.value)} />
     );
 };
 
@@ -142,6 +238,7 @@ const kindToControlMap = {
     'integer': IntegerControl,
     'number': NumberControl,
     'choice': ChoiceControl,
+    'list': ListControl,
     'cloud.size': CloudSizeControl,
     'cloud.machine': CloudMachineControl,
     'cloud.ip': CloudIpControl,
@@ -158,7 +255,7 @@ const BooleanParameterField = (props) => {
           helpText={<ReactMarkdown source={parameter.description} />}>
             <Checkbox
               id={parameter.name}
-              checked={value}
+              checked={value || false}
               onChange={(e) => onChange(e.target.checked)}
               disabled={parameter.immutable && !isCreate}>
                 {parameter.options.checkboxLabel || parameter.label}
@@ -182,7 +279,7 @@ const DefaultParameterField = (props) => {
               tenancyActions={tenancyActions}
               required={parameter.required}
               value={value}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={onChange}
               disabled={parameter.immutable && !isCreate}
               placeholder={parameter.label}
               {...parameter.options} />

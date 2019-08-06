@@ -72,9 +72,7 @@ class ClusterParametersForm extends React.Component {
                 {},
                 ...props.clusterType.parameters
                     .filter(p => p.required)
-                    .map(p => ({
-                        [p.name]: p.default || (p.kind === "boolean" ? false : '')
-                    }))
+                    .map(p => ({ [p.name]: p.default || '' }))
             )
         };
     }
