@@ -15,20 +15,24 @@ class QuotaProgressCircle extends React.Component {
         this.state = { fraction: 0 };
     }
 
+    setFraction = () => this.setState({
+        fraction: (
+            this.props.quota.allocated > 0 ?
+                this.props.quota.used / this.props.quota.allocated :
+                0
+        )
+    })
+
     componentDidMount = () => {
         this.initialTimeout = setTimeout(() => {
-            this.requestAnimationFrame = window.requestAnimationFrame(() => {
-                this.setState({
-                    fraction: this.props.quota.used / this.props.quota.allocated
-                });
-            });
+            this.requestAnimationFrame = window.requestAnimationFrame(this.setFraction);
         }, 0);
     }
 
     componentDidUpdate = (prevProps) => {
-        const prevFraction = prevProps.quota.used / prevProps.quota.allocated;
-        const fraction = this.props.quota.used / this.props.quota.allocated;
-        if( prevFraction !== fraction ) this.setState({ fraction });
+        const usageChanged = prevProps.quota.used !== this.props.quota.used;
+        const allocationChanged = prevProps.quota.allocated !== this.props.quota.allocated;
+        if( usageChanged || allocationChanged ) this.setFraction();
     }
 
     componentWillUnmount = () => {
@@ -42,9 +46,7 @@ class QuotaProgressCircle extends React.Component {
             ${quota.used}${quota.units || ''} of
             ${quota.allocated}${quota.units || ''} used
         `;
-        // We don't use this.state.fraction because we want this to be fixed
-        // This only makes a different during the initial animation
-        const percent = Math.round((quota.used / quota.allocated) * 100);
+        const percent = Math.round(this.state.fraction * 100);
         const context = (percent <= 60 ? 'success' : (percent <= 80 ? 'warning' : 'danger'));
         const radius = 50 - (strokeWidth / 2);
         const circumference = Math.PI * 2 * radius;
