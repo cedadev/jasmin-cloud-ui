@@ -49,6 +49,8 @@ class TextControl extends React.Component {
             tenancyActions: __,
             secret,
             confirm,
+            min_length: minLength,
+            max_length: maxLength,
             ...props
         } = this.props;
         const inputType = secret ? "password" : "text";
@@ -61,6 +63,8 @@ class TextControl extends React.Component {
             <>
                 <FormControl
                   {...props}
+                  minLength={minLength}
+                  maxLength={maxLength}
                   type={inputType}
                   onChange={(e) => this.props.onChange(e.target.value)} />
                 {confirm && (
