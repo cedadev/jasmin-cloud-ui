@@ -35,7 +35,10 @@ import { TenancyClustersPanel } from './components/pages/tenancy/clusters';
 const ConnectedNav = connect(
     (state) => ({
         username: state.session.username,
-        tenancies: state.tenancies.data
+        tenancies: state.tenancies.data,
+        currentTenancy: state.tenancies.current,
+        clouds: state.clouds.available_clouds,
+        currentCloud: state.clouds.current_cloud
     }),
     (dispatch) => bindActionCreators({
         signOut: sessionActions.signOut

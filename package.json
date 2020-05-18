@@ -4,7 +4,7 @@
   "description": "Web portal interface for administration of tenancies in the JASMIN Cloud.",
   "scripts": {
     "watch": "webpack --mode development --watch --progress --config webpack.dev.js",
-    "start": "webpack-dev-server --mode development --watch --progress --config webpack.dev.js",
+    "serve": "webpack-dev-server --mode development --watch --progress --config webpack.dev.js",
     "build": "webpack --mode production --progress --config webpack.prod.js"
   },
   "repository": "git+https://github.com/cedadev/jasmin-cloud-ui.git",

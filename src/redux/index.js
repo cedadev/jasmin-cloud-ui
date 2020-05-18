@@ -6,6 +6,11 @@ import { combineReducers, applyMiddleware, compose, createStore } from 'redux';
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import {
+    actionCreators as cloudsActionCreators,
+    reducer as cloudsReducer
+} from './clouds';
+
+import {
     actionCreators as sessionActionCreators,
     reducer as sessionReducer,
     epic as sessionEpic
@@ -23,6 +28,7 @@ import {
 
 
 const rootReducer = combineReducers({
+    clouds: cloudsReducer,
     session: sessionReducer,
     notifications: notificationReducer,
     tenancies: tenanciesReducer
@@ -40,4 +46,5 @@ export const store = createStore(
 epicMiddleware.run(rootEpic);
 
 // Initialise the session
+store.dispatch(cloudsActionCreators.fetch());
 store.dispatch(sessionActionCreators.initialise());
