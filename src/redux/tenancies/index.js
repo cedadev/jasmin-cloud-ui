@@ -187,8 +187,12 @@ export const epic = combineEpics(
             //   * The session is terminated before the timer expires
             return of(tenancyActionCreators.fetchList()).pipe(
                 delay(30 * 60 * 1000),
-                takeUntil(action$.pipe(ofType(actions.FETCH_LIST))),
-                takeUntil(action$.pipe(ofType(sessionActions.TERMINATED)))
+                takeUntil(
+                    merge(
+                        action$.pipe(ofType(actions.FETCH_LIST)),
+                        action$.pipe(ofType(sessionActions.TERMINATED))
+                    )
+                )
             );
         })
     ),

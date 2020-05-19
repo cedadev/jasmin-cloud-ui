@@ -276,15 +276,19 @@ export function createEpic(actions, actionCreators, isActive, id) {
                 //   * A switch takes place to a different tenancy before the timer expires
                 return of(actionCreators.fetchList(tenancyId)).pipe(
                     delay(120000),
-                    takeUntil(action$.pipe(
-                        ofType(actions.FETCH_LIST),
-                        filter(action => action.tenancyId === tenancyId)
-                    )),
-                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED))),
-                    takeUntil(action$.pipe(
-                        ofType(tenancyActions.SWITCH),
-                        filter(action => action.tenancyId !== tenancyId)
-                    ))
+                    takeUntil(
+                        merge(
+                            action$.pipe(
+                                ofType(actions.FETCH_LIST),
+                                filter(action => action.tenancyId === tenancyId)
+                            ),
+                            action$.pipe(ofType(sessionActions.TERMINATED)),
+                            action$.pipe(
+                                ofType(tenancyActions.SWITCH),
+                                filter(action => action.tenancyId !== tenancyId)
+                            )
+                        )
+                    )
                 );
             })
         ),
@@ -318,17 +322,19 @@ export function createEpic(actions, actionCreators, isActive, id) {
                 return of(actionCreators.fetchOne(tenancyId, resourceId)).pipe(
                     delay(5000),
                     takeUntil(
-                        action$.pipe(
-                            ofType(actions.FETCH_ONE),
-                            filter(action => action.tenancyId === tenancyId),
-                            filter(action => action.resourceId === resourceId)
+                        merge(
+                            action$.pipe(
+                                ofType(actions.FETCH_ONE),
+                                filter(action => action.tenancyId === tenancyId),
+                                filter(action => action.resourceId === resourceId)
+                            ),
+                            action$.pipe(ofType(sessionActions.TERMINATED)),
+                            action$.pipe(
+                                ofType(tenancyActions.SWITCH),
+                                filter(action => action.tenancyId !== tenancyId)
+                            )
                         )
-                    ),
-                    takeUntil(action$.pipe(ofType(sessionActions.TERMINATED))),
-                    takeUntil(action$.pipe(
-                        ofType(tenancyActions.SWITCH),
-                        filter(action => action.tenancyId !== tenancyId)
-                    ))
+                    )
                 );
             })
         ),
