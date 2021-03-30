@@ -8,8 +8,15 @@ module.exports = merge(
         devServer: {
             contentBase: path.join(__dirname, 'dist'),
             compress: true,
-            port: 9000,
-            disableHostCheck: true
+            port: 3000,
+            disableHostCheck: true,
+            proxy: [
+                {
+                    context: ['/api', '/static'],
+                    target: 'http://localhost:8000',
+                    changeOrigin: true
+                }
+            ]
         }
     }
 );
