@@ -24,7 +24,7 @@ export const Navigation = (props) => {
         <Navbar fixedTop collapseOnSelect>
             <Navbar.Header>
                 <Navbar.Brand>
-                    <Link to="/">JASMIN Cloud Portal</Link>
+                    <Link to="/">VIO7 JASMIN Cloud Portal</Link>
                 </Navbar.Brand>
                 <Navbar.Toggle />
             </Navbar.Header>
