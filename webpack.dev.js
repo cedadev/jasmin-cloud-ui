@@ -13,7 +13,7 @@ module.exports = merge(
             proxy: [
                 {
                     context: ['/api', '/static'],
-                    target: 'http://localhost:8000',
+                    target: 'http://localhost:8080',
                     changeOrigin: true
                 }
             ]
