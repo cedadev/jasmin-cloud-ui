@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { MenuItem, Modal, Button, FormControl } from 'react-bootstrap';
+import { Nav, Modal, Button, FormControl } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
@@ -42,9 +42,9 @@ export class AttachExternalIpMenuItem extends React.Component {
             .filter(ip => !ip.updating && !ip.machine);
         return (
             <>
-                <MenuItem onSelect={this.open} disabled={disabled}>
+                <Nav.Item onSelect={this.open} disabled={disabled}>
                     Attach external IP
-                </MenuItem>
+                </Nav.Item>
                 <Modal
                   backdrop="static"
                   onHide={!externalIps.creating ? this.close : undefined}

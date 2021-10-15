@@ -48,7 +48,7 @@ export class TenancyPage extends React.Component {
             const clustersEnabled = get(tenancy, 'clusters.enabled', false);
             return (
                 <div>
-                    <PageHeader>{tenancy.name}</PageHeader>
+                    <h1>{tenancy.name}</h1>
                     <Nav bsStyle="tabs" activeHref={this.props.match.url}>
                         <LinkContainer exact to={`/tenancies/${tenancy.id}`}>
                             <NavItem>Overview</NavItem>

@@ -5,7 +5,7 @@
 import React from 'react';
 import {
     Table, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal,
-    DropdownButton, MenuItem
+    DropdownButton, Nav
 } from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
@@ -32,12 +32,12 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <MenuItem
+                <Nav.Item
                   className="danger"
                   disabled={this.props.disabled}
                   onSelect={this.open}>
                     Delete volume
-                </MenuItem>
+                </Nav.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -90,11 +90,11 @@ function VolumeActionsDropdown(props) {
               volume={props.volume}
               machines={props.machines}
               attach={(mid) => props.volumeActions.update({ machine_id: mid })} />
-            <MenuItem
+            <Nav.Item
               disabled={!props.volume.machine}
               onSelect={() => props.volumeActions.update({ machine_id: null })}>
                 Detach volume from machine
-            </MenuItem>
+            </Nav.Item>
             <ConfirmDeleteMenuItem
               name={props.volume.name}
               disabled={!['AVAILABLE', 'ERROR'].includes(props.volume.status.toUpperCase())}

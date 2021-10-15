@@ -5,7 +5,7 @@
 import React from 'react';
 import {
     Table, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal,
-    DropdownButton, MenuItem
+    DropdownButton, Nav
 } from 'react-bootstrap';
 
 import moment from 'moment';
@@ -34,9 +34,9 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <MenuItem className="danger" onSelect={this.open}>
+                <Nav.Item className="danger" onSelect={this.open}>
                     Delete machine
-                </MenuItem>
+                </Nav.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>
@@ -136,29 +136,29 @@ function MachineActionsDropdown(props) {
               externalIps={props.externalIps}
               externalIpActions={props.externalIpActions}
               disabled={!!props.machineExternalIp || !props.machine.nat_allowed} />
-            <MenuItem
+            <Nav.Item
               onSelect={() => props.externalIpActions.update(
                   props.machineExternalIp,
                   { machine_id: null }
               )}
               disabled={!props.machineExternalIp}>
                 Detach external IP
-            </MenuItem>
-            <MenuItem
+            </Nav.Item>
+            <Nav.Item
               onSelect={props.machineActions.start}
               disabled={props.machine.status.name === 'ACTIVE'}>
                 Start machine
-            </MenuItem>
-            <MenuItem
+            </Nav.Item>
+            <Nav.Item
               onSelect={props.machineActions.stop}
               disabled={props.machine.status.name !== 'ACTIVE'}>
                 Stop machine
-            </MenuItem>
-            <MenuItem
+            </Nav.Item>
+            <Nav.Item
               onSelect={props.machineActions.restart}
               disabled={props.machine.status.name !== 'ACTIVE'}>
                 Restart machine
-            </MenuItem>
+            </Nav.Item>
             <ConfirmDeleteMenuItem
               name={props.machine.name}
               onConfirm={props.machineActions.delete} />

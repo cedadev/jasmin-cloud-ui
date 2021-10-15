@@ -5,7 +5,7 @@
 import isEmpty from 'lodash/isEmpty';
 
 import React from 'react';
-import { PageHeader, Row, Col, Panel, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { PageHeader, Row, Col, Alert, ListGroup, ListGroupItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { Loading } from '../utils';
@@ -24,11 +24,11 @@ export class Dashboard extends React.Component {
                 .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
             return (
                 <div>
-                    <PageHeader>Dashboard</PageHeader>
+                    <h1>Dashboard</h1>
                     <Row>
                         <Col md={6} mdOffset={3}>
-                            <Panel>
-                                <Panel.Heading>Available tenancies</Panel.Heading>
+                            <Alert>
+                                <Alert.Heading>Available tenancies</Alert.Heading>
                                 <ListGroup fill="true">
                                     {sorted.map((t) =>
                                         <LinkContainer
@@ -38,7 +38,7 @@ export class Dashboard extends React.Component {
                                         </LinkContainer>
                                     )}
                                 </ListGroup>
-                            </Panel>
+                            </Alert>
                         </Col>
                     </Row>
                 </div>
@@ -50,13 +50,13 @@ export class Dashboard extends React.Component {
         else {
             return (
                 <div>
-                    <PageHeader>Dashboard</PageHeader>
+                    <h1>Dashboard</h1>
                     <Row>
                         <Col md={6} mdOffset={3}>
-                            <Panel>
-                                <Panel.Heading>Available tenancies</Panel.Heading>
+                            <Alert>
+                                <Alert.Heading>Available tenancies</Alert.Heading>
                                 You do not belong to any tenancies.
-                            </Panel>
+                            </Alert>
                         </Col>
                     </Row>
                 </div>

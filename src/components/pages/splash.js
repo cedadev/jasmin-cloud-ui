@@ -25,7 +25,6 @@ export class SplashPage extends React.Component {
                                 <p>Here, you can manage your tenancies in the JASMIN Cloud.</p>
                             </Col>
                             <Col md={5}>
-                                <Well>
                                     <LinkContainer to={`/dashboard`}>
                                         <Button bsStyle="primary" bsSize="lg" block>
                                             <i className="fa fa-fw fa-cloud" />
@@ -42,7 +41,6 @@ export class SplashPage extends React.Component {
                                         {'\u00A0\u00A0'}
                                         Join a JASMIN Cloud tenancy
                                     </Button>
-                                </Well>
                             </Col>
                         </div>
                     </div>

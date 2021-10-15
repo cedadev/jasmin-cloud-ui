@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Grid } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -135,7 +135,7 @@ const TenancyClustersPage = props => (
 export class Application extends React.Component {
     render() {
         return (
-            <Grid>
+            <Container>
                 <ConnectedNav />
                 <CookielawBanner />
                 <ConnectedNotifications />
@@ -149,7 +149,7 @@ export class Application extends React.Component {
                     <ProtectedRoute exact path="/tenancies/:id/clusters" component={TenancyClustersPage} />
                     <Route component={NotFound} />
                 </Switch>
-            </Grid>
+            </Container>
         );
     }
 }

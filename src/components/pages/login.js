@@ -98,7 +98,7 @@ export class LoginPage extends React.Component {
         if( initialising ) return <Loading message="Initialising..." />;
         return (
             <div>
-                <PageHeader>Sign in with your JASMIN account</PageHeader>
+                <h1>Sign in with your JASMIN account</h1>
                 <Row>
                     <Col md={8} mdOffset={2}>
                         <div className="banner banner-warning text-center">

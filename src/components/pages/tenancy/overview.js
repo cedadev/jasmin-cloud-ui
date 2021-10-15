@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Panel } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 
 import { ResourcePanel } from './resource-utils';
 
@@ -57,11 +57,10 @@ class QuotaProgressCircle extends React.Component {
         `;
         return (
             <div className="quota-progress">
-                <Panel>
-                    <Panel.Heading>
-                        <Panel.Title componentClass="h3">{title}</Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
+                <Alert>
+                    <Alert.Heading as='h3'>
+                        {title}
+                    </Alert.Heading>
                         <svg viewBox="0 0 100 100">
                             <path
                             className="quota-progress-background"
@@ -79,9 +78,8 @@ class QuotaProgressCircle extends React.Component {
                                 {percent}%
                             </text>
                         </svg>
-                    </Panel.Body>
-                    <Panel.Footer>{label}</Panel.Footer>
-                </Panel>
+                    {label}
+                </Alert>
             </div>
         );
     }

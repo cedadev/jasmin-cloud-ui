@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -22,18 +22,18 @@ export const Navigation = (props) => {
         .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
     return (
         <Navbar fixedTop collapseOnSelect>
-            <Navbar.Header>
+            //<Navbar.Header>
                 <Navbar.Brand>
                     <Link to="/">JASMIN Cloud Portal</Link>
                 </Navbar.Brand>
                 <Navbar.Toggle />
-            </Navbar.Header>
+            //</Navbar.Header>
             <Navbar.Collapse>
                 {currentCloud && clouds && (
                     <Nav>
                         <NavDropdown title={currentCloud.label} id="clouds-dropdown">
                             {clouds.map(c =>
-                                <MenuItem key={c.name} href={c.url}>{c.label}</MenuItem>
+                                <NavDropdown.Item key={c.name} href={c.url}>{c.label}</NavDropdown.Item>
                             )}
                         </NavDropdown>
                     </Nav>
@@ -46,7 +46,7 @@ export const Navigation = (props) => {
                                   key={t.id}
                                   to={`/tenancies/${t.id}`}
                                   isActive={() => false}>
-                                    <MenuItem>{t.name}</MenuItem>
+                                    <NavDropdown.Item>{t.name}</NavDropdown.Item>
                                 </LinkContainer>
                             )}
                         </NavDropdown>
@@ -56,7 +56,7 @@ export const Navigation = (props) => {
                     <Navbar.Text pullRight>
                         Signed in as <strong>{props.username}</strong>
                         {'\u00A0'}
-                        (<Navbar.Link onClick={props.signOut}>sign out</Navbar.Link>)
+                        (<Nav.Link onClick={props.signOut}>sign out</Nav.Link>)
                     </Navbar.Text>
                 ) : (
                     <Nav pullRight>

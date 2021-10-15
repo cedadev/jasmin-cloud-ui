@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Col, Row, Clearfix, Button, Modal, Badge, Panel, FormControl, Image } from 'react-bootstrap';
+import { Col, Row, Clearfix, Button, Modal, Badge, Alert, FormControl, Image } from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
 
@@ -23,21 +23,17 @@ class ClusterTypePanel extends React.Component {
         const { clusterType, onSelect } = this.props;
         return (
             <Col key={clusterType.name} md={4} sm={6}>
-                <Panel
+                <Alert
                   bsStyle={this.state.hovering ? 'primary' : undefined}
                   onMouseEnter={this.handleMouseEnter}
                   onMouseLeave={this.handleMouseLeave}
                   onClick={() => onSelect(clusterType.name)}>
-                    <Panel.Heading>
+                    <Alert.Heading>
                         <Panel.Title componentClass="h3">{clusterType.label}</Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
+                    </Alert.Heading>
                         <Image src={clusterType.logo} responsive />
-                    </Panel.Body>
-                    <Panel.Footer>
                         <ReactMarkdown source={clusterType.description} />
-                    </Panel.Footer>
-                </Panel>
+                </Alert>
             </Col>
         );
     }
@@ -52,12 +48,11 @@ function ClusterTypeForm(props) {
                 {sortBy(Object.values(clusterTypes), ['name']).map((ct, i) => (
                     <React.Fragment key={ct.name}>
                         <ClusterTypePanel clusterType={ct} onSelect={onSelect} />
-                        {i % 2 === 1 && <Clearfix visibleSmBlock />}
-                        {i % 3 === 2 && <Clearfix visibleMdBlock visibleLgBlock />}
+                        {i % 2 === 1 && <visibleSmBlock />}
+                        {i % 3 === 2 && <visibleMdBlock visibleLgBlock />}
                     </React.Fragment>
                 ))}
             </Col>
-            <Clearfix />
         </Modal.Body>
     );
 }

@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Grid, Alert, ButtonGroup, Button } from 'react-bootstrap';
+import { Container, Alert, ButtonGroup, Button } from 'react-bootstrap';
 
 import Cookies from 'js-cookie';
 
@@ -23,7 +23,7 @@ export class CookielawBanner extends React.Component {
     render() {
         if( this.state.visible ) {
             return (
-                <Grid>
+                <Container>
                     <Alert bsStyle="info" className="text-center">
                         <span style={{ marginRight: '5px'}}>
                             This website and other JASMIN sites use cookies.
@@ -37,7 +37,7 @@ export class CookielawBanner extends React.Component {
                             </Button>
                         </ButtonGroup>
                     </Alert>
-                </Grid>
+                </Container>
             );
         }
         return null;

@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { FormControl, Checkbox, Button, InputGroup } from 'react-bootstrap';
+import { FormControl, Button, InputGroup } from 'react-bootstrap';
 
 import ReactMarkdown from 'react-markdown';
 
@@ -257,13 +257,13 @@ const BooleanParameterField = (props) => {
         <Field
           label={parameter.label}
           helpText={<ReactMarkdown source={parameter.description} />}>
-            <Checkbox
+            <InputGroup.Checkbox
               id={parameter.name}
               checked={value || false}
               onChange={(e) => onChange(e.target.checked)}
               disabled={parameter.immutable && !isCreate}>
                 {parameter.options.checkboxLabel || parameter.label}
-            </Checkbox>
+            </InputGroup.Checkbox>
         </Field>
     );
 };

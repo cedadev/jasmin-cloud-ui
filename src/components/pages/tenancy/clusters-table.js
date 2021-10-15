@@ -8,7 +8,7 @@ import {
     Button,
     Modal,
     DropdownButton,
-    MenuItem,
+    Nav,
     Form,
     FormControl,
     Tooltip,
@@ -78,9 +78,9 @@ class UpdateClusterParametersMenuItem extends React.Component {
         // It will either become available, or it no longer exists
         return (
             <>
-                <MenuItem onSelect={this.open} disabled={!clusterType}>
+                <Nav.Item onSelect={this.open} disabled={!clusterType}>
                     Update cluster options
-                </MenuItem>
+                </Nav.Item>
                 <Modal
                   backdrop="static"
                   onHide={this.close}
@@ -136,7 +136,7 @@ class ConfirmPatchMenuItem extends React.Component {
     render() {
         return (
             <>
-                <MenuItem onSelect={this.open}>Patch cluster</MenuItem>
+                <Nav.Item onSelect={this.open}>Patch cluster</Nav.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to patch {this.props.name}?</p>
@@ -170,12 +170,12 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <MenuItem
+                <Nav.Item
                   className="danger"
                   disabled={this.props.disabled}
                   onSelect={this.open}>
                     Delete cluster
-                </MenuItem>
+                </Nav.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>Are you sure you want to delete {this.props.name}?</p>

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import {
-    FormGroup, ControlLabel, HelpBlock, Form as BSForm
+    FormGroup, HelpBlock, Form as BSForm
 } from 'react-bootstrap';
 
 import $ from 'jquery';
@@ -95,11 +95,11 @@ export function Field(props) {
           controlId={name}
           className={required && 'required'}
           validationState={errors.length > 0 ? 'error' : null}>
-            {label && <ControlLabel>{label}</ControlLabel>}
+            {label && <BSForm.Label>{label}</BSForm.Label>}
             <ControlContainer>
                 {children}
-                {helpText && <HelpBlock>{helpText}</HelpBlock>}
-                {errors && errors.map((e) => <HelpBlock>{e}</HelpBlock>)}
+                {helpText && <BSForm.Text>{helpText}</BSForm.Text>}
+                {errors && errors.map((e) => <BSForm.Text>{e}</BSForm.Text>)}
             </ControlContainer>
         </FormGroup>
     );
