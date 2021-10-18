@@ -45,7 +45,6 @@ const ConnectedNav = connect(
     }, dispatch)
 )(Navigation);
 
-
 const ConnectedNotifications = connect(
     (state) => ({ notifications: state.notifications }),
     (dispatch) => ({

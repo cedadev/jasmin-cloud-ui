@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
+import { Navbar, Nav, NavItem, NavDropdown, MenuItem, Container} from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -22,50 +22,37 @@ export const Navigation = (props) => {
         .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
     return (
         <Navbar fixedTop collapseOnSelect>
-            //<Navbar.Header>
-                <Navbar.Brand>
-                    <Link to="/">JASMIN Cloud Portal</Link>
-                </Navbar.Brand>
-                <Navbar.Toggle />
-            //</Navbar.Header>
-            <Navbar.Collapse>
-                {currentCloud && clouds && (
-                    <Nav>
-                        <NavDropdown title={currentCloud.label} id="clouds-dropdown">
-                            {clouds.map(c =>
-                                <NavDropdown.Item key={c.name} href={c.url}>{c.label}</NavDropdown.Item>
-                            )}
-                        </NavDropdown>
-                    </Nav>
-                )}
-                {currentTenancy && tenancies && (
-                    <Nav>
-                        <NavDropdown title={currentTenancy.name} id="tenancies-dropdown">
-                            {tenancies.map(t =>
-                                <LinkContainer
-                                  key={t.id}
-                                  to={`/tenancies/${t.id}`}
-                                  isActive={() => false}>
-                                    <NavDropdown.Item>{t.name}</NavDropdown.Item>
-                                </LinkContainer>
-                            )}
-                        </NavDropdown>
-                    </Nav>
-                )}
-                {props.username ? (
-                    <Navbar.Text pullRight>
-                        Signed in as <strong>{props.username}</strong>
-                        {'\u00A0'}
-                        (<Nav.Link onClick={props.signOut}>sign out</Nav.Link>)
-                    </Navbar.Text>
-                ) : (
-                    <Nav pullRight>
-                        <LinkContainer to="/login" isActive={() => false}>
-                            <NavItem>Sign In</NavItem>
-                        </LinkContainer>
-                    </Nav>
-                )}
-            </Navbar.Collapse>
+        <Container>
+        <Navbar.Brand><Link to="/">JASMIN Cloud Portal</Link></Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+        <Nav className="me-auto">
+        {currentCloud && clouds && (
+            <NavDropdown title={currentCloud.label} id="clouds-dropdown">
+            {clouds.map(c =>
+                <NavDropdown.Item key={c.name} href={c.url}>{c.label}</NavDropdown.Item>
+            )}
+            </NavDropdown>
+        )}
+        {currentTenancy && tenancies && (
+            <NavDropdown title={currentTenancy.name} id="tenancies-dropdown">
+            {tenancies.map(t =>
+                <NavDropdown.Item href={`/tenancies/${t.id}`}>{t.name}</NavDropdown.Item>
+            )}
+            </NavDropdown>
+        )}
+        {props.username ? (
+            <Navbar.Text pullRight>
+            Signed in as <strong>{props.username}</strong>
+            {'\u00A0'}
+            (<Nav.Link onClick={props.signOut}>sign out</Nav.Link>)
+            </Navbar.Text>
+        ) : (
+            <Nav.Link href="/login">Sign In</Nav.Link>
+        )}
+        </Nav>
+        </Navbar.Collapse>
+        </Container>
         </Navbar>
     );
 };
