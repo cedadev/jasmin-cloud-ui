@@ -27,7 +27,6 @@ import { TenancyMachinesPanel } from './components/pages/tenancy/machines';
 import { TenancyVolumesPanel } from './components/pages/tenancy/volumes';
 import { TenancyClustersPanel } from './components/pages/tenancy/clusters';
 
-
 /**
  * Where components need to be bound to the Redux state, generate the connectors
  */
@@ -52,7 +51,6 @@ const ConnectedNotifications = connect(
     })
 )(Notifications);
 
-
 const ConnectedLoginPage = connect(
     (state) => state.session,
     (dispatch) => bindActionCreators({
@@ -60,11 +58,9 @@ const ConnectedLoginPage = connect(
     }, dispatch)
 )(LoginPage);
 
-
 const ConnectedDashboard = connect(
-    (state) => ({ tenancies: state.tenancies }),
+    (state) => ({ tenancies: state.tenancies })
 )(Dashboard);
-
 
 const ConnectedTenancyPage = connect(
     (state) => ({ tenancies: state.tenancies }),
@@ -83,7 +79,6 @@ const ConnectedTenancyPage = connect(
     })
 )(TenancyPage);
 
-
 const NotFound = connect(
     undefined,
     (dispatch) => ({
@@ -94,61 +89,56 @@ const NotFound = connect(
     return <Redirect to="/dashboard" />;
 });
 
-
 const ProtectedRoute = connect(
     (state) => ({ session: state.session })
-)(({ component: Component, session, ...rest }) => {
-    return (
-        <Route
-            {...rest}
-            render={props =>
-                session.username ? (
-                    <Component {...props} />
-                ) : (
-                    (session.initialising || session.authenticating) ? (
-                        <div></div>
-                    ) : (
-                        <Redirect to="/login" />
-                    )
-                )
-            }
-        />
-    );
-});
+)(({ component: Component, session, ...rest }) => (
+    <Route
+        {...rest}
+        render={(props) => (session.username ? (
+            <Component {...props} />
+        ) : (
+            (session.initialising || session.authenticating) ? (
+                <div />
+            ) : (
+                <Redirect to="/login" />
+            )
+        ))}
+    />
+));
 
-
-const TenancyOverviewPage = props => (
+const TenancyOverviewPage = (props) => (
     <ConnectedTenancyPage {...props}><TenancyOverviewPanel /></ConnectedTenancyPage>
 );
-const TenancyMachinesPage = props => (
+const TenancyMachinesPage = (props) => (
     <ConnectedTenancyPage {...props}><TenancyMachinesPanel /></ConnectedTenancyPage>
 );
-const TenancyVolumesPage = props => (
+const TenancyVolumesPage = (props) => (
     <ConnectedTenancyPage {...props}><TenancyVolumesPanel /></ConnectedTenancyPage>
 );
-const TenancyClustersPage = props => (
+const TenancyClustersPage = (props) => (
     <ConnectedTenancyPage {...props}><TenancyClustersPanel /></ConnectedTenancyPage>
 );
-
 
 export class Application extends React.Component {
     render() {
         return (
-            <Container>
+            <div>
                 <ConnectedNav />
-                <CookielawBanner />
-                <ConnectedNotifications />
-                <Switch>
-                    <Route exact path="/" component={SplashPage} />
-                    <Route exact path="/login" component={ConnectedLoginPage} />
-                    <ProtectedRoute exact path="/dashboard" component={ConnectedDashboard} />
-                    <ProtectedRoute exact path="/tenancies/:id" component={TenancyOverviewPage} />
-                    <ProtectedRoute exact path="/tenancies/:id/machines" component={TenancyMachinesPage} />
-                    <ProtectedRoute exact path="/tenancies/:id/volumes" component={TenancyVolumesPage} />
-                    <ProtectedRoute exact path="/tenancies/:id/clusters" component={TenancyClustersPage} />
-                    <Route component={NotFound} />
-                </Switch>
-            </Container>
+                <Container>
+                    <CookielawBanner />
+                    <ConnectedNotifications />
+                    <Switch>
+                        <Route exact path="/" component={SplashPage} />
+                        <Route exact path="/login" component={ConnectedLoginPage} />
+                        <ProtectedRoute exact path="/dashboard" component={ConnectedDashboard} />
+                        <ProtectedRoute exact path="/tenancies/:id" component={TenancyOverviewPage} />
+                        <ProtectedRoute exact path="/tenancies/:id/machines" component={TenancyMachinesPage} />
+                        <ProtectedRoute exact path="/tenancies/:id/volumes" component={TenancyVolumesPage} />
+                        <ProtectedRoute exact path="/tenancies/:id/clusters" component={TenancyClustersPage} />
+                        <Route component={NotFound} />
+                    </Switch>
+                </Container>
+            </div>
         );
     }
 }
