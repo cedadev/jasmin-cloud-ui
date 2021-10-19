@@ -1,49 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="keywords" content="some keywords">
         <meta name="description" content="JASMIN Theme example page">
 
-        <!-- Replace with page title -->
         <title>JASMIN Cloud Portal</title>
         <link rel="shortcut icon" href="/jasmin_theme/img/favicon.ico">
 
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.8/css/bootstrap-select.min.css">
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/theme/css/main.css" />
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/vendor/css/fontawesome-all.min.css" />
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/vendor/css/bootstrap-select.min.css">
     </head>
 
-    <body>
-        <div id="react-root"></div>
+    <body id="body" class="d-flex flex-column min-vh-100">
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="react-root" class="flex-fill"></div>
 
-        <footer>
-            <div class="container">
+        <footer class="site-footer border-top pt-3 px-3 mt-3">
+            <div class="container-fluid">
                 <div class="row">
-                    <div id="nerc-logo" class="col-sm-6">
-                        <a href="http://www.nerc.ac.uk" title="NERC">
-                            <img src="/jasmin_theme/img/nerc-long-logo-261.png" title="NERC logo"
-                                 height="53" width="261" alt="NERC logo" />
-                        </a>
+                    <div class="col">
+                        <h2 class="footer-heading">Useful links</h2>
+                        <ul class="footer-list">
+                            <li><a href="//www.jasmin.ac.uk" target="_blank">JASMIN</a></li>
+                            <li><a href="//www.ceda.ac.uk" target="_blank">CEDA</a></li>
+                            <li><a href="//accounts.jasmin.ac.uk" target="_blank">Accounts Portal</a></li>
+                            <li><a href="//cloud.jasmin.ac.uk" target="_blank">Cloud Portal</a></li>
+                            <li><a href="//projects.jasmin.ac.uk" target="_blank">Projects Portal</a></li>
+                            <li><a href="https://notebooks.jasmin.ac.uk" target="_blank">Notebook Service</a></li>
+                        </ul>
                     </div>
-                    <div id="stfc-logo" class="col-sm-6">
-                        <a href="http://www.stfc.ac.uk" title="STFC">
-                            <img src="/jasmin_theme/img/STFCMediumColourTrans.png" title="STFC logo"
-                                 height="57" width="261" alt="STFC logo" />
+
+                    <div class="col">
+                        <h2 class="footer-heading">Contact us</h2>
+                        <ul class="footer-list">
+                            <li><a href="//help.jasmin.ac.uk" target="_blank"><i class="mr-2 fas fa-fw fa-bookmark"></i>Documentation</a></li>
+                            <li><a href="//help.ac.uk" target="_blank"><i class="mr-2 fas fa-fw fa-life-ring"></i>Helpdesk</a></li>
+                            <li><a href="//twitter.com/cedanews" target="_blank"><i class="mr-2 fab fa-fw fa-twitter"></i>Twitter</a></li>
+                            <li><a href="//www.youtube.com/channel/UCYjSH2ET9nLMhDcXa5y2OMg" target="_blank"><i class="mr-2 fab fa-fw fa-youtube"></i>YouTube</a></li>
+                        </ul>
+                    </div>
+                    <div class="text-center col-md-5">
+                        <p class="mb-0"><strong>JASMIN is operated by the Science and Technology Facilities Council on behalf of the Natural Environment Research Council.</strong></p>
+                        <a href="//stfc.ukri.org" title="STFC" target="_blank">
+                            <img src="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/assets/img/UKRI_STF_Council-Logo_Horiz-RGB_h80.png" title="STFC UKRI logo" alt="STFC UKRI logo" height="80">
+                        </a>
+                        <a href="//nerc.ukri.org/" title="NERC" target="_blank">
+                            <img src="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/assets/img/UKRI_NER_Council-Logo_Horiz-RGB_h80.png" title="NERC UKRI logo" alt="NERC UKRI logo" height="80">
                         </a>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        <p class="site-info">
-                            Copyright &copy; 2017 <a href="http://www.stfc.ac.uk">STFC</a> |
-                            All Rights Reserved |
-                            <a href="https://accounts.jasmin.ac.uk/account/accessibility/" target="_blank">Accessibility</a> |
-                            <a href="https://accounts.jasmin.ac.uk/account/privacy/" target="_blank">Privacy</a> |
-                            <a href="https://accounts.jasmin.ac.uk/account/support/" target="_blank">Support</a> |
-                            <a href="https://accounts.jasmin.ac.uk/account/conditions/" target="_blank">Terms and Conditions</a>
-                        </p>
+                    <div class="py-3 col">
+                        <ul class="d-inline-block list-inline mb-0">
+                            <li class="list-inline-item mr-3">© Copyright 2020 STFC</li>
+                            <li class="list-inline-item mr-3"><a href="//accounts.jasmin.ac.uk/account/accessibility/" target="_blank">Accessibility</a></li>
+                            <li class="list-inline-item mr-3"><a href="//accounts.jasmin.ac.uk/account/support/" target="_blank">Support</a></li>
+                            <li class="list-inline-item mr-3"><a href="//accounts.jasmin.ac.uk/account/privacy/" target="_blank">Privacy</a></li>
+                            <li class="list-inline-item"><a href="//accounts.jasmin.ac.uk/account/conditions/" target="_blank">Terms and Conditions</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
