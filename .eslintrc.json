@@ -7,8 +7,10 @@
         "plugin:react/recommended",
         "airbnb"
     ],
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaFeatures": {
+            "experimentalObjectRestSpread": true,
             "jsx": true
         },
         "ecmaVersion": 12,
@@ -19,15 +21,17 @@
     ],
     "rules": {
         "indent": ["error", 4],
-        "comma-dangle": ["error", {"functions": "only-multiline"}],
+        "comma-dangle": ["error", "only-multiline"],
+        "max-classes-per-file": ["off"],
         "no-nested-ternary": ["warn"],
         "react/jsx-indent": ["error", 4],
         "react/jsx-indent-props": ["error", 4],
         "react/jsx-filename-extension": ["off"],
-        "react/prefer-stateless-function": ["off"],
-        "react/jsx-props-no-spreading": ["off"],
-        "react/destructuring-assignment": ["off"],
-        "react/prop-types": ["off"],
+        "react/prefer-stateless-function": ["warn"],
+        "react/jsx-props-no-spreading": ["warn"],
+        "react/destructuring-assignment": ["warn"],
+        "react/prop-types": ["warn"],
+        "react/no-did-update-set-state": ["warn"],
         "import/prefer-default-export": ["off"]
     }
 }

@@ -9,6 +9,7 @@ import {
     NavDropdown,
     Container
 } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import get from 'lodash/get';
 
@@ -25,30 +26,36 @@ export const Navigation = (props) => {
     return (
         <Navbar sticky="top" variant="dark" bg="success">
             <Container>
-                <Navbar.Brand href="/">
-                    <img
-                        src="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/assets/img/jasmin_logo_white_greendots_h50.png"
-                        alt="JASMIN logo"
-                    />
-                </Navbar.Brand>
+                <LinkContainer to="/">
+                    <Navbar.Brand>
+                        <img
+                            src="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/assets/img/jasmin_logo_white_greendots_h50.png"
+                            alt="JASMIN logo"
+                        />
+                    </Navbar.Brand>
+                </LinkContainer>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         {currentCloud && clouds && (
                             <NavDropdown title={currentCloud.label} id="clouds-dropdown">
                                 {clouds.map((c) => (
-                                    <NavDropdown.Item key={c.name} href={c.url}>
-                                        {c.label}
-                                    </NavDropdown.Item>
+                                    <LinkContainer to={c.url}>
+                                        <NavDropdown.Item key={c.name}>
+                                            {c.label}
+                                        </NavDropdown.Item>
+                                    </LinkContainer>
                                 ))}
                             </NavDropdown>
                         )}
                         {currentTenancy && tenancies && (
                             <NavDropdown title={currentTenancy.name} id="tenancies-dropdown">
                                 {tenancies.map((t) => (
-                                    <NavDropdown.Item href={`/tenancies/${t.id}`}>
-                                        {t.name}
-                                    </NavDropdown.Item>
+                                    <LinkContainer to={`/tenancies/${t.id}`}>
+                                        <NavDropdown.Item>
+                                            {t.name}
+                                        </NavDropdown.Item>
+                                    </LinkContainer>
                                 ))}
                             </NavDropdown>
                         )}
@@ -65,7 +72,9 @@ export const Navigation = (props) => {
                                 )
                             </Navbar.Text>
                         ) : (
-                            <Nav.Link href="/login">Sign In</Nav.Link>
+                            <LinkContainer to="/login">
+                                <Nav.Link>Sign In</Nav.Link>
+                            </LinkContainer>
                         )}
                     </Nav>
                 </Navbar.Collapse>

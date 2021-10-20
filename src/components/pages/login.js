@@ -3,11 +3,19 @@
  */
 
 import React from 'react';
-import { Row, Col, PageHeader, FormGroup, FormControl, Button, Alert } from 'react-bootstrap';
+import {
+    Form,
+    Row,
+    Button,
+    Alert,
+} from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
-
-import { Form, Field, ControlContainer, Loading } from '../utils';
-
+import PropTypes from 'prop-types';
+import {
+    HorizFormButtonContainer,
+    HorizFormGroup,
+    Loading,
+} from '../utils';
 
 class LoginForm extends React.Component {
     constructor(props) {
@@ -17,59 +25,67 @@ class LoginForm extends React.Component {
 
     componentDidUpdate(prevProps) {
         // If transitioning from authenticating to not authenticating, reset the form
-        if( prevProps.authenticating && !this.props.authenticating )
+        if (prevProps.authenticating && !this.props.authenticating) {
             this.setState({ username: '', password: '' });
+        }
     }
 
-    handleChange = (e) => this.setState({ [e.target.id]: e.target.value });
+    handleChange = (e) => {
+        this.setState({ [e.target.id]: e.target.value });
+    };
 
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.authenticate(this.state.username, this.state.password);
-    }
+    };
 
     render() {
+        const {
+            username,
+            password,
+        } = this.state;
+        const {
+            authenticating,
+        } = this.props;
         return (
-            <div>
-                <Form
-                    horizontal
-                    disabled={this.props.authenticating}
-                    onSubmit={this.handleSubmit}>
-                    <Field name="username" label="Username">
-                        <FormControl
-                            type="text"
-                            placeholder="Username"
-                            required
-                            value={this.state.username}
-                            onChange={this.handleChange} />
-                    </Field>
-                    <Field name="password" label="Password">
-                        <FormControl
-                            type="password"
-                            placeholder="Password"
-                            required
-                            value={this.state.password}
-                            onChange={this.handleChange} />
-                    </Field>
-                    <FormGroup>
-                        <ControlContainer>
-                            { this.props.authenticating ? (
-                                <Button bsStyle="primary" type="submit">
-                                    <i className="fa fa-fw fa-spinner fa-pulse" />
-                                    { ' ' }
-                                    Signing in...
-                                </Button>
-                            ) : (
-                                <Button bsStyle="primary" type="submit">Sign in</Button>
-                            ) }
-                        </ControlContainer>
-                    </FormGroup>
-                </Form>
-            </div>
+            <Form onSubmit={this.handleSubmit}>
+                <HorizFormGroup
+                    controlId="username"
+                    label="Username"
+                    type="text"
+                    placeholder="Username"
+                    required
+                    value={username}
+                    onChange={this.handleChange}
+                />
+                <HorizFormGroup
+                    controlId="password"
+                    label="Password"
+                    type="password"
+                    placeholder="Password"
+                    required
+                    value={password}
+                    onChange={this.handleChange}
+                />
+                <HorizFormButtonContainer>
+                    { authenticating ? (
+                        <Button varient="primary" type="submit">
+                            <i className="fas fa-fw fa-spinner fa-pulse" />
+                            { ' ' }
+                            Signing in...
+                        </Button>
+                    ) : (
+                        <Button varient="primary" type="submit">Sign in</Button>
+                    ) }
+                </HorizFormButtonContainer>
+            </Form>
         );
     }
 }
-
+LoginForm.propTypes = {
+    authenticating: PropTypes.bool.isRequired,
+    authenticate: PropTypes.func.isRequired,
+};
 
 export class LoginPage extends React.Component {
     constructor(props) {
@@ -80,50 +96,48 @@ export class LoginPage extends React.Component {
     componentDidMount() {
         document.title = 'Sign in | JASMIN Cloud Portal';
         // When the component mounts, reset the error
-        if( this.state.error !== null )
-            this.setState({ error: null });
+        if (this.state.error !== null) this.setState({ error: null });
     }
 
     componentDidUpdate(prevProps) {
         // If transitioning from authenticating to not authenticating, store the error
-        if( prevProps.authenticating && !this.props.authenticating )
+        if (prevProps.authenticating && !this.props.authenticating) {
             this.setState({ error: this.props.authenticationError });
+        }
     }
 
     render() {
         const { username, initialising, ...formProps } = this.props;
+        const { error } = this.state;
         // If there is an active user, redirect to dashboard
-        if( username ) return <Redirect to="/dashboard" />;
+        if (username) return <Redirect to="/dashboard" />;
         // If we are still initialising, don't render yet
-        if( initialising ) return <Loading message="Initialising..." />;
+        if (initialising) return <Loading message="Initialising..." />;
         return (
             <div>
-                <h1>Sign in with your JASMIN account</h1>
+                <Row><h1>Sign in with your JASMIN account</h1></Row>
                 <Row>
-                    <Col md={8} mdOffset={2}>
-                        <div className="banner banner-warning text-center">
-                            This is the same username and password as you use to sign
-                            in to the JASMIN Accounts Portal.
-                        </div>
-                    </Col>
+                    <Alert>
+                        This is the same username and password as you use to sign
+                        in to the JASMIN Accounts Portal.
+                    </Alert>
                 </Row>
-                {this.state.error && (
+                {error && (
                     <Row>
-                        <Col md={6} mdOffset={3}>
-                            <div
-                              role="notification"
-                              className="notification notification-inline notification-danger">
-                                <div className="notification-content">{this.state.error.message}</div>
-                            </div>
-                        </Col>
+                        <Alert variant="warning">
+                            <p>{error.message}</p>
+                        </Alert>
                     </Row>
                 )}
                 <Row>
-                    <Col md={8} mdOffset={2}>
-                        <LoginForm {...formProps} />
-                    </Col>
+                    <LoginForm {...formProps} />
                 </Row>
             </div>
         );
     }
 }
+LoginPage.propTypes = {
+    username: PropTypes.string,
+    initialising: PropTypes.bool,
+    authenticating: PropTypes.bool,
+};

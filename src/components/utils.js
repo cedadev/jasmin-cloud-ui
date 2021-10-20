@@ -4,12 +4,15 @@
 
 import React from 'react';
 import {
-    FormGroup, HelpBlock, Form as BSForm
+    FormGroup,
+    Form as BSForm,
+    Row,
+    Col,
 } from 'react-bootstrap';
 
 import $ from 'jquery';
 import 'bootstrap-select';
-
+import PropTypes from 'prop-types';
 
 /**
  * This function takes an "actions" object, which is a map of name => function,
@@ -47,7 +50,6 @@ export function Loading(props) {
     );
 }
 
-
 /**
  * React component for a form that can be disabled.
  *
@@ -68,7 +70,6 @@ export function Form(props) {
         </BSForm>
     );
 }
-
 
 /**
  * React component for a Bootstrap formatted form field. The actual form elements
@@ -92,9 +93,10 @@ export function Field(props) {
     } = props;
     return (
         <FormGroup
-          controlId={name}
-          className={required && 'required'}
-          validationState={errors.length > 0 ? 'error' : null}>
+            controlId={name}
+            className={required && 'required'}
+            validationState={errors.length > 0 ? 'error' : null}
+        >
             {label && <BSForm.Label>{label}</BSForm.Label>}
             <ControlContainer>
                 {children}
@@ -104,7 +106,6 @@ export function Field(props) {
         </FormGroup>
     );
 }
-
 
 /**
  * React component for a control container.
@@ -121,7 +122,6 @@ export function ControlContainer(props) {
     );
 }
 
-
 /**
  * React component for a rich select
  *
@@ -129,13 +129,13 @@ export function ControlContainer(props) {
  */
 export class RichSelect extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = { open: false };
         this.selectInput = React.createRef();
     }
 
     componentDidMount() {
-        var select = $(this.selectInput.current);
+        const select = $(this.selectInput.current);
         select.selectpicker();
 
         // Attach event handlers
@@ -143,7 +143,7 @@ export class RichSelect extends React.Component {
         $('html').click(() => this.setState({ open: false }));
         // If another bootstrap-select receives focus, close
         $('body').on('focus', '.bootstrap-select .btn', (e) => {
-            if( $(e.target).is(button) ) return;
+            if ($(e.target).is(button)) return;
             this.setState({ open: false });
         });
         button.click((e) => {
@@ -157,7 +157,7 @@ export class RichSelect extends React.Component {
     }
 
     componentDidUpdate() {
-        var select = $(this.selectInput.current)
+        const select = $(this.selectInput.current);
         select.selectpicker('refresh');
         select.parent().toggleClass('open', this.state.open);
     }
@@ -177,3 +177,46 @@ export class RichSelect extends React.Component {
         );
     }
 }
+
+/* React component for a Bootstrap5 Horizontal Form Group Row. */
+export function HorizFormGroup(props) {
+    const {
+        controlId,
+        className = 'mb-3',
+        label,
+        ...rest
+    } = props;
+    return (
+        <BSForm.Group as={Row} className={className} controlId={controlId}>
+            <BSForm.Label column sm={2}>{label}</BSForm.Label>
+            <Col sm={10}>
+                <BSForm.Control
+                    {...rest}
+                />
+            </Col>
+        </BSForm.Group>
+    );
+}
+HorizFormGroup.propTypes = {
+    controlId: PropTypes.string.isRequired,
+    className: PropTypes.string,
+    label: PropTypes.string.isRequired,
+};
+HorizFormGroup.defaultProps = {
+    className: 'mb-3',
+};
+
+/* React component to contain a bootstrap5 horizontal form group Submit Button */
+export function HorizFormButtonContainer(props) {
+    const { children } = props;
+    return (
+        <BSForm.Group as={Row} className="justify-content-end">
+            <Col sm="10">
+                {children}
+            </Col>
+        </BSForm.Group>
+    );
+}
+HorizFormButtonContainer.propTypes = {
+    children: PropTypes.node.isRequired,
+};
