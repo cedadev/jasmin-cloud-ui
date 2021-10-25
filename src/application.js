@@ -8,9 +8,6 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import get from 'lodash/get';
-import sortBy from 'lodash/get';
-
 import { actionCreators as sessionActions } from './redux/session';
 import { actionCreators as tenancyActions } from './redux/tenancies';
 import { actionCreators as notificationActions } from './redux/notifications';
@@ -122,10 +119,10 @@ const TenancyClustersPage = (props) => (
 export class Application extends React.Component {
     render() {
         return (
-            <div>
+            <>
                 <ConnectedNav />
+                <CookielawBanner />
                 <Container>
-                    <CookielawBanner />
                     <ConnectedNotifications />
                     <Switch>
                         <Route exact path="/" component={SplashPage} />
@@ -138,7 +135,7 @@ export class Application extends React.Component {
                         <Route component={NotFound} />
                     </Switch>
                 </Container>
-            </div>
+            </>
         );
     }
 }

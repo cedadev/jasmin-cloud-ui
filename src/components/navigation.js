@@ -62,15 +62,13 @@ export const Navigation = (props) => {
                     </Nav>
                     <Nav className="ms-auto">
                         {props.username ? (
-                            <Navbar.Text pullRight>
-                                Signed in as
-                                {' '}
-                                <strong>{props.username}</strong>
-                                {'\u00A0'}
-                                (
-                                <Nav.Link onClick={props.signOut}>sign out</Nav.Link>
-                                )
-                            </Navbar.Text>
+                            <NavDropdown title={props.username} id="user-dropdown">
+                                <NavDropdown.Item
+                                    onClick={props.signOut}
+                                >
+                                    Sign out
+                                </NavDropdown.Item>
+                            </NavDropdown>
                         ) : (
                             <LinkContainer to="/login">
                                 <Nav.Link>Sign In</Nav.Link>

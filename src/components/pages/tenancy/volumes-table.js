@@ -4,8 +4,7 @@
 
 import React from 'react';
 import {
-    Table, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal,
-    DropdownButton, Nav
+    Table, Button, Modal, Dropdown
 } from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
@@ -14,14 +13,14 @@ import { bindArgsToActions } from '../../utils';
 
 import { AttachVolumeMenuItem } from './attach-volume-modal';
 
-
 class ConfirmDeleteMenuItem extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = { visible: false };
     }
 
     open = () => this.setState({ visible: true });
+
     close = () => this.setState({ visible: false });
 
     onConfirm = () => {
@@ -32,20 +31,25 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <Nav.Item
-                  className="danger"
-                  disabled={this.props.disabled}
-                  onSelect={this.open}>
+                <Dropdown.Item
+                    className="text-danger"
+                    disabled={this.props.disabled}
+                    onClick={this.open}
+                >
                     Delete volume
-                </Nav.Item>
+                </Dropdown.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
-                        <p>Are you sure you want to delete {this.props.name}?</p>
+                        <p>
+                            Are you sure you want to delete
+                            {this.props.name}
+                            ?
+                        </p>
                         <p><strong>Once deleted, a volume cannot be restored.</strong></p>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button onClick={this.close}>Cancel</Button>
-                        <Button bsStyle="danger" onClick={this.onConfirm}>Delete volume</Button>
+                        <Button variant="danger" onClick={this.onConfirm}>Delete volume</Button>
                     </Modal.Footer>
                 </Modal>
             </>
@@ -55,14 +59,14 @@ class ConfirmDeleteMenuItem extends React.Component {
 
 function VolumeStatus(props) {
     const statusStyleMap = {
-        'CREATING': 'info',
-        'AVAILABLE': 'success',
-        'ATTACHING': 'warning',
-        'DETACHING': 'warning',
-        'IN_USE': 'success',
-        'DELETING': 'danger',
-        'ERROR': 'danger',
-        'OTHER': 'warning'
+        CREATING: 'info',
+        AVAILABLE: 'success',
+        ATTACHING: 'warning',
+        DETACHING: 'warning',
+        IN_USE: 'success',
+        DELETING: 'danger',
+        ERROR: 'danger',
+        OTHER: 'warning'
     };
     return (
         <span className={`resource-status text-${statusStyleMap[props.status]}`}>
@@ -72,55 +76,66 @@ function VolumeStatus(props) {
 }
 
 function VolumeActionsDropdown(props) {
-    const buttonTitle = props.disabled ?
-        <span>
-            <i className="fa fa-fw fa-spinner fa-pulse" />
-            <span className="sr-only">Working...</span>
-        </span> :
-        'Actions...';
+    const buttonTitle = props.disabled
+        ? (
+            <span>
+                <i className="fas fa-fw fa-spinner fa-pulse" />
+                <span className="sr-only">Working...</span>
+            </span>
+        )
+        : 'Actions...';
     return (
-        <DropdownButton
-          id={`volume-actions-${props.volume.id}`}
-          bsStyle="default"
-          block
-          title={buttonTitle}
-          pullRight
-          disabled={props.disabled}>
-            <AttachVolumeMenuItem
-              volume={props.volume}
-              machines={props.machines}
-              attach={(mid) => props.volumeActions.update({ machine_id: mid })} />
-            <Nav.Item
-              disabled={!props.volume.machine}
-              onSelect={() => props.volumeActions.update({ machine_id: null })}>
-                Detach volume from machine
-            </Nav.Item>
-            <ConfirmDeleteMenuItem
-              name={props.volume.name}
-              disabled={!['AVAILABLE', 'ERROR'].includes(props.volume.status.toUpperCase())}
-              onConfirm={props.volumeActions.delete} />
-        </DropdownButton>
+        <Dropdown className="ms-auto">
+            <Dropdown.Toggle
+                id={`volume-actions-${props.volume.id}`}
+                disabled={props.disabled}
+            >
+                {buttonTitle}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+                <AttachVolumeMenuItem
+                    volume={props.volume}
+                    machines={props.machines}
+                    attach={(mid) => props.volumeActions.update({ machine_id: mid })}
+                />
+                <Dropdown.Item
+                    disabled={!props.volume.machine}
+                    onSelect={() => props.volumeActions.update({ machine_id: null })}
+                >
+                    Detach volume from machine
+                </Dropdown.Item>
+                <ConfirmDeleteMenuItem
+                    name={props.volume.name}
+                    disabled={!['AVAILABLE', 'ERROR'].includes(props.volume.status.toUpperCase())}
+                    onConfirm={props.volumeActions.delete}
+                />
+            </Dropdown.Menu>
+        </Dropdown>
     );
 }
 
 function VolumeRow(props) {
-    const volume = props.volume;
+    const { volume } = props;
     const status = volume.status.toUpperCase();
-    const highlightClass = (status === 'CREATING') ?
-        'info' :
-        ((status === 'DELETING') ?
-            'danger' :
-            (['ATTACHING', 'DETACHING'].includes(status) ||
-             !!volume.updating ||
-             !!volume.deleting
+    const highlightClass = (status === 'CREATING')
+        ? 'info'
+        : ((status === 'DELETING')
+            ? 'danger'
+            : (['ATTACHING', 'DETACHING'].includes(status)
+             || !!volume.updating
+             || !!volume.deleting
             ) && 'warning');
     // Try and find the attached machine
     const attachedTo = (props.machines.data || {})[(volume.machine || {}).id];
     return (
-        <tr className={highlightClass || undefined}>
+        <tr className={`table-${highlightClass || undefined}`}>
             <td>{volume.name}</td>
             <td><VolumeStatus status={volume.status} /></td>
-            <td>{volume.size} GB</td>
+            <td>
+                {volume.size}
+                {' '}
+                GB
+            </td>
             <td>
                 {attachedTo ? (
                     `Attached to ${(attachedTo || {}).name || '-'} on ${volume.device}`
@@ -128,12 +143,13 @@ function VolumeRow(props) {
                     '-'
                 )}
             </td>
-            <td className="resource-actions">
+            <td className="d-flex">
                 <VolumeActionsDropdown
-                  disabled={!!highlightClass}
-                  volume={volume}
-                  machines={props.machines}
-                  volumeActions={props.volumeActions} />
+                    disabled={!!highlightClass}
+                    volume={volume}
+                    machines={props.machines}
+                    volumeActions={props.volumeActions}
+                />
             </td>
         </tr>
     );
@@ -153,7 +169,7 @@ export class VolumesTable extends React.Component {
     }
 
     componentWillUnmount() {
-        document.body.classList.remove('resource-page')
+        document.body.classList.remove('resource-page');
     }
 
     render() {
@@ -162,7 +178,10 @@ export class VolumesTable extends React.Component {
         return (
             <Table striped hover responsive>
                 <caption>
-                    {volumes.length} volume{volumes.length !== 1 && 's'}
+                    {volumes.length}
+                    {' '}
+                    volume
+                    {volumes.length !== 1 && 's'}
                 </caption>
                 <thead>
                     <tr>
@@ -170,17 +189,18 @@ export class VolumesTable extends React.Component {
                         <th>Status</th>
                         <th>Size</th>
                         <th>Attached To</th>
-                        <th></th>
+                        <th />
                     </tr>
                 </thead>
                 <tbody>
-                    {volumes.map(volume =>
+                    {volumes.map((volume) => (
                         <VolumeRow
-                          key={volume.id}
-                          volume={volume}
-                          machines={this.props.machines}
-                          volumeActions={bindArgsToActions(this.props.volumeActions, volume.id)} />
-                    )}
+                            key={volume.id}
+                            volume={volume}
+                            machines={this.props.machines}
+                            volumeActions={bindArgsToActions(this.props.volumeActions, volume.id)}
+                        />
+                    ))}
                 </tbody>
             </Table>
         );

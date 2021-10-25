@@ -6,7 +6,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import React from 'react';
 import {
-    Row, Col, Alert, ListGroup, ListGroupItem
+    Row, Col, Alert, ListGroup, Card,
 } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -24,26 +24,30 @@ export class Dashboard extends React.Component {
             const sorted = Object.values(tenancies)
                 .sort((x, y) => (x.name < y.name ? -1 : (x.name > y.name ? 1 : 0)));
             return (
-                <div>
-                    <h1>Dashboard</h1>
-                    <Row>
-                        <Col md={6} mdOffset={3}>
-                            <Alert>
-                                <Alert.Heading>Available tenancies</Alert.Heading>
+                <>
+                    <Row><h1>Dashboard</h1></Row>
+                    <Row className="justify-content-center">
+                        <Col md={6}>
+                            <Card>
+                                <Card.Header>Available tenancies</Card.Header>
                                 <ListGroup fill="true">
                                     {sorted.map((t) => (
                                         <LinkContainer
                                             key={t.id}
                                             to={`/tenancies/${t.id}`}
                                         >
-                                            <ListGroupItem>{t.name}</ListGroupItem>
+                                            <ListGroup.Item
+                                                action
+                                            >
+                                                {t.name}
+                                            </ListGroup.Item>
                                         </LinkContainer>
                                     ))}
                                 </ListGroup>
-                            </Alert>
+                            </Card>
                         </Col>
                     </Row>
-                </div>
+                </>
             );
         }
         if (fetching) {

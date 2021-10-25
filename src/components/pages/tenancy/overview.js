@@ -3,10 +3,9 @@
  */
 
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Card, Col } from 'react-bootstrap';
 
 import { ResourcePanel } from './resource-utils';
-
 
 class QuotaProgressCircle extends React.Component {
     // Initial animation code lifted from https://github.com/iqnivek/react-circular-progressbar
@@ -17,9 +16,9 @@ class QuotaProgressCircle extends React.Component {
 
     setFraction = () => this.setState({
         fraction: (
-            this.props.quota.allocated > 0 ?
-                this.props.quota.used / this.props.quota.allocated :
-                0
+            this.props.quota.allocated > 0
+                ? this.props.quota.used / this.props.quota.allocated
+                : 0
         )
     })
 
@@ -32,7 +31,7 @@ class QuotaProgressCircle extends React.Component {
     componentDidUpdate = (prevProps) => {
         const usageChanged = prevProps.quota.used !== this.props.quota.used;
         const allocationChanged = prevProps.quota.allocated !== this.props.quota.allocated;
-        if( usageChanged || allocationChanged ) this.setFraction();
+        if (usageChanged || allocationChanged) this.setFraction();
     }
 
     componentWillUnmount = () => {
@@ -56,35 +55,39 @@ class QuotaProgressCircle extends React.Component {
             a ${radius},${radius} 0 1 1 0,-${2 * radius}
         `;
         return (
-            <div className="quota-progress">
-                <Alert>
-                    <Alert.Heading as='h3'>
-                        {title}
-                    </Alert.Heading>
+            <Col xs>
+                <Card>
+                    <Card.Header>{title}</Card.Header>
+                    <Card.Body className="col-md">
                         <svg viewBox="0 0 100 100">
                             <path
-                            className="quota-progress-background"
-                            strokeWidth={strokeWidth}
-                            d={pathDescription}
-                            fillOpacity={0} />
+                                className="stroke-light"
+                                strokeWidth={strokeWidth}
+                                d={pathDescription}
+                                fillOpacity={0}
+                            />
                             <path
-                            className={`quota-progress-bar ${context}`}
-                            strokeWidth={strokeWidth}
-                            d={pathDescription}
-                            fillOpacity={0}
-                            strokeDasharray={circumference}
-                            strokeDashoffset={(1 - this.state.fraction) * circumference} />
-                            <text className="quota-progress-text" x={50} y={50}>
-                                {percent}%
+                                className={`stroke-${context}`}
+                                strokeWidth={strokeWidth}
+                                d={pathDescription}
+                                fillOpacity={0}
+                                strokeDasharray={circumference}
+                                strokeDashoffset={(1 - this.state.fraction) * circumference}
+                            />
+                            <text className="fs-4 text-secondary svg-text-center" x={50} y={50}>
+                                {percent}
+                                %
                             </text>
                         </svg>
-                    {label}
-                </Alert>
-            </div>
+                    </Card.Body>
+                    <Card.Footer>
+                        {label}
+                    </Card.Footer>
+                </Card>
+            </Col>
         );
     }
 }
-
 
 const Quotas = (props) => (
     <>
@@ -97,22 +100,23 @@ const Quotas = (props) => (
     </>
 );
 
-
 export class TenancyOverviewPanel extends React.Component {
     setPageTitle = () => {
         document.title = `Overview | ${this.props.tenancy.name} | JASMIN Cloud Portal`;
     }
 
     componentDidMount = () => this.setPageTitle()
+
     componentDidUpdate = () => this.setPageTitle()
 
     render() {
         return (
             <ResourcePanel
-              resource={this.props.tenancy.quotas}
-              resourceActions={this.props.tenancyActions.quota}
-              resourceName="quota information"
-              className="quotas-wrapper">
+                resource={this.props.tenancy.quotas}
+                resourceActions={this.props.tenancyActions.quota}
+                resourceName="quota information"
+                className="quotas-wrapper"
+            >
                 <Quotas />
             </ResourcePanel>
         );

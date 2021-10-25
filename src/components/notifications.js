@@ -3,38 +3,27 @@
  */
 
 import React from 'react';
-import { TransitionGroup, CSSTransition } from 'react-transition-group';
-
+import { ToastContainer, Toast } from 'react-bootstrap';
 
 const Notification = (props) => (
-    <div
-      role="notification"
-      className={`notification notification-${props.notification.context}`}>
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={props.remove}>
-            <i className="fa fa-fw fa-times" aria-hidden="true" />
-            <span className="sr-only">Close</span>
-        </button>
-        <div className="notification-content">{props.notification.message}</div>
-    </div>
+    <Toast
+        bg={props.notification.context}
+        onClose={props.remove}
+    >
+        <Toast.Header><span className="me-auto" /></Toast.Header>
+        <Toast.Body className={props.notification.context === 'danger' && 'text-white'}>
+            {props.notification.message}
+        </Toast.Body>
+    </Toast>
 );
 
-
 export const Notifications = (props) => (
-    <div className="notification-container">
-        <TransitionGroup>
-            {props.notifications.map((notification, i) =>
-                <CSSTransition
-                  key={i}
-                  classNames="notification"
-                  timeout={{ enter: 300, exit: 300 }}>
-                    <Notification
-                      notification={notification}
-                      remove={() => props.notificationActions.remove(i)} />
-                </CSSTransition>
-            )}
-        </TransitionGroup>
-    </div>
+    <ToastContainer className="position-absolute m-2 end-0" style={{ zIndex: '1' }}>
+        {props.notifications.map((notification, i) => (
+            <Notification
+                notification={notification}
+                remove={() => props.notificationActions.remove(i)}
+            />
+        ))}
+    </ToastContainer>
 );

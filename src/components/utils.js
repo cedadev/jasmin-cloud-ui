@@ -11,7 +11,6 @@ import {
 } from 'react-bootstrap';
 
 import $ from 'jquery';
-import 'bootstrap-select';
 import PropTypes from 'prop-types';
 
 /**
@@ -178,32 +177,68 @@ export class RichSelect extends React.Component {
     }
 }
 
+/* React component to contain a Bootstrap5 Horizontal form Group Row */
+export function HorizFormGroupContainer(props) {
+    const {
+        controlId,
+        className = 'mb-3',
+        label,
+        labelWidth = 2,
+        children,
+    } = props;
+    const controlWidth = 12 - labelWidth;
+    return (
+        <BSForm.Group as={Row} className={className} controlId={controlId}>
+            <BSForm.Label column sm={labelWidth}>{label}</BSForm.Label>
+            <Col sm={controlWidth}>
+                {children}
+            </Col>
+        </BSForm.Group>
+    );
+}
+HorizFormGroupContainer.propTypes = {
+    children: PropTypes.node.isRequired,
+    controlId: PropTypes.string.isRequired,
+    className: PropTypes.string,
+    label: PropTypes.string.isRequired,
+    labelWidth: PropTypes.number,
+};
+HorizFormGroupContainer.defaultProps = {
+    className: 'mb-3',
+    labelWidth: 2,
+};
+
 /* React component for a Bootstrap5 Horizontal Form Group Row. */
 export function HorizFormGroup(props) {
     const {
         controlId,
         className = 'mb-3',
         label,
+        labelWidth = 2,
         ...rest
     } = props;
     return (
-        <BSForm.Group as={Row} className={className} controlId={controlId}>
-            <BSForm.Label column sm={2}>{label}</BSForm.Label>
-            <Col sm={10}>
-                <BSForm.Control
-                    {...rest}
-                />
-            </Col>
-        </BSForm.Group>
+        <HorizFormGroupContainer
+            controlId={controlId}
+            className={className}
+            label={label}
+            labelWidth={labelWidth}
+        >
+            <BSForm.Control
+                {...rest}
+            />
+        </HorizFormGroupContainer>
     );
 }
 HorizFormGroup.propTypes = {
     controlId: PropTypes.string.isRequired,
     className: PropTypes.string,
     label: PropTypes.string.isRequired,
+    labelWidth: PropTypes.number,
 };
 HorizFormGroup.defaultProps = {
     className: 'mb-3',
+    labelWidth: 2,
 };
 
 /* React component to contain a bootstrap5 horizontal form group Submit Button */

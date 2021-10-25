@@ -4,14 +4,15 @@
 
 import React from 'react';
 
-import { Row, Col, ButtonGroup, Button, FormControl, InputGroup } from 'react-bootstrap';
+import {
+    Row, Col, ButtonGroup, Button, Form, InputGroup
+} from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
 import startsWith from 'lodash/startsWith';
 
 import { Loading, RichSelect } from '../../utils';
-
 
 export const ResourcePanel = (props) => {
     const {
@@ -25,47 +26,51 @@ export const ResourcePanel = (props) => {
     } = props;
     return (
         data ? (
-            <div className={className || undefined}>
-                <Row>
-                    <Col md={12}>
-                        <ButtonGroup className="pull-right">
+            <>
+                <Row className="justify-content-end">
+                    <div className="py-2 d-block">
+                        <ButtonGroup className="float-end">
                             {CreateButtonComponent && (
                                 <CreateButtonComponent
-                                  creating={creating}
-                                  create={resourceActions.create}
-                                  {...createButtonExtraProps} />
+                                    creating={creating}
+                                    create={resourceActions.create}
+                                    {...createButtonExtraProps}
+                                />
                             )}
                             <Button
-                              bsStyle="info"
-                              disabled={fetching}
-                              onClick={resourceActions.fetchList}
-                              title={`Refresh ${resourceName}`}>
-                                <i className={`fa fa-refresh ${fetching ? 'fa-spin' : ''}`}></i>
+                                variant="info"
+                                disabled={fetching}
+                                onClick={resourceActions.fetchList}
+                                title={`Refresh ${resourceName}`}
+                            >
+                                <i className={`fas fa-sync ${fetching ? 'fa-spin' : ''}`} />
                                 {'\u00A0'}
                                 Refresh
                             </Button>
                         </ButtonGroup>
-                    </Col>
+                    </div>
                 </Row>
                 <Row>
-                    <Col md={12}>
-                        {React.Children.map(
-                            children,
-                            c => React.cloneElement(c, { resourceData: data, resourceActions })
-                        )}
-                    </Col>
+                    {React.Children.map(
+                        children,
+                        (c) => React.cloneElement(c, { resourceData: data, resourceActions })
+                    )}
                 </Row>
-            </div>
+            </>
         ) : (
             <Row>
-                <Col md={6} mdOffset={3}>
+                <Col md={6}>
                     {fetching ? (
                         <Loading message={`Loading ${resourceName}...`} />
                     ) : (
                         <div
-                          role="notification"
-                          className="notification notification-inline notification-danger">
-                            <div className="notification-content">Unable to load {resourceName}</div>
+                            role="notification"
+                            className="notification notification-inline notification-danger"
+                        >
+                            <div className="notification-content">
+                                Unable to load
+                                {resourceName}
+                            </div>
                         </div>
                     )}
                 </Col>
@@ -73,7 +78,6 @@ export const ResourcePanel = (props) => {
         )
     );
 };
-
 
 const ResourceSelectControl = (props) => {
     const {
@@ -89,34 +93,49 @@ const ResourceSelectControl = (props) => {
     const resources = sortResources(Object.values(data)).filter(resourceFilter);
     const startsWithVowel = (string) => ['a', 'e', 'i', 'o', 'u'].some((c) => startsWith(string, c));
     return data ? (
-        <FormControl
-          componentClass={RichSelect}
-          disabled={isEmpty(resources)}
-          {...rest}>
+        <Form.Select
+            disabled={isEmpty(resources)}
+            {...rest}
+        >
             {isEmpty(resources) ? (
-                <option value="">No {resourceNamePlural} available</option>
+                <option value="">
+                    No
+                    {resourceNamePlural}
+                    {' '}
+                    available
+                </option>
             ) : (
-                <option value="">Select a{startsWithVowel(resourceName) ? 'n' : ''} {resourceName}...</option>
+                <option value="">
+                    Select a
+                    {startsWithVowel(resourceName) ? 'n' : ''}
+                    {' '}
+                    {resourceName}
+                    ...
+                </option>
             )}
             {resources.map(resourceToOption)}
-        </FormControl>
+        </Form.Select>
     ) : (
         fetching ? (
-            <FormControl.Static>
+            <Form.Text>
                 <i className="fa fa-spinner fa-pulse" />
                 {'\u00A0'}
-                Loading {resourceNamePlural}...
-            </FormControl.Static>
+                Loading
+                {' '}
+                {resourceNamePlural}
+                ...
+            </Form.Text>
         ) : (
-            <FormControl.Static className="text-danger">
+            <Form.Text className="text-danger">
                 <i className="fa fa-exclamation-triangle" />
                 {'\u00A0'}
-                Failed to load {resourceNamePlural}
-            </FormControl.Static>
+                Failed to load
+                {' '}
+                {resourceNamePlural}
+            </Form.Text>
         )
     );
 };
-
 
 export const ImageSelectControl = (props) => (
     <ResourceSelectControl resourceName="image" {...props} />
@@ -127,17 +146,21 @@ export const SizeSelectControl = (props) => (
         resourceName="size"
         resourceToOption={(s) => (
             <option
-              key={s.id}
-              value={s.id}
-              data-subtext={`${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`}>
+                key={s.id}
+                value={s.id}
+                data-subtext={`${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`}
+            >
                 {s.name}
             </option>
         )}
         sortResources={(sizes) => sortBy(sizes, ['cpus', 'ram', 'disk'])}
-        {...props} />
+        {...props}
+    />
 );
 
-export const ExternalIpSelectControl = ({ value, resource, resourceActions, ...props }) => (
+export const ExternalIpSelectControl = ({
+    value, resource, resourceActions, ...props
+}) => (
     <InputGroup>
         <ResourceSelectControl
             resource={resource}
@@ -150,13 +173,15 @@ export const ExternalIpSelectControl = ({ value, resource, resourceActions, ...p
             // The currently selected IP should be permitted, regardless of state
             resourceFilter={(ip) => (ip.external_ip === value) || (!ip.updating && !ip.machine)}
             value={value}
-            {...props} />
+            {...props}
+        />
         <InputGroup.Button>
             <Button
-              bsStyle="success"
-              disabled={props.disabled || resource.creating}
-              onClick={() => resourceActions.create()}
-              title="Allocate new IP">
+                variant="success"
+                disabled={props.disabled || resource.creating}
+                onClick={() => resourceActions.create()}
+                title="Allocate new IP"
+            >
                 {resource.creating ? (
                     <i className="fa fa-fw fa-spinner fa-pulse" />
                 ) : (
