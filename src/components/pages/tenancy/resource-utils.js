@@ -126,6 +126,13 @@ const ResourceSelectControl = (props) => {
         return (
             <Select
                 name={name}
+                styles={{
+                    control: (provided) => {
+                        const borderRadius = 0;
+                        return { ...provided, borderRadius };
+                    }
+                }}
+                className="flex-fill"
                 inputId={name}
                 options={optionArray}
                 getOptionLabel={(options) => `${options.title} ${options.subTitle}`}

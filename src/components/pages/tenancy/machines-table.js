@@ -225,8 +225,9 @@ function MachineRow(props) {
             <td>{machine.internal_ip || '-'}</td>
             <td>{(externalIp || {}).external_ip || '-'}</td>
             <td>{moment(machine.created).fromNow()}</td>
-            <td className="d-flex">
+            <td>
                 <MachineActionsDropdown
+                    className="float-end"
                     disabled={!!highlightClass}
                     machine={machine}
                     machineExternalIp={(externalIp || {}).external_ip}

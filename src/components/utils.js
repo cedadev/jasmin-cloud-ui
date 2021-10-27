@@ -185,27 +185,39 @@ export function HorizFormGroupContainer(props) {
         label,
         labelWidth = 2,
         children,
+        helpText,
     } = props;
     const controlWidth = 12 - labelWidth;
     return (
-        <BSForm.Group as={Row} className={className} controlId={controlId}>
+        <BSForm.Group
+            as={Row}
+            className={className}
+            controlId={controlId || undefined}
+        >
             <BSForm.Label column sm={labelWidth}>{label}</BSForm.Label>
             <Col sm={controlWidth}>
                 {children}
+                {helpText ? <BSForm.Text>{helpText}</BSForm.Text> : ''}
             </Col>
         </BSForm.Group>
     );
 }
 HorizFormGroupContainer.propTypes = {
     children: PropTypes.node.isRequired,
-    controlId: PropTypes.string.isRequired,
+    controlId: PropTypes.string,
     className: PropTypes.string,
     label: PropTypes.string.isRequired,
     labelWidth: PropTypes.number,
+    helpText: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.element,
+    ]),
 };
 HorizFormGroupContainer.defaultProps = {
     className: 'mb-3',
     labelWidth: 2,
+    helpText: '',
+    controlId: '',
 };
 
 /* React component for a Bootstrap5 Horizontal Form Group Row. */
