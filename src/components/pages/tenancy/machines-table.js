@@ -5,7 +5,7 @@
 import React from 'react';
 import {
     Table, Button, ProgressBar, OverlayTrigger, Tooltip, Popover, Modal,
-    Dropdown, Nav
+    Dropdown
 } from 'react-bootstrap';
 
 import moment from 'moment';
@@ -34,13 +34,14 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <Dropdown.Item className="text-danger" onSelect={this.open}>
+                <Dropdown.Item className="text-danger" onClick={this.open}>
                     Delete machine
                 </Dropdown.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>
                             Are you sure you want to delete
+                            {' '}
                             {this.props.name}
                             ?
                         </p>
@@ -158,7 +159,7 @@ function MachineActionsDropdown(props) {
                     disabled={!!props.machineExternalIp || !props.machine.nat_allowed}
                 />
                 <Dropdown.Item
-                    onSelect={() => props.externalIpActions.update(
+                    onClick={() => props.externalIpActions.update(
                         props.machineExternalIp,
                         { machine_id: null }
                     )}
@@ -167,19 +168,19 @@ function MachineActionsDropdown(props) {
                     Detach external IP
                 </Dropdown.Item>
                 <Dropdown.Item
-                    onSelect={props.machineActions.start}
+                    onClick={props.machineActions.start}
                     disabled={props.machine.status.name === 'ACTIVE'}
                 >
                     Start machine
                 </Dropdown.Item>
                 <Dropdown.Item
-                    onSelect={props.machineActions.stop}
+                    onClick={props.machineActions.stop}
                     disabled={props.machine.status.name !== 'ACTIVE'}
                 >
                     Stop machine
                 </Dropdown.Item>
                 <Dropdown.Item
-                    onSelect={props.machineActions.restart}
+                    onClick={props.machineActions.restart}
                     disabled={props.machine.status.name !== 'ACTIVE'}
                 >
                     Restart machine
@@ -210,7 +211,7 @@ function MachineRow(props) {
             ) && 'warning')
         );
     return (
-        <tr className={highlightClass || undefined}>
+        <tr className={`table-${highlightClass || undefined}`}>
             <td>{machine.name}</td>
             <td>{(machine.image || {}).name || '-'}</td>
             <td>{machine.size ? <MachineSize machine={machine} size={machine.size} /> : '-'}</td>
@@ -218,7 +219,7 @@ function MachineRow(props) {
             <td>{machine.power_state}</td>
             <td>
                 {machine.task
-                    ? <ProgressBar active striped label={machine.task} now={100} />
+                    ? <ProgressBar striped label={machine.task} now={100} />
                     : '-'}
             </td>
             <td>{machine.internal_ip || '-'}</td>

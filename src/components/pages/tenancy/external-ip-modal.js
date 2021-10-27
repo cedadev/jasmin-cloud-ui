@@ -4,12 +4,12 @@
 
 import React from 'react';
 import {
-    Nav, Modal, Button, FormControl, Dropdown
+    Modal, Button, Form, Dropdown
 } from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 
-import { Form, Field, RichSelect } from '../../utils';
+import { HorizFormGroupContainer } from '../../utils';
 import { ExternalIpSelectControl } from './resource-utils';
 
 export class AttachExternalIpMenuItem extends React.Component {
@@ -24,10 +24,12 @@ export class AttachExternalIpMenuItem extends React.Component {
 
     handleChange = (e) => this.setState({ [e.target.id]: e.target.value });
 
+    handleSelectChange = (value, { name }) => this.setState({ [name]: value });
+
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.externalIpActions.update(
-            this.state.externalIp,
+            this.state.externalIp.value,
             { machine_id: this.props.machine.id }
         );
         this.close();
@@ -44,7 +46,7 @@ export class AttachExternalIpMenuItem extends React.Component {
             .filter((ip) => !ip.updating && !ip.machine);
         return (
             <>
-                <Dropdown.Item onSelect={this.open} disabled={disabled}>
+                <Dropdown.Item onClick={this.open} disabled={disabled}>
                     Attach external IP
                 </Dropdown.Item>
                 <Modal
@@ -59,20 +61,23 @@ export class AttachExternalIpMenuItem extends React.Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Form
-                        horizontal
                         disabled={!!externalIps.creating}
                         onSubmit={this.handleSubmit}
                     >
                         <Modal.Body>
-                            <Field name="externalIp" label="External IP">
+                            <HorizFormGroupContainer
+                                controlId="externalIp"
+                                label="External IP"
+                                labelWidth={4}
+                            >
                                 <ExternalIpSelectControl
                                     resource={externalIps}
                                     resourceActions={externalIpActions}
                                     required
                                     value={this.state.externalIp}
-                                    onChange={this.handleChange}
+                                    onChange={this.handleSelectChange}
                                 />
-                            </Field>
+                            </HorizFormGroupContainer>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button
@@ -80,7 +85,7 @@ export class AttachExternalIpMenuItem extends React.Component {
                                 type="submit"
                                 disabled={isEmpty(availableIps)}
                             >
-                                <i className="fa fa-check" />
+                                <i className="fas fa-check" />
                                 {'\u00A0'}
                                 Attach IP
                             </Button>

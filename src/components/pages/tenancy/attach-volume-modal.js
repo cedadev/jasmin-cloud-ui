@@ -24,9 +24,11 @@ export class AttachVolumeMenuItem extends React.Component {
 
     handleChange = (e) => this.setState({ [e.target.id]: e.target.value });
 
+    handleSelectChange = (value, { name }) => this.setState({ [name]: value });
+
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.attach(this.state.machine);
+        this.props.attach(this.state.machine.value);
         this.close();
     }
 
@@ -65,7 +67,7 @@ export class AttachVolumeMenuItem extends React.Component {
                                     resource={this.props.machines}
                                     required
                                     value={this.state.machine}
-                                    onChange={this.handleChange}
+                                    onChange={this.handleSelectChange}
                                 />
                             </HorizFormGroupContainer>
                         </Modal.Body>

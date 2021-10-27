@@ -11,8 +11,9 @@ import {
 import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
 import startsWith from 'lodash/startsWith';
+import Select, { components } from 'react-select';
 
-import { Loading, RichSelect } from '../../utils';
+import { Loading } from '../../utils';
 
 export const ResourcePanel = (props) => {
     const {
@@ -64,7 +65,6 @@ export const ResourcePanel = (props) => {
                         <Loading message={`Loading ${resourceName}...`} />
                     ) : (
                         <div
-                            role="notification"
                             className="notification notification-inline notification-danger"
                         >
                             <div className="notification-content">
@@ -79,61 +79,81 @@ export const ResourcePanel = (props) => {
     );
 };
 
+// Override to allow a caption in the selectpicker.
+const Option = (props) => {
+    const { title, subTitle } = props.data;
+    return (
+        <components.Option {...props}>
+            <span className="text">
+                {title}
+                {' '}
+                <small className="text-muted">{subTitle}</small>
+            </span>
+        </components.Option>
+    );
+};
+
+// Override to hide default caption in the selectpicker.
+const SingleValue = (props) => {
+    const { title } = props.getValue()[0];
+    return (
+        <components.SingleValue {...props}>
+            <span className="text">{title}</span>
+        </components.SingleValue>
+    );
+};
+
 const ResourceSelectControl = (props) => {
     const {
         resource: { fetching, data },
         resourceActions: _,
         resourceName,
+        name = resourceName,
         resourceNamePlural = `${resourceName}s`,
-        resourceToOption = (r) => (<option key={r.id} value={r.id}>{r.name}</option>),
+        resourceToOption = (r) => ({ key: r.id, value: r.id, title: r.name }),
         sortResources = (rs) => sortBy(rs, ['name']),
         resourceFilter = (_) => true,
         ...rest
     } = props;
     const resources = sortResources(Object.values(data)).filter(resourceFilter);
     const startsWithVowel = (string) => ['a', 'e', 'i', 'o', 'u'].some((c) => startsWith(string, c));
-    return data ? (
-        <Form.Select
-            disabled={isEmpty(resources)}
-            {...rest}
-        >
-            {isEmpty(resources) ? (
-                <option value="">
-                    No
-                    {resourceNamePlural}
-                    {' '}
-                    available
-                </option>
-            ) : (
-                <option value="">
-                    Select a
-                    {startsWithVowel(resourceName) ? 'n' : ''}
-                    {' '}
-                    {resourceName}
-                    ...
-                </option>
-            )}
-            {resources.map(resourceToOption)}
-        </Form.Select>
-    ) : (
-        fetching ? (
+
+    const a = startsWithVowel(resourceName) ? 'an' : 'a';
+    const prefix = isEmpty(resources) ? `No ${resourceNamePlural} available` : `Select ${a} ${resourceName}`;
+    const optionArray = resources.map(resourceToOption);
+
+    if (data) {
+        return (
+            <Select
+                name={name}
+                inputId={name}
+                options={optionArray}
+                getOptionLabel={(options) => `${options.title} ${options.subTitle}`}
+                components={{ Option, SingleValue }}
+                placeholder={prefix}
+                {...rest}
+            />
+        );
+    } if (fetching) {
+        return (
             <Form.Text>
-                <i className="fa fa-spinner fa-pulse" />
+                <i className="fas fa-spinner fa-pulse" />
                 {'\u00A0'}
                 Loading
                 {' '}
                 {resourceNamePlural}
                 ...
             </Form.Text>
-        ) : (
-            <Form.Text className="text-danger">
-                <i className="fa fa-exclamation-triangle" />
-                {'\u00A0'}
-                Failed to load
-                {' '}
-                {resourceNamePlural}
-            </Form.Text>
-        )
+        );
+    }
+    return (
+        <Form.Text className="text-danger">
+            <i className="fas fa-exclamation-triangle" />
+            {'\u00A0'}
+            Failed to load
+            {' '}
+            {resourceNamePlural}
+        </Form.Text>
     );
 };
 
@@ -145,13 +165,12 @@ export const SizeSelectControl = (props) => (
     <ResourceSelectControl
         resourceName="size"
         resourceToOption={(s) => (
-            <option
-                key={s.id}
-                value={s.id}
-                data-subtext={`${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`}
-            >
-                {s.name}
-            </option>
+            {
+                value: s.id,
+                key: s.id,
+                title: s.name,
+                subTitle: `${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`
+            }
         )}
         sortResources={(sizes) => sortBy(sizes, ['cpus', 'ram', 'disk'])}
         {...props}
@@ -166,8 +185,13 @@ export const ExternalIpSelectControl = ({
             resource={resource}
             resourceActions={resourceActions}
             resourceName="external ip"
+            name="externalIp"
             resourceToOption={(ip) => (
-                <option key={ip.external_ip} value={ip.external_ip}>{ip.external_ip}</option>
+                {
+                    value: ip.external_ip,
+                    key: ip.external_ip,
+                    title: ip.external_ip
+                }
             )}
             sortResources={(ips) => sortBy(ips, ['external_ip'])}
             // The currently selected IP should be permitted, regardless of state
@@ -175,20 +199,18 @@ export const ExternalIpSelectControl = ({
             value={value}
             {...props}
         />
-        <InputGroup.Button>
-            <Button
-                variant="success"
-                disabled={props.disabled || resource.creating}
-                onClick={() => resourceActions.create()}
-                title="Allocate new IP"
-            >
-                {resource.creating ? (
-                    <i className="fa fa-fw fa-spinner fa-pulse" />
-                ) : (
-                    <i className="fa fa-fw fa-plus" />
-                )}
-            </Button>
-        </InputGroup.Button>
+        <Button
+            variant="success"
+            disabled={props.disabled || resource.creating}
+            onClick={() => resourceActions.create()}
+            title="Allocate new IP"
+        >
+            {resource.creating ? (
+                <i className="fas fa-fw fa-spinner fa-pulse" />
+            ) : (
+                <i className="fas fa-fw fa-plus" />
+            )}
+        </Button>
     </InputGroup>
 );
 

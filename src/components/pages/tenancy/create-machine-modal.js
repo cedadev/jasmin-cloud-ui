@@ -24,12 +24,15 @@ export class CreateMachineButton extends React.Component {
 
     handleChange = (e) => this.setState({ [e.target.id]: e.target.value });
 
+    handleSelectChange = (value, { name }) => this.setState({ [name]: value });
+
     handleSubmit = (e) => {
         e.preventDefault();
+        console.log(this.state);
         this.props.create({
             name: this.state.name,
-            image_id: this.state.image,
-            size_id: this.state.size
+            image_id: this.state.image.value,
+            size_id: this.state.size.value,
         });
         this.close();
     }
@@ -80,7 +83,7 @@ export class CreateMachineButton extends React.Component {
                                     resource={images}
                                     required
                                     value={this.state.image}
-                                    onChange={this.handleChange}
+                                    onChange={this.handleSelectChange}
                                 />
                             </HorizFormGroupContainer>
                             <HorizFormGroupContainer controlId="size" label="Size" labelWidth={4}>
@@ -88,7 +91,7 @@ export class CreateMachineButton extends React.Component {
                                     resource={sizes}
                                     required
                                     value={this.state.change}
-                                    onChange={this.handleChange}
+                                    onChange={this.handleSelectChange}
                                 />
                             </HorizFormGroupContainer>
                         </Modal.Body>

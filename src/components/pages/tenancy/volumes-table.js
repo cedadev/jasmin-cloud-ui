@@ -42,7 +42,9 @@ class ConfirmDeleteMenuItem extends React.Component {
                     <Modal.Body>
                         <p>
                             Are you sure you want to delete
+                            {' '}
                             {this.props.name}
+                            {' '}
                             ?
                         </p>
                         <p><strong>Once deleted, a volume cannot be restored.</strong></p>
@@ -100,7 +102,7 @@ function VolumeActionsDropdown(props) {
                 />
                 <Dropdown.Item
                     disabled={!props.volume.machine}
-                    onSelect={() => props.volumeActions.update({ machine_id: null })}
+                    onClick={() => props.volumeActions.update({ machine_id: null })}
                 >
                     Detach volume from machine
                 </Dropdown.Item>
