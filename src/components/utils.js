@@ -42,7 +42,7 @@ export function bindArgsToActions(actions, ...args) {
 export function Loading(props) {
     return (
         <div className="loading-notice text-muted">
-            <i className="fa fa-fw fa-spinner fa-pulse" />
+            <i className="fas fa-fw fa-spinner fa-pulse" />
             {'\u00A0'}
             {props.message}
         </div>

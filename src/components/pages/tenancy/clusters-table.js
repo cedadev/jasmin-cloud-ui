@@ -7,10 +7,9 @@ import {
     Table,
     Button,
     Modal,
-    DropdownButton,
+    Dropdown,
     Nav,
     Form,
-    FormControl,
     Tooltip,
     OverlayTrigger,
     ProgressBar
@@ -78,9 +77,9 @@ class UpdateClusterParametersMenuItem extends React.Component {
         // It will either become available, or it no longer exists
         return (
             <>
-                <Nav.Item onSelect={this.open} disabled={!clusterType}>
+                <Dropdown.Item onClick={this.open} disabled={!clusterType}>
                     Update cluster options
-                </Nav.Item>
+                </Dropdown.Item>
                 <Modal
                     backdrop="static"
                     onHide={this.close}
@@ -114,7 +113,7 @@ class UpdateClusterParametersMenuItem extends React.Component {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="success" type="submit">
-                                <i className="fa fa-save" />
+                                <i className="fas fa-save" />
                                 {'\u00A0'}
                                 Update cluster
                             </Button>
@@ -144,7 +143,7 @@ class ConfirmPatchMenuItem extends React.Component {
     render() {
         return (
             <>
-                <Nav.Item onSelect={this.open}>Patch cluster</Nav.Item>
+                <Dropdown.Item onClick={this.open}>Patch cluster</Dropdown.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>
@@ -182,13 +181,13 @@ class ConfirmDeleteMenuItem extends React.Component {
     render() {
         return (
             <>
-                <Nav.Item
-                    className="danger"
+                <Dropdown.Item
+                    variant="danger text-white"
                     disabled={this.props.disabled}
-                    onSelect={this.open}
+                    onClick={this.open}
                 >
                     Delete cluster
-                </Nav.Item>
+                </Dropdown.Item>
                 <Modal show={this.state.visible}>
                     <Modal.Body>
                         <p>
@@ -224,7 +223,7 @@ function ClusterStatus(props) {
     return statusTooltip ? (
         <OverlayTrigger placement="top" overlay={statusTooltip}>
             <span className={`${className} tooltip-trigger`}>
-                <i className="fa fa-exclamation-circle" />
+                <i className="fas fa-exclamation-circle" />
                 {'\u00A0'}
                 {props.cluster.status}
             </span>
@@ -247,7 +246,7 @@ function ClusterPatched(props) {
         : (
             <OverlayTrigger placement="top" overlay={tooltip}>
                 <strong className="text-danger tooltip-trigger">
-                    <i className="fa fa-exclamation-circle" />
+                    <i className="fas fa-exclamation-circle" />
                     {'\u00A0'}
                     {patched.fromNow()}
                 </strong>
@@ -259,33 +258,37 @@ function ClusterActionsDropdown(props) {
     const buttonTitle = props.disabled
         ? (
             <span>
-                <i className="fa fa-fw fa-spinner fa-pulse" />
+                <i className="fas fa-fw fa-spinner fa-pulse" />
                 <span className="sr-only">Working...</span>
             </span>
         )
         : 'Actions...';
     return (
-        <DropdownButton
-            id={`cluster-actions-${props.cluster.name}`}
-            title={buttonTitle}
-            disabled={props.disabled}
-        >
-            <ConfirmPatchMenuItem
-                name={props.cluster.name}
-                onConfirm={props.clusterActions.patch}
-            />
-            <UpdateClusterParametersMenuItem
-                cluster={props.cluster}
-                tenancy={props.tenancy}
-                tenancyActions={props.tenancyActions}
-                onSubmit={props.clusterActions.update}
-            />
-            <ConfirmDeleteMenuItem
-                name={props.cluster.name}
-                disabled={props.cluster.linked}
-                onConfirm={props.clusterActions.delete}
-            />
-        </DropdownButton>
+        <Dropdown>
+            <Dropdown.Toggle
+                id={`cluster-actions-${props.cluster.name}`}
+                disabled={props.disabled}
+            >
+                {buttonTitle}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+                <ConfirmPatchMenuItem
+                    name={props.cluster.name}
+                    onConfirm={props.clusterActions.patch}
+                />
+                <UpdateClusterParametersMenuItem
+                    cluster={props.cluster}
+                    tenancy={props.tenancy}
+                    tenancyActions={props.tenancyActions}
+                    onSubmit={props.clusterActions.update}
+                />
+                <ConfirmDeleteMenuItem
+                    name={props.cluster.name}
+                    disabled={props.cluster.linked}
+                    onConfirm={props.clusterActions.delete}
+                />
+            </Dropdown.Menu>
+        </Dropdown>
     );
 }
 

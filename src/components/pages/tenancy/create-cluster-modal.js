@@ -148,7 +148,7 @@ class ClusterParametersForm extends React.Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={this.props.goBack}>
-                        <i className="fas fa-arrow-circle-left" />
+                        <i className="fas fa-arrow-alt-circle-left" />
                         {'\u00A0'}
                         Back
                     </Button>
@@ -198,9 +198,9 @@ export class CreateClusterButton extends React.Component {
                     className="text-white"
                 >
                     { creating ? (
-                        <i className="fa fa-spinner fa-pulse" />
+                        <i className="fas fa-spinner fa-pulse" />
                     ) : (
-                        <i className="fa fa-sitemap" />
+                        <i className="fas fa-sitemap" />
                     )}
                     {'\u00A0\u00A0'}
                     { creating ? 'Creating cluster...' : 'New cluster' }

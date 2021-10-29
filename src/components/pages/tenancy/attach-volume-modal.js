@@ -73,7 +73,7 @@ export class AttachVolumeMenuItem extends React.Component {
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="primary" type="submit">
-                                <i className="fas fa-sign-in" />
+                                <i className="fas fa-sign-in-alt" />
                                 {'\u00A0'}
                                 Attach volume
                             </Button>
