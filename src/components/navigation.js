@@ -38,9 +38,9 @@ export const Navigation = (props) => {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         {currentCloud && clouds && (
-                            <NavDropdown title={currentCloud.label} id="clouds-dropdown">
+                            <NavDropdown title={currentCloud.label}>
                                 {clouds.map((c) => (
-                                    <LinkContainer to={c.url}>
+                                    <LinkContainer to={c.url} key={`link-cloud-${c.id}`}>
                                         <NavDropdown.Item key={c.name}>
                                             {c.label}
                                         </NavDropdown.Item>
@@ -49,9 +49,9 @@ export const Navigation = (props) => {
                             </NavDropdown>
                         )}
                         {currentTenancy && tenancies && (
-                            <NavDropdown title={currentTenancy.name} id="tenancies-dropdown">
+                            <NavDropdown title={currentTenancy.name}>
                                 {tenancies.map((t) => (
-                                    <LinkContainer to={`/tenancies/${t.id}`}>
+                                    <LinkContainer to={`/tenancies/${t.id}`} key={`link-ten-${t.id}`}>
                                         <NavDropdown.Item>
                                             {t.name}
                                         </NavDropdown.Item>
