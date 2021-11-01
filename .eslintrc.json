@@ -31,6 +31,7 @@
         "no-case-declarations": ["warn"],
         "no-unused-vars": ["warn"],
         "no-fallthrough": ["warn"],
+        "no-console": ["error"],
         "arrow-parens": ["warn"],
         "implicit-arrow-linebreak": ["warn"],
         "no-use-before-define": ["warn"],

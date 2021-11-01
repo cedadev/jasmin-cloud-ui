@@ -105,8 +105,7 @@ class ClusterParametersForm extends React.Component {
             }
         });
         this.state.parameterValues = parameterValues;
-        console.log(this.state);
-        // this.props.onSubmit(this.state);
+        this.props.onSubmit(this.state);
     }
 
     render() {

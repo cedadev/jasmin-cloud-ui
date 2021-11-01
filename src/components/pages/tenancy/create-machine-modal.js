@@ -28,7 +28,6 @@ export class CreateMachineButton extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        console.log(this.state);
         this.props.create({
             name: this.state.name,
             image_id: this.state.image.value,
