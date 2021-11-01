@@ -299,7 +299,7 @@ function ClusterRow(props) {
         ? 'info'
         : ((!!cluster.updating || !!cluster.deleting)
             ? 'warning'
-            : (cluster.status == 'DELETING' && 'danger')
+            : (cluster.status === 'DELETING' && 'danger')
         );
     return (
         <tr className={highlightClass || undefined}>
@@ -386,7 +386,7 @@ export class ClustersTable extends React.Component {
                         <th>Created</th>
                         <th>Updated</th>
                         <th>Patched</th>
-                        <th />
+                        <th aria-label="Actions menu." />
                     </tr>
                 </thead>
                 <tbody>

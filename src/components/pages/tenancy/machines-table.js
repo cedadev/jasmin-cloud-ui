@@ -99,7 +99,7 @@ function MachineSize(props) {
             trigger="click"
             rootClose
         >
-            <a className="size-details">{props.size.name}</a>
+            <Button variant="link">{props.size.name}</Button>
         </OverlayTrigger>
     );
 }
@@ -123,10 +123,10 @@ function MachineStatus(props) {
                 <OverlayTrigger placement="top" overlay={statusTooltip}>
                     <span>
                         {'\u00A0'}
-                        <a className="tooltip-trigger">
+                        <Button variant="link" className="tooltip-trigger">
                             <i className="fas fa-fw fa-question-circle" />
                             <span className="sr-only">Details</span>
-                        </a>
+                        </Button>
                     </span>
                 </OverlayTrigger>
             )}
@@ -279,7 +279,7 @@ export class MachinesTable extends React.Component {
                         <th>Internal IP</th>
                         <th>External IP</th>
                         <th>Created</th>
-                        <th />
+                        <th aria-label="Actions Menu" />
                     </tr>
                 </thead>
                 <tbody>

@@ -10,7 +10,6 @@ import { Provider } from 'react-redux';
 import { Application } from './application';
 import { store } from './redux';
 
-
 ReactDOM.render(
     <Provider store={store}>
         <BrowserRouter>

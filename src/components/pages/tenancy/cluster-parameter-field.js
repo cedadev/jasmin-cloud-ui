@@ -332,6 +332,6 @@ const DefaultParameterField = (props) => {
     );
 };
 
-export const ClusterParameterField = (props) => (props.parameter.kind == 'boolean'
+export const ClusterParameterField = (props) => (props.parameter.kind === 'boolean'
     ? <BooleanParameterField {...props} />
     : <DefaultParameterField {...props} />);

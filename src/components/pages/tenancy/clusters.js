@@ -51,7 +51,7 @@ export class TenancyClustersPanel extends React.Component {
 
         return (
             <div
-                role="notification"
+                role="alert"
                 className="notification notification-inline notification-danger"
             >
                 <div className="notification-content">

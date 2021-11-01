@@ -191,7 +191,7 @@ export class VolumesTable extends React.Component {
                         <th>Status</th>
                         <th>Size</th>
                         <th>Attached To</th>
-                        <th />
+                        <th aria-label="Actions menu." />
                     </tr>
                 </thead>
                 <tbody>
