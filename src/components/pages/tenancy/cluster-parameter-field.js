@@ -6,7 +6,6 @@ import React from 'react';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 
 import ReactMarkdown from 'react-markdown';
-import PropTypes from 'prop-types';
 
 import get from 'lodash/get';
 

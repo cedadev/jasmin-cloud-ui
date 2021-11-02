@@ -100,7 +100,7 @@ class ClusterParametersForm extends React.Component {
         // We must transform the data to remove this before submission.
         const { parameterValues } = this.state;
         Object.keys(parameterValues).forEach((k) => {
-            if (typeof (parameterValues[k]) === 'object') {
+            if ((typeof (parameterValues[k]) === 'object') && ('value' in parameterValues[k])) {
                 parameterValues[k] = parameterValues[k].value;
             }
         });
