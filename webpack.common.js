@@ -16,15 +16,15 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: "babel-loader",
+                    loader: 'babel-loader',
                     options: {
-                        "presets": [
-                            "@babel/preset-env",
-                            "@babel/preset-react"
+                        presets: [
+                            '@babel/preset-env',
+                            '@babel/preset-react'
                         ],
-                        "plugins": [
-                            "@babel/plugin-proposal-object-rest-spread",
-                            "@babel/plugin-proposal-class-properties"
+                        plugins: [
+                            '@babel/plugin-proposal-object-rest-spread',
+                            '@babel/plugin-proposal-class-properties'
                         ]
                     }
                 }
@@ -39,23 +39,6 @@ module.exports = {
         }),
         // Add CSS links with hashes for cache busting
         new AddAssetHtmlPlugin([
-            // We can't rely on a wildcard as ordering is important
-            {
-                filepath: './assets/jasmin_theme/css/bootstrap-theme.css',
-                outputPath: 'jasmin_theme/css',
-                publicPath: '/jasmin_theme/css/',
-                typeOfAsset: 'css',
-                hash: true,
-                includeSourcemap: false
-            },
-            {
-                filepath: './assets/jasmin_theme/css/jasmin.css',
-                outputPath: 'jasmin_theme/css',
-                publicPath: '/jasmin_theme/css/',
-                typeOfAsset: 'css',
-                hash: true,
-                includeSourcemap: false
-            },
             {
                 filepath: './assets/*.css',
                 typeOfAsset: 'css',
@@ -63,9 +46,5 @@ module.exports = {
                 includeSourcemap: false
             }
         ]),
-        // Add images
-        new CopyWebpackPlugin([
-            { context: 'assets', from: 'jasmin_theme/img', to: 'jasmin_theme/img' },
-        ])
     ]
 };

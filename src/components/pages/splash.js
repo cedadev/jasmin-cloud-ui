@@ -3,9 +3,8 @@
  */
 
 import React from 'react';
-import { Row, Col, Well, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-
 
 export class SplashPage extends React.Component {
     componentDidMount() {
@@ -18,33 +17,33 @@ export class SplashPage extends React.Component {
                 <Col md={12}>
                     <div className="splash">
                         <div className="splash-header">
-                            <h1>Welcome to the JASMIN Cloud Portal</h1>
+                            <h1>JASMIN Cloud Portal</h1>
                         </div>
-                        <div className="splash-body clearfix">
-                            <Col md={7}>
+                        <Row className="justify-content-end border border-primary p-2">
+                            <Col lg={7}>
                                 <p>Here, you can manage your tenancies in the JASMIN Cloud.</p>
                             </Col>
-                            <Col md={5}>
-                                <Well>
-                                    <LinkContainer to={`/dashboard`}>
-                                        <Button bsStyle="primary" bsSize="lg" block>
-                                            <i className="fa fa-fw fa-cloud" />
+                            <Col lg={5}>
+                                <div className="d-grid gap-2">
+                                    <LinkContainer to="/dashboard">
+                                        <Button varient="primary" size="lg">
+                                            <i className="fas fa-fw fa-cloud" />
                                             {'\u00A0\u00A0'}
                                             My JASMIN Cloud tenancies
                                         </Button>
                                     </LinkContainer>
                                     <Button
-                                      bsStyle="primary"
-                                      bsSize="lg"
-                                      block
-                                      href="https://accounts.jasmin.ac.uk/services/cloud_tenancies/">
-                                        <i className="fa fa-fw fa-user-plus" />
+                                        varient="primary"
+                                        size="lg"
+                                        href="https://accounts.jasmin.ac.uk/services/cloud_tenancies/"
+                                    >
+                                        <i className="fas fa-fw fa-user-plus" />
                                         {'\u00A0\u00A0'}
                                         Join a JASMIN Cloud tenancy
                                     </Button>
-                                </Well>
+                                </div>
                             </Col>
-                        </div>
+                        </Row>
                     </div>
                 </Col>
             </Row>
