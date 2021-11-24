@@ -24,6 +24,7 @@ export const Navigation = (props) => {
         .filter((tenancy) => tenancy.id !== get(currentTenancy, 'id'))
         .sort((x, y) => (x.name < y.name ? -1 : x.name > y.name ? 1 : 0));
     return (
+
         <Navbar sticky="top" variant="dark" bg="success">
             <Container>
                 <LinkContainer to="/">
@@ -59,6 +60,7 @@ export const Navigation = (props) => {
                                 ))}
                             </NavDropdown>
                         )}
+
                     </Nav>
                     <Nav className="ms-auto">
                         {props.username ? (
