@@ -30,7 +30,7 @@ export const Navigation = (props) => {
                 <LinkContainer to="/">
                     <Navbar.Brand>
                         <img
-                            src="//cdn.jsdelivr.net/gh/cedadev/orgtheme-jasmin@v0.6-beta1/orgtheme_jasmin/static/orgtheme/assets/img/jasmin_logo_white_greendots_h50.png"
+                            src="//artefacts.ceda.ac.uk/themes/orgtheme_jasmin/0.6/assets/img/jasmin_logo_white_greendots_h50.png"
                             alt="JASMIN logo"
                         />
                     </Navbar.Brand>
