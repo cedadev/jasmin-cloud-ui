@@ -34,14 +34,17 @@ export class TenancyClustersPanel extends React.Component {
         const fetching = get(tenancy.clusters, 'fetching', false);
         if( enabled ) {
             return (
-                <ResourcePanel
+                /*<ResourcePanel
                   resource={tenancy.clusters}
                   resourceActions={tenancyActions.cluster}
                   resourceName="clusters"
                   createButtonComponent={CreateClusterButton}
                   createButtonExtraProps={({ tenancy, tenancyActions })}>
                     <Clusters tenancy={tenancy} tenancyActions={tenancyActions} />
-                </ResourcePanel>
+                </ResourcePanel>*/
+                <div className="notification-content">
+                    Clusters are currently dissabled.
+                </div>
             );
         }
         else if( fetching ) {
