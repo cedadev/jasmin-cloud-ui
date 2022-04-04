@@ -8,14 +8,13 @@ import { ResourcePanel } from './resource-utils';
 import { CreateVolumeButton } from './create-volume-modal';
 import { VolumesTable } from './volumes-table';
 
-
 const Volumes = (props) => (
     <VolumesTable
-      volumes={props.resourceData}
-      machines={props.machines}
-      volumeActions={props.resourceActions} />
+        volumes={props.resourceData}
+        machines={props.machines}
+        volumeActions={props.resourceActions}
+    />
 );
-
 
 export class TenancyVolumesPanel extends React.Component {
     setPageTitle(props) {
@@ -23,15 +22,17 @@ export class TenancyVolumesPanel extends React.Component {
     }
 
     componentDidMount = () => this.setPageTitle()
+
     componentDidUpdate = () => this.setPageTitle()
 
     render() {
         return (
             <ResourcePanel
-              resource={this.props.tenancy.volumes}
-              resourceActions={this.props.tenancyActions.volume}
-              resourceName="volumes"
-              createButtonComponent={CreateVolumeButton}>
+                resource={this.props.tenancy.volumes}
+                resourceActions={this.props.tenancyActions.volume}
+                resourceName="volumes"
+                createButtonComponent={CreateVolumeButton}
+            >
                 <Volumes machines={this.props.tenancy.machines} />
             </ResourcePanel>
         );

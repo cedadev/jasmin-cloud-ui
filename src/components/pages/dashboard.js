@@ -5,11 +5,12 @@
 import isEmpty from 'lodash/isEmpty';
 
 import React from 'react';
-import { PageHeader, Row, Col, Panel, ListGroup, ListGroupItem } from 'react-bootstrap';
+import {
+    Row, Col, Alert, ListGroup, Card,
+} from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { Loading } from '../utils';
-
 
 export class Dashboard extends React.Component {
     componentDidMount() {
@@ -18,49 +19,53 @@ export class Dashboard extends React.Component {
 
     render() {
         const { fetching, data: tenancies } = this.props.tenancies;
-        if( !isEmpty(tenancies || {}) ) {
+        if (!isEmpty(tenancies || {})) {
             // Sort the tenancies by name before rendering
             const sorted = Object.values(tenancies)
-                .sort((x, y) => x.name < y.name ? -1 : (x.name > y.name ? 1 : 0));
+                .sort((x, y) => (x.name < y.name ? -1 : (x.name > y.name ? 1 : 0)));
             return (
-                <div>
-                    <PageHeader>Dashboard</PageHeader>
-                    <Row>
-                        <Col md={6} mdOffset={3}>
-                            <Panel>
-                                <Panel.Heading>Available tenancies</Panel.Heading>
+                <>
+                    <Row><h1>Dashboard</h1></Row>
+                    <Row className="justify-content-center">
+                        <Col md={6}>
+                            <Card>
+                                <Card.Header>Available tenancies</Card.Header>
                                 <ListGroup fill="true">
-                                    {sorted.map((t) =>
+                                    {sorted.map((t) => (
                                         <LinkContainer
-                                          key={t.id}
-                                          to={`/tenancies/${t.id}`}>
-                                            <ListGroupItem>{t.name}</ListGroupItem>
+                                            key={t.id}
+                                            to={`/tenancies/${t.id}`}
+                                        >
+                                            <ListGroup.Item
+                                                action
+                                            >
+                                                {t.name}
+                                            </ListGroup.Item>
                                         </LinkContainer>
-                                    )}
+                                    ))}
                                 </ListGroup>
-                            </Panel>
+                            </Card>
                         </Col>
                     </Row>
-                </div>
+                </>
             );
         }
-        else if( fetching ) {
+        if (fetching) {
             return <Loading message="Loading tenancies..." />;
         }
-        else {
-            return (
-                <div>
-                    <PageHeader>Dashboard</PageHeader>
-                    <Row>
-                        <Col md={6} mdOffset={3}>
-                            <Panel>
-                                <Panel.Heading>Available tenancies</Panel.Heading>
-                                You do not belong to any tenancies.
-                            </Panel>
-                        </Col>
-                    </Row>
-                </div>
-            );
-        }
+
+        return (
+            <div>
+                <h1>Dashboard</h1>
+                <Row>
+                    <Col md={6} mdOffset={3}>
+                        <Alert>
+                            <Alert.Heading>Available tenancies</Alert.Heading>
+                            You do not belong to any tenancies.
+                        </Alert>
+                    </Col>
+                </Row>
+            </div>
+        );
     }
 }

@@ -4,14 +4,16 @@
 
 import React from 'react';
 
-import { Row, Col, ButtonGroup, Button, FormControl, InputGroup } from 'react-bootstrap';
+import {
+    Row, Col, ButtonGroup, Button, Form, InputGroup
+} from 'react-bootstrap';
 
 import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
 import startsWith from 'lodash/startsWith';
+import Select, { components } from 'react-select';
 
-import { Loading, RichSelect } from '../../utils';
-
+import { Loading } from '../../utils';
 
 export const ResourcePanel = (props) => {
     const {
@@ -25,47 +27,50 @@ export const ResourcePanel = (props) => {
     } = props;
     return (
         data ? (
-            <div className={className || undefined}>
-                <Row>
-                    <Col md={12}>
-                        <ButtonGroup className="pull-right">
+            <>
+                <Row className="justify-content-end">
+                    <div className="py-2 d-block">
+                        <ButtonGroup className="float-end">
                             {CreateButtonComponent && (
                                 <CreateButtonComponent
-                                  creating={creating}
-                                  create={resourceActions.create}
-                                  {...createButtonExtraProps} />
+                                    creating={creating}
+                                    create={resourceActions.create}
+                                    {...createButtonExtraProps}
+                                />
                             )}
                             <Button
-                              bsStyle="info"
-                              disabled={fetching}
-                              onClick={resourceActions.fetchList}
-                              title={`Refresh ${resourceName}`}>
-                                <i className={`fa fa-refresh ${fetching ? 'fa-spin' : ''}`}></i>
+                                variant="info"
+                                disabled={fetching}
+                                onClick={resourceActions.fetchList}
+                                title={`Refresh ${resourceName}`}
+                            >
+                                <i className={`fas fa-sync ${fetching ? 'fa-spin' : ''}`} />
                                 {'\u00A0'}
                                 Refresh
                             </Button>
                         </ButtonGroup>
-                    </Col>
+                    </div>
                 </Row>
                 <Row>
-                    <Col md={12}>
-                        {React.Children.map(
-                            children,
-                            c => React.cloneElement(c, { resourceData: data, resourceActions })
-                        )}
-                    </Col>
+                    {React.Children.map(
+                        children,
+                        (c) => React.cloneElement(c, { resourceData: data, resourceActions })
+                    )}
                 </Row>
-            </div>
+            </>
         ) : (
             <Row>
-                <Col md={6} mdOffset={3}>
+                <Col md={6}>
                     {fetching ? (
                         <Loading message={`Loading ${resourceName}...`} />
                     ) : (
                         <div
-                          role="notification"
-                          className="notification notification-inline notification-danger">
-                            <div className="notification-content">Unable to load {resourceName}</div>
+                            className="notification notification-inline notification-danger"
+                        >
+                            <div className="notification-content">
+                                Unable to load
+                                {resourceName}
+                            </div>
                         </div>
                     )}
                 </Col>
@@ -74,49 +79,90 @@ export const ResourcePanel = (props) => {
     );
 };
 
+// Override to allow a caption in the selectpicker.
+const Option = (props) => {
+    const { title, subTitle } = props.data;
+    return (
+        <components.Option {...props}>
+            <span className="text">
+                {title}
+                {' '}
+                <small className="text-muted">{subTitle}</small>
+            </span>
+        </components.Option>
+    );
+};
+
+// Override to hide default caption in the selectpicker.
+const SingleValue = (props) => {
+    const { title } = props.getValue()[0];
+    return (
+        <components.SingleValue {...props}>
+            <span className="text">{title}</span>
+        </components.SingleValue>
+    );
+};
 
 const ResourceSelectControl = (props) => {
     const {
         resource: { fetching, data },
         resourceActions: _,
         resourceName,
+        name = resourceName,
         resourceNamePlural = `${resourceName}s`,
-        resourceToOption = (r) => (<option key={r.id} value={r.id}>{r.name}</option>),
+        resourceToOption = (r) => ({ key: r.id, value: r.id, title: r.name }),
         sortResources = (rs) => sortBy(rs, ['name']),
         resourceFilter = (_) => true,
         ...rest
     } = props;
     const resources = sortResources(Object.values(data)).filter(resourceFilter);
     const startsWithVowel = (string) => ['a', 'e', 'i', 'o', 'u'].some((c) => startsWith(string, c));
-    return data ? (
-        <FormControl
-          componentClass={RichSelect}
-          disabled={isEmpty(resources)}
-          {...rest}>
-            {isEmpty(resources) ? (
-                <option value="">No {resourceNamePlural} available</option>
-            ) : (
-                <option value="">Select a{startsWithVowel(resourceName) ? 'n' : ''} {resourceName}...</option>
-            )}
-            {resources.map(resourceToOption)}
-        </FormControl>
-    ) : (
-        fetching ? (
-            <FormControl.Static>
-                <i className="fa fa-spinner fa-pulse" />
+
+    const a = startsWithVowel(resourceName) ? 'an' : 'a';
+    const prefix = isEmpty(resources) ? `No ${resourceNamePlural} available` : `Select ${a} ${resourceName}`;
+    const optionArray = resources.map(resourceToOption);
+
+    if (data) {
+        return (
+            <Select
+                name={name}
+                styles={{
+                    control: (provided) => {
+                        const borderRadius = 0;
+                        return { ...provided, borderRadius };
+                    }
+                }}
+                className="flex-fill"
+                inputId={name}
+                options={optionArray}
+                getOptionLabel={(options) => `${options.title} ${options.subTitle}`}
+                components={{ Option, SingleValue }}
+                placeholder={prefix}
+                {...rest}
+            />
+        );
+    } if (fetching) {
+        return (
+            <Form.Text>
+                <i className="fas fa-spinner fa-pulse" />
                 {'\u00A0'}
-                Loading {resourceNamePlural}...
-            </FormControl.Static>
-        ) : (
-            <FormControl.Static className="text-danger">
-                <i className="fa fa-exclamation-triangle" />
-                {'\u00A0'}
-                Failed to load {resourceNamePlural}
-            </FormControl.Static>
-        )
+                Loading
+                {' '}
+                {resourceNamePlural}
+                ...
+            </Form.Text>
+        );
+    }
+    return (
+        <Form.Text className="text-danger">
+            <i className="fas fa-exclamation-triangle" />
+            {'\u00A0'}
+            Failed to load
+            {' '}
+            {resourceNamePlural}
+        </Form.Text>
     );
 };
-
 
 export const ImageSelectControl = (props) => (
     <ResourceSelectControl resourceName="image" {...props} />
@@ -126,44 +172,52 @@ export const SizeSelectControl = (props) => (
     <ResourceSelectControl
         resourceName="size"
         resourceToOption={(s) => (
-            <option
-              key={s.id}
-              value={s.id}
-              data-subtext={`${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`}>
-                {s.name}
-            </option>
+            {
+                value: s.id,
+                key: s.id,
+                title: s.name,
+                subTitle: `${s.cpus} cpus, ${s.ram}MB RAM, ${s.disk}GB disk`
+            }
         )}
         sortResources={(sizes) => sortBy(sizes, ['cpus', 'ram', 'disk'])}
-        {...props} />
+        {...props}
+    />
 );
 
-export const ExternalIpSelectControl = ({ value, resource, resourceActions, ...props }) => (
+export const ExternalIpSelectControl = ({
+    value, resource, resourceActions, ...props
+}) => (
     <InputGroup>
         <ResourceSelectControl
             resource={resource}
             resourceActions={resourceActions}
             resourceName="external ip"
+            name="externalIp"
             resourceToOption={(ip) => (
-                <option key={ip.external_ip} value={ip.external_ip}>{ip.external_ip}</option>
+                {
+                    value: ip.external_ip,
+                    key: ip.external_ip,
+                    title: ip.external_ip
+                }
             )}
             sortResources={(ips) => sortBy(ips, ['external_ip'])}
             // The currently selected IP should be permitted, regardless of state
             resourceFilter={(ip) => (ip.external_ip === value) || (!ip.updating && !ip.machine)}
             value={value}
-            {...props} />
-        <InputGroup.Button>
-            <Button
-              bsStyle="success"
-              disabled={props.disabled || resource.creating}
-              onClick={() => resourceActions.create()}
-              title="Allocate new IP">
-                {resource.creating ? (
-                    <i className="fa fa-fw fa-spinner fa-pulse" />
-                ) : (
-                    <i className="fa fa-fw fa-plus" />
-                )}
-            </Button>
-        </InputGroup.Button>
+            {...props}
+        />
+        <Button
+            variant="success"
+            disabled={props.disabled || resource.creating}
+            onClick={() => resourceActions.create()}
+            title="Allocate new IP"
+        >
+            {resource.creating ? (
+                <i className="fas fa-fw fa-spinner fa-pulse" />
+            ) : (
+                <i className="fas fa-fw fa-plus" />
+            )}
+        </Button>
     </InputGroup>
 );
 
