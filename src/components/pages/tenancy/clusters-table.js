@@ -75,7 +75,6 @@ class UpdateClusterParametersMenuItem extends React.Component {
         const parameters = get(clusterType, 'parameters', []);
         // If the cluster has a cluster type that doesn't exist, disable updates
         // It will either become available, or it no longer exists
-        console.log(clusterType);
         return (
             <>
                 <Dropdown.Item onClick={this.open} disabled={!clusterType}>
