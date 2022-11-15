@@ -128,8 +128,8 @@ class ClusterParametersForm extends React.Component {
                         type="text"
                         placeholder="Cluster name"
                         required
-                        pattern="[A-Za-z0-9\-]+"
-                        title="Must contain alphanumeric characters and dash (-) only."
+                        pattern="[a-z0-9\-]+"
+                        title="Must contain lowercase alphanumeric characters and dash (-) only."
                         value={this.state.name}
                         onChange={this.handleNameChange}
                     />
