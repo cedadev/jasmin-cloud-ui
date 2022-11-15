@@ -24,10 +24,10 @@ class ClusterTypePanel extends React.Component {
         return (
             <Col key={clusterType.name} md={4} sm={6}>
                 <Panel
-                  bsStyle={this.state.hovering ? 'primary' : undefined}
-                  onMouseEnter={this.handleMouseEnter}
-                  onMouseLeave={this.handleMouseLeave}
-                  onClick={() => onSelect(clusterType.name)}>
+                    bsStyle={this.state.hovering ? 'primary' : undefined}
+                    onMouseEnter={this.handleMouseEnter}
+                    onMouseLeave={this.handleMouseLeave}
+                    onClick={() => onSelect(clusterType.name)}>
                     <Panel.Heading>
                         <Panel.Title componentClass="h3">{clusterType.label}</Panel.Title>
                     </Panel.Heading>
@@ -79,7 +79,7 @@ class ClusterParametersForm extends React.Component {
 
     handleNameChange = (e) => this.setState({ name: e.target.value })
     handleParameterValueChange = (name) => (value) => {
-        if( value !== '' ) {
+        if (value !== '') {
             this.setState({
                 parameterValues: { ...this.state.parameterValues, [name]: value }
             });
@@ -104,23 +104,23 @@ class ClusterParametersForm extends React.Component {
                     </Field>
                     <Field name="name" label="Cluster name" required>
                         <FormControl
-                          type="text"
-                          placeholder="Cluster name"
-                          required
-                          pattern="[A-Za-z0-9\-]+"
-                          title="Must contain alphanumeric characters and dash (-) only."
-                          value={this.state.name}
-                          onChange={this.handleNameChange} />
+                            type="text"
+                            placeholder="Cluster name"
+                            required
+                            pattern="[a-z0-9\-]+"
+                            title="Must contain lowercase alphanumeric characters and dash (-) only."
+                            value={this.state.name}
+                            onChange={this.handleNameChange} />
                     </Field>
                     {parameters.map(p => (
                         <ClusterParameterField
-                          key={p.name}
-                          tenancy={this.props.tenancy}
-                          tenancyActions={this.props.tenancyActions}
-                          isCreate={true}
-                          parameter={p}
-                          value={this.state.parameterValues[p.name] || ''}
-                          onChange={this.handleParameterValueChange(p.name)} />
+                            key={p.name}
+                            tenancy={this.props.tenancy}
+                            tenancyActions={this.props.tenancyActions}
+                            isCreate={true}
+                            parameter={p}
+                            value={this.state.parameterValues[p.name] || ''}
+                            onChange={this.handleParameterValueChange(p.name)} />
                     ))}
                 </Modal.Body>
                 <Modal.Footer>
@@ -149,7 +149,7 @@ export class CreateClusterButton extends React.Component {
 
     componentDidUpdate(_, prevState) {
         // If transitioning from not open to open, reset clusterType
-        if( !prevState.visible && this.state.visible )
+        if (!prevState.visible && this.state.visible)
             this.setState({ clusterType: '' })
     }
 
@@ -168,23 +168,23 @@ export class CreateClusterButton extends React.Component {
         return (
             <>
                 <Button
-                  bsStyle="success"
-                  disabled={creating}
-                  onClick={this.open}
-                  title="Create a new cluster">
-                    { creating ? (
+                    bsStyle="success"
+                    disabled={creating}
+                    onClick={this.open}
+                    title="Create a new cluster">
+                    {creating ? (
                         <i className="fa fa-spinner fa-pulse" />
                     ) : (
                         <i className="fa fa-sitemap"></i>
                     )}
                     {'\u00A0\u00A0'}
-                    { creating ? 'Creating cluster...' : 'New cluster' }
+                    {creating ? 'Creating cluster...' : 'New cluster'}
                 </Button>
                 <Modal
-                  backdrop="static"
-                  onHide={this.close}
-                  bsSize={!this.state.clusterType ? 'large' : undefined}
-                  show={this.state.visible}>
+                    backdrop="static"
+                    onHide={this.close}
+                    bsSize={!this.state.clusterType ? 'large' : undefined}
+                    show={this.state.visible}>
                     <Modal.Header closeButton>
                         <Modal.Title>Create a new cluster</Modal.Title>
                     </Modal.Header>
@@ -199,24 +199,24 @@ export class CreateClusterButton extends React.Component {
                     {clusterTypes.data ? (
                         !this.state.clusterType ? (
                             <ClusterTypeForm
-                              clusterTypes={clusterTypes.data}
-                              onSelect={this.handleClusterTypeSelected} />
+                                clusterTypes={clusterTypes.data}
+                                onSelect={this.handleClusterTypeSelected} />
                         ) : (
                             <ClusterParametersForm
-                              tenancy={this.props.tenancy}
-                              tenancyActions={this.props.tenancyActions}
-                              clusterType={clusterTypes.data[this.state.clusterType]}
-                              goBack={() => this.setState({ clusterType: '' })}
-                              onSubmit={this.handleClusterParamsSubmitted} />
+                                tenancy={this.props.tenancy}
+                                tenancyActions={this.props.tenancyActions}
+                                clusterType={clusterTypes.data[this.state.clusterType]}
+                                goBack={() => this.setState({ clusterType: '' })}
+                                onSubmit={this.handleClusterParamsSubmitted} />
                         )
                     ) : (
                         <Modal.Body>
                             {clusterTypes.fetching ? (
-                                <Loading message="Loading cluster types..."/>
+                                <Loading message="Loading cluster types..." />
                             ) : (
                                 <div
-                                role="notification"
-                                className="notification notification-inline notification-danger">
+                                    role="notification"
+                                    className="notification notification-inline notification-danger">
                                     <div className="notification-content">Unable to load cluster types</div>
                                 </div>
                             )}
