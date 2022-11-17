@@ -138,6 +138,7 @@ const ResourceSelectControl = (props) => {
                 getOptionLabel={(options) => `${options.title} ${options.subTitle}`}
                 components={{ Option, SingleValue }}
                 placeholder={prefix}
+                isDisabled={props.disabled}
                 {...rest}
             />
         );
