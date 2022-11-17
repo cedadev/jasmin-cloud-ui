@@ -113,6 +113,7 @@ const ResourceSelectControl = (props) => {
         resourceToOption = (r) => ({ key: r.id, value: r.id, title: r.name }),
         sortResources = (rs) => sortBy(rs, ['name']),
         resourceFilter = (_) => true,
+        value,
         ...rest
     } = props;
     const resources = sortResources(Object.values(data)).filter(resourceFilter);
@@ -121,6 +122,8 @@ const ResourceSelectControl = (props) => {
     const a = startsWithVowel(resourceName) ? 'an' : 'a';
     const prefix = isEmpty(resources) ? `No ${resourceNamePlural} available` : `Select ${a} ${resourceName}`;
     const optionArray = resources.map(resourceToOption);
+
+    const valueItem = optionArray.find((element) => element.value === value);
 
     if (data) {
         return (
@@ -138,6 +141,8 @@ const ResourceSelectControl = (props) => {
                 getOptionLabel={(options) => `${options.title} ${options.subTitle}`}
                 components={{ Option, SingleValue }}
                 placeholder={prefix}
+                isDisabled={props.disabled}
+                value={valueItem}
                 {...rest}
             />
         );
