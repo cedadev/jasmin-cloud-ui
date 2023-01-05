@@ -41,7 +41,7 @@ export class CreateVolumeButton extends React.Component {
                         <i className="fas fa-database" />
                     )}
                     {'\u00A0\u00A0'}
-                    { this.props.creating ? 'Creating volume...' : 'New volume' }
+                    {this.props.creating ? 'Creating volume...' : 'New volume'}
                 </Button>
                 <Modal
                     backdrop="static"
@@ -75,6 +75,7 @@ export class CreateVolumeButton extends React.Component {
                                 type="number"
                                 required
                                 min="1"
+                                max="6000"
                                 step="1"
                                 value={this.state.size}
                                 onChange={this.handleChange}
