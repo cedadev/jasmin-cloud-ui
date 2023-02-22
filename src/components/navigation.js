@@ -38,17 +38,7 @@ export const Navigation = (props) => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        {currentCloud && clouds && (
-                            <NavDropdown title={currentCloud.label}>
-                                {clouds.map((c) => (
-                                    <LinkContainer to={c.url} key={`link-cloud-${c.id}`}>
-                                        <NavDropdown.Item key={c.name}>
-                                            {c.label}
-                                        </NavDropdown.Item>
-                                    </LinkContainer>
-                                ))}
-                            </NavDropdown>
-                        )}
+
                         {currentTenancy && tenancies && (
                             <NavDropdown title={currentTenancy.name}>
                                 {tenancies.map((t) => (
