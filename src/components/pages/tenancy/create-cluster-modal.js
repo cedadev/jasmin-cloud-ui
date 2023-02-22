@@ -3,65 +3,68 @@
  */
 
 import React from 'react';
-import { Col, Row, Clearfix, Button, Modal, Badge, Panel, FormControl, Image } from 'react-bootstrap';
+import {
+    Col, Card, Button, Modal, Badge, Form, Row
+} from 'react-bootstrap';
 
 import sortBy from 'lodash/sortBy';
 
 import ReactMarkdown from 'react-markdown';
 
-import { Loading, Form, Field } from '../../utils';
+import { Loading, HorizFormGroup } from '../../utils';
 import { ClusterParameterField } from './cluster-parameter-field';
-
 
 class ClusterTypePanel extends React.Component {
     state = { hovering: false };
 
     handleMouseEnter = () => this.setState({ hovering: true })
+
     handleMouseLeave = () => this.setState({ hovering: false })
 
     render() {
         const { clusterType, onSelect } = this.props;
         return (
-            <Col key={clusterType.name} md={4} sm={6}>
-                <Panel
-                    bsStyle={this.state.hovering ? 'primary' : undefined}
+            <Col key={clusterType.name} md={4} sm={6} className="mb-2">
+                <Card
+                    border={this.state.hovering ? 'primary' : undefined}
                     onMouseEnter={this.handleMouseEnter}
                     onMouseLeave={this.handleMouseLeave}
-                    onClick={() => onSelect(clusterType.name)}>
-                    <Panel.Heading>
-                        <Panel.Title componentClass="h3">{clusterType.label}</Panel.Title>
-                    </Panel.Heading>
-                    <Panel.Body>
-                        <Image src={clusterType.logo} responsive />
-                    </Panel.Body>
-                    <Panel.Footer>
-                        <ReactMarkdown source={clusterType.description} />
-                    </Panel.Footer>
-                </Panel>
+                    onClick={() => onSelect(clusterType.name)}
+                >
+                    <Card.Header>{clusterType.label}</Card.Header>
+                    <Card.Body className="d-flex justify-content-center">
+                        <Card.Img
+                            className="p-2 mw-100"
+                            variant="top"
+                            src={clusterType.logo}
+                            bsPrefix="img-fluid"
+                        />
+                    </Card.Body>
+                    <Card.Footer><ReactMarkdown source={clusterType.description} /></Card.Footer>
+                </Card>
             </Col>
         );
     }
 }
 
-
 function ClusterTypeForm(props) {
     const { clusterTypes, onSelect } = props;
     return (
         <Modal.Body className="cluster-type-select">
-            <Col md={12}>
+            <Row>
                 {sortBy(Object.values(clusterTypes), ['name']).map((ct, i) => (
                     <React.Fragment key={ct.name}>
                         <ClusterTypePanel clusterType={ct} onSelect={onSelect} />
-                        {i % 2 === 1 && <Clearfix visibleSmBlock />}
-                        {i % 3 === 2 && <Clearfix visibleMdBlock visibleLgBlock />}
+                        {/*
+                        {i % 2 === 1 && <visibleSmBlock />}
+                        {i % 3 === 2 && <visibleMdBlock visibleLgBlock />}
+                        */}
                     </React.Fragment>
                 ))}
-            </Col>
-            <Clearfix />
+            </Row>
         </Modal.Body>
     );
 }
-
 
 class ClusterParametersForm extends React.Component {
     constructor(props) {
@@ -71,13 +74,14 @@ class ClusterParametersForm extends React.Component {
             parameterValues: Object.assign(
                 {},
                 ...props.clusterType.parameters
-                    .filter(p => p.required)
-                    .map(p => ({ [p.name]: p.default || '' }))
+                    .filter((p) => p.required)
+                    .map((p) => ({ [p.name]: p.default || '' }))
             )
         };
     }
 
     handleNameChange = (e) => this.setState({ name: e.target.value })
+
     handleParameterValueChange = (name) => (value) => {
         if (value !== '') {
             this.setState({
@@ -91,46 +95,64 @@ class ClusterParametersForm extends React.Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
+
+        // React select pickers hold state in an object rather than a value.
+        // We must transform the data to remove this before submission.
+        const { parameterValues } = this.state;
+        Object.keys(parameterValues).forEach((k) => {
+            if ((typeof (parameterValues[k]) === 'object') && ('value' in parameterValues[k])) {
+                parameterValues[k] = parameterValues[k].value;
+            }
+        });
+        this.state.parameterValues = parameterValues;
         this.props.onSubmit(this.state);
     }
 
     render() {
         const { label, parameters } = this.props.clusterType;
         return (
-            <Form horizontal onSubmit={this.handleSubmit}>
+            <Form onSubmit={this.handleSubmit}>
                 <Modal.Body>
-                    <Field name="clusterType" label="Cluster Type">
-                        <FormControl.Static>{label}</FormControl.Static>
-                    </Field>
-                    <Field name="name" label="Cluster name" required>
-                        <FormControl
-                            type="text"
-                            placeholder="Cluster name"
-                            required
-                            pattern="[a-z0-9\-]+"
-                            title="Must contain lowercase alphanumeric characters and dash (-) only."
-                            value={this.state.name}
-                            onChange={this.handleNameChange} />
-                    </Field>
-                    {parameters.map(p => (
+                    <HorizFormGroup
+                        controlId="clusterType"
+                        label="Cluster Type"
+                        labelWidth={3}
+                        value={label}
+                        readOnly
+                        plaintext
+                    />
+                    <HorizFormGroup
+                        controlId="name"
+                        label="Cluster name"
+                        labelWidth={3}
+                        type="text"
+                        placeholder="Cluster name"
+                        required
+                        pattern="[a-z0-9\-]+"
+                        title="Must contain lowercase alphanumeric characters and dash (-) only."
+                        value={this.state.name}
+                        onChange={this.handleNameChange}
+                    />
+                    {parameters.map((p) => (
                         <ClusterParameterField
                             key={p.name}
                             tenancy={this.props.tenancy}
                             tenancyActions={this.props.tenancyActions}
-                            isCreate={true}
+                            isCreate
                             parameter={p}
                             value={this.state.parameterValues[p.name] || ''}
-                            onChange={this.handleParameterValueChange(p.name)} />
+                            onChange={this.handleParameterValueChange(p.name)}
+                        />
                     ))}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={this.props.goBack}>
-                        <i className="fa fa-arrow-circle-left" />
+                        <i className="fas fa-arrow-alt-circle-left" />
                         {'\u00A0'}
                         Back
                     </Button>
-                    <Button bsStyle="success" type="submit">
-                        <i className="fa fa-plus" />
+                    <Button variant="success" type="submit">
+                        <i className="fas fa-plus" />
                         {'\u00A0'}
                         Create cluster
                     </Button>
@@ -140,20 +162,20 @@ class ClusterParametersForm extends React.Component {
     }
 }
 
-
 export class CreateClusterButton extends React.Component {
     state = { visible: false, clusterType: '' }
 
     open = () => this.setState({ visible: true })
+
     close = () => this.setState({ visible: false })
 
     componentDidUpdate(_, prevState) {
         // If transitioning from not open to open, reset clusterType
-        if (!prevState.visible && this.state.visible)
-            this.setState({ clusterType: '' })
+        if (!prevState.visible && this.state.visible) this.setState({ clusterType: '' });
     }
 
     handleClusterTypeSelected = (clusterType) => this.setState({ clusterType });
+
     handleClusterParamsSubmitted = ({ name, parameterValues }) => {
         this.props.create({
             name,
@@ -168,14 +190,16 @@ export class CreateClusterButton extends React.Component {
         return (
             <>
                 <Button
-                    bsStyle="success"
+                    variant="success"
                     disabled={creating}
                     onClick={this.open}
-                    title="Create a new cluster">
+                    title="Create a new cluster"
+                    className="text-white"
+                >
                     {creating ? (
-                        <i className="fa fa-spinner fa-pulse" />
+                        <i className="fas fa-spinner fa-pulse" />
                     ) : (
-                        <i className="fa fa-sitemap"></i>
+                        <i className="fas fa-sitemap" />
                     )}
                     {'\u00A0\u00A0'}
                     {creating ? 'Creating cluster...' : 'New cluster'}
@@ -183,31 +207,38 @@ export class CreateClusterButton extends React.Component {
                 <Modal
                     backdrop="static"
                     onHide={this.close}
-                    bsSize={!this.state.clusterType ? 'large' : undefined}
-                    show={this.state.visible}>
+                    size="lg"
+                    show={this.state.visible}
+                >
                     <Modal.Header closeButton>
                         <Modal.Title>Create a new cluster</Modal.Title>
                     </Modal.Header>
-                    <ul className="steps steps-2">
-                        <li className={this.state.clusterType ? 'success' : 'active'}>
-                            <Badge>1</Badge> Cluster type
+                    <ul className="steps">
+                        <li className={this.state.clusterType ? 'bg-success' : 'bg-warning'}>
+                            <Badge>1</Badge>
+                            {' '}
+                            Cluster type
                         </li>
-                        <li className={this.state.clusterType ? 'active' : undefined}>
-                            <Badge>2</Badge> Cluster options
+                        <li className={this.state.clusterType ? 'bg-warning' : undefined}>
+                            <Badge>2</Badge>
+                            {' '}
+                            Cluster options
                         </li>
                     </ul>
                     {clusterTypes.data ? (
                         !this.state.clusterType ? (
                             <ClusterTypeForm
                                 clusterTypes={clusterTypes.data}
-                                onSelect={this.handleClusterTypeSelected} />
+                                onSelect={this.handleClusterTypeSelected}
+                            />
                         ) : (
                             <ClusterParametersForm
                                 tenancy={this.props.tenancy}
                                 tenancyActions={this.props.tenancyActions}
                                 clusterType={clusterTypes.data[this.state.clusterType]}
                                 goBack={() => this.setState({ clusterType: '' })}
-                                onSubmit={this.handleClusterParamsSubmitted} />
+                                onSubmit={this.handleClusterParamsSubmitted}
+                            />
                         )
                     ) : (
                         <Modal.Body>
@@ -215,8 +246,8 @@ export class CreateClusterButton extends React.Component {
                                 <Loading message="Loading cluster types..." />
                             ) : (
                                 <div
-                                    role="notification"
-                                    className="notification notification-inline notification-danger">
+                                    className="notification notification-inline notification-danger"
+                                >
                                     <div className="notification-content">Unable to load cluster types</div>
                                 </div>
                             )}
