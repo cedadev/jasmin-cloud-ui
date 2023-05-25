@@ -59,5 +59,6 @@
     "rxjs": "^6.4.0",
     "rxjs-compat": "^6.4.0"
   },
-  "main": "./src/main.js"
+  "main": "./src/main.js",
+  "packageManager": "yarn@3.5.1"
 }
